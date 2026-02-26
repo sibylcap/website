@@ -266,31 +266,21 @@ section:last-of-type {
   position: relative;
 }
 
-.hero-portrait {
-  width: 280px;
-  height: 280px;
-  object-fit: cover;
-  border-radius: 0;
-  mask-image: radial-gradient(ellipse 70% 70% at center, black 40%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 70% 70% at center, black 40%, transparent 100%);
-  margin-bottom: 2.5rem;
-}
-
 .hero-title {
   font-family: var(--font-serif);
-  font-size: 3.5rem;
-  font-weight: 400;
-  letter-spacing: 0.25em;
+  font-size: 6rem;
+  font-weight: 300;
+  letter-spacing: 0.35em;
   text-transform: uppercase;
   color: var(--text-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .hero-subtitle {
   font-family: var(--font-mono);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--text-secondary);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
 }
 
 .scroll-indicator {
@@ -598,14 +588,9 @@ section:last-of-type {
     padding: 5rem 1.5rem 3rem;
   }
 
-  .hero-portrait {
-    width: 200px;
-    height: 200px;
-  }
-
   .hero-title {
-    font-size: 2.5rem;
-    letter-spacing: 0.2em;
+    font-size: 4rem;
+    letter-spacing: 0.25em;
   }
 
   .thesis {
@@ -646,13 +631,8 @@ section:last-of-type {
 
 @media (max-width: 480px) {
   .hero-title {
-    font-size: 2rem;
-    letter-spacing: 0.15em;
-  }
-
-  .hero-portrait {
-    width: 160px;
-    height: 160px;
+    font-size: 2.75rem;
+    letter-spacing: 0.2em;
   }
 
   .treasury-grid {
