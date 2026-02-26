@@ -634,6 +634,227 @@ section {
 }
 
 /* ============================================
+   Forms
+   ============================================ */
+
+.sibyl-form {
+  margin-top: 1rem;
+}
+
+.sibyl-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+  align-items: end;
+}
+
+.sibyl-form-row .form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.sibyl-form-row .form-submit {
+  justify-self: start;
+}
+
+.sibyl-form-row .form-status {
+  align-self: center;
+}
+
+.form-field {
+  margin-bottom: 0.875rem;
+}
+
+.form-field label {
+  display: block;
+  font-size: 0.5625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.375rem;
+}
+
+.form-field label .optional {
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: none;
+}
+
+.form-field input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-field input:focus {
+  border-color: var(--gold);
+}
+
+.form-field input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.form-submit {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  padding: 0.625rem 1.5rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  border-radius: 2px;
+}
+
+.form-submit:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.form-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.form-status {
+  font-size: 0.6875rem;
+  margin-left: 0.75rem;
+  transition: opacity 0.3s ease;
+}
+
+.form-status.success {
+  color: var(--gold);
+}
+
+.form-status.error {
+  color: var(--negative);
+}
+
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Pitch Section */
+.pitch-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.pitch-section h3 {
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+/* Community Signal */
+.signal-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.signal-section h3 {
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.signal-intro {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.signal-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.signal-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+}
+
+.signal-btn:hover {
+  border-color: var(--accent);
+}
+
+.signal-btn .signal-name {
+  font-size: 0.75rem;
+  color: var(--text-primary);
+}
+
+.signal-btn .signal-label {
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.signal-btn:hover .signal-label {
+  color: var(--accent);
+}
+
+.signal-btn.signaled {
+  border-color: var(--gold);
+  pointer-events: none;
+}
+
+.signal-btn.signaled .signal-label {
+  color: var(--gold);
+}
+
+/* Suggest */
+.suggest-wrap {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.suggest-wrap h4 {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+/* ============================================
    Footer
    ============================================ */
 
@@ -749,6 +970,18 @@ section {
 
   .nav-donate-label {
     display: none;
+  }
+
+  .sibyl-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .signal-grid {
+    gap: 0.375rem;
+  }
+
+  .signal-btn {
+    padding: 0.375rem 0.625rem;
   }
 }
 

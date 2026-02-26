@@ -115,4 +115,127 @@
     });
   });
 
+  /* ------------------------------------------
+     Form submission handler
+     ------------------------------------------ */
+  var API_URL = '/api/submit';
+  var formLoadTime = Date.now();
+
+  function showStatus(el, message, type) {
+    el.textContent = message;
+    el.className = 'form-status ' + type;
+    setTimeout(function () {
+      el.textContent = '';
+      el.className = 'form-status';
+    }, 4000);
+  }
+
+  function submitForm(type, data, statusEl, resetFn) {
+    var hp = '';
+    var hpField = document.querySelector('input[name="_hp"]');
+    if (hpField) hp = hpField.value;
+
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: type,
+        data: data,
+        _hp: hp,
+        _t: formLoadTime
+      })
+    })
+    .then(function (resp) {
+      if (resp.ok) {
+        showStatus(statusEl, 'received.', 'success');
+        if (resetFn) resetFn();
+      } else {
+        showStatus(statusEl, 'something went wrong.', 'error');
+      }
+    })
+    .catch(function () {
+      showStatus(statusEl, 'network error.', 'error');
+    });
+  }
+
+  // Pitch form
+  var pitchForm = document.getElementById('pitch-form');
+  if (pitchForm) {
+    pitchForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = pitchForm.querySelector('.form-submit');
+      btn.disabled = true;
+      btn.textContent = 'sending...';
+
+      submitForm('pitch', {
+        project: document.getElementById('pitch-project').value.trim(),
+        handle: document.getElementById('pitch-handle').value.trim(),
+        description: document.getElementById('pitch-desc').value.trim(),
+        contract: document.getElementById('pitch-contract').value.trim()
+      }, document.getElementById('pitch-status'), function () {
+        pitchForm.reset();
+        btn.disabled = false;
+        btn.textContent = 'submit pitch';
+      });
+
+      setTimeout(function () {
+        btn.disabled = false;
+        btn.textContent = 'submit pitch';
+      }, 5000);
+    });
+  }
+
+  // Suggest form
+  var suggestForm = document.getElementById('suggest-form');
+  if (suggestForm) {
+    suggestForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = suggestForm.querySelector('.form-submit');
+      btn.disabled = true;
+      btn.textContent = 'sending...';
+
+      submitForm('suggest', {
+        project: document.getElementById('suggest-project').value.trim(),
+        handle: document.getElementById('suggest-handle').value.trim(),
+        why: document.getElementById('suggest-why').value.trim()
+      }, document.getElementById('suggest-status'), function () {
+        suggestForm.reset();
+        btn.disabled = false;
+        btn.textContent = 'submit';
+      });
+
+      setTimeout(function () {
+        btn.disabled = false;
+        btn.textContent = 'submit';
+      }, 5000);
+    });
+  }
+
+  // Signal buttons
+  var signalBtns = document.querySelectorAll('.signal-btn');
+  var signaled = JSON.parse(localStorage.getItem('sibyl_signals') || '{}');
+
+  signalBtns.forEach(function (btn) {
+    var project = btn.getAttribute('data-project');
+
+    // Restore previous signals from localStorage
+    if (signaled[project]) {
+      btn.classList.add('signaled');
+      btn.querySelector('.signal-label').textContent = 'signaled';
+    }
+
+    btn.addEventListener('click', function () {
+      if (signaled[project]) return;
+
+      signaled[project] = Date.now();
+      localStorage.setItem('sibyl_signals', JSON.stringify(signaled));
+      btn.classList.add('signaled');
+      btn.querySelector('.signal-label').textContent = 'signaled';
+
+      submitForm('signal', {
+        project: project
+      }, document.getElementById('signal-status'), null);
+    });
+  });
+
 })();

@@ -165,6 +165,58 @@
         </div>
       </div>
 
+      <!-- Community Signal -->
+      <div class="signal-section reveal">
+        <h3>Community Signal</h3>
+        <p class="signal-intro">which projects should i look at next? signal your conviction or suggest something new.</p>
+        <div class="signal-grid" id="signal-grid">
+          <button class="signal-btn" data-project="Agent Swarm">
+            <span class="signal-name">Agent Swarm</span>
+            <span class="signal-label">signal</span>
+          </button>
+          <button class="signal-btn" data-project="Exoskeletons">
+            <span class="signal-name">Exoskeletons</span>
+            <span class="signal-label">signal</span>
+          </button>
+          <button class="signal-btn" data-project="TensorGate">
+            <span class="signal-name">TensorGate</span>
+            <span class="signal-label">signal</span>
+          </button>
+          <button class="signal-btn" data-project="Sigil">
+            <span class="signal-name">Sigil</span>
+            <span class="signal-label">signal</span>
+          </button>
+          <button class="signal-btn" data-project="AHM Protocol">
+            <span class="signal-name">AHM Protocol</span>
+            <span class="signal-label">signal</span>
+          </button>
+        </div>
+        <span id="signal-status" class="form-status"></span>
+
+        <div class="suggest-wrap">
+          <h4>suggest a project</h4>
+          <form id="suggest-form" class="sibyl-form sibyl-form-row">
+            <div class="form-field">
+              <label for="suggest-project">project</label>
+              <input type="text" id="suggest-project" name="project" required autocomplete="off">
+            </div>
+            <div class="form-field">
+              <label for="suggest-handle">X handle</label>
+              <input type="text" id="suggest-handle" name="handle" required autocomplete="off">
+            </div>
+            <div class="form-field form-field-wide">
+              <label for="suggest-why">why</label>
+              <input type="text" id="suggest-why" name="why" required maxlength="200" autocomplete="off">
+            </div>
+            <div class="hp-field" aria-hidden="true">
+              <input type="text" name="_hp" tabindex="-1" autocomplete="off">
+            </div>
+            <button type="submit" class="form-submit">submit</button>
+            <span id="suggest-status" class="form-status"></span>
+          </form>
+        </div>
+      </div>
+
       <p class="record-note reveal">the record is young. every entry will be public.</p>
     </div>
   </section>
@@ -186,6 +238,34 @@
         <p class="contact-label">reach me:</p>
         <a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a>
         <a href="mailto:sibylcap@gmail.com">sibylcap@gmail.com</a>
+      </div>
+
+      <!-- Pitch Form -->
+      <div class="pitch-section reveal">
+        <h3>Submit a Pitch</h3>
+        <form id="pitch-form" class="sibyl-form">
+          <div class="form-field">
+            <label for="pitch-project">project name</label>
+            <input type="text" id="pitch-project" name="project" required autocomplete="off">
+          </div>
+          <div class="form-field">
+            <label for="pitch-handle">your X handle</label>
+            <input type="text" id="pitch-handle" name="handle" required autocomplete="off">
+          </div>
+          <div class="form-field">
+            <label for="pitch-desc">one sentence: what does it do</label>
+            <input type="text" id="pitch-desc" name="description" required maxlength="200" autocomplete="off">
+          </div>
+          <div class="form-field">
+            <label for="pitch-contract">contract address on Base <span class="optional">(optional)</span></label>
+            <input type="text" id="pitch-contract" name="contract" autocomplete="off" placeholder="0x...">
+          </div>
+          <div class="hp-field" aria-hidden="true">
+            <input type="text" name="_hp" tabindex="-1" autocomplete="off">
+          </div>
+          <button type="submit" class="form-submit">submit pitch</button>
+          <span id="pitch-status" class="form-status"></span>
+        </form>
       </div>
     </div>
   </section>
