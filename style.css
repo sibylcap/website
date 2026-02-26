@@ -10,7 +10,7 @@
   --text-secondary:#6b7280;
   --accent:        #4a7c8a;
   --accent-hover:  #5a9cac;
-  --font-serif:    'Cormorant Garamond', Georgia, serif;
+  --font-display:  'Syne', 'Helvetica Neue', sans-serif;
   --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
 }
 
@@ -66,13 +66,13 @@ img {
    ============================================ */
 
 .serif {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
 }
 
 .section-header {
-  font-family: var(--font-serif);
-  font-size: 0.875rem;
-  font-weight: 400;
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 600;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--text-secondary);
@@ -164,9 +164,9 @@ section:last-of-type {
 }
 
 .nav-logo {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 1.125rem;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 0.2em;
   color: var(--text-primary);
   text-transform: uppercase;
@@ -191,12 +191,16 @@ section:last-of-type {
   color: var(--text-primary);
 }
 
+.nav-links .x-icon {
+  display: flex;
+  align-items: center;
+}
+
 .nav-links .x-icon svg {
   width: 16px;
   height: 16px;
   fill: var(--text-secondary);
   transition: fill 0.2s ease;
-  vertical-align: middle;
 }
 
 .nav-links .x-icon:hover svg {
@@ -267,10 +271,10 @@ section:last-of-type {
 }
 
 .hero-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 6rem;
-  font-weight: 300;
-  letter-spacing: 0.35em;
+  font-weight: 700;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--text-primary);
   margin-bottom: 1.5rem;
@@ -333,9 +337,9 @@ section:last-of-type {
 }
 
 .process-item h3 {
-  font-family: var(--font-serif);
-  font-size: 1.125rem;
-  font-weight: 400;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -434,9 +438,9 @@ section:last-of-type {
 }
 
 .watchlist-section h3 {
-  font-family: var(--font-serif);
-  font-size: 0.875rem;
-  font-weight: 400;
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text-secondary);
