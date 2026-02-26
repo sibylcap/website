@@ -319,6 +319,31 @@ section {
   letter-spacing: 0.15em;
 }
 
+.hero-contact {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+}
+
+.hero-contact a {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  transition: color 0.2s ease;
+}
+
+.hero-contact a:hover {
+  color: var(--accent);
+}
+
+.hero-contact-sep {
+  width: 1px;
+  height: 12px;
+  background: var(--border-strong);
+}
+
 .scroll-indicator {
   position: absolute;
   bottom: 2.5rem;
@@ -487,6 +512,14 @@ section {
   color: var(--warning);
 }
 
+.pnl-positive {
+  color: var(--positive);
+}
+
+.pnl-negative {
+  color: var(--negative);
+}
+
 .record-note {
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -570,6 +603,26 @@ section {
   line-height: 1.8;
 }
 
+.builders-cta {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+  padding: 0.75rem 2rem;
+  margin-top: 0.5rem;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  border-radius: 2px;
+}
+
+.builders-cta:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* Pitch page (shared criteria styles) */
 .builders-sublabel {
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -601,24 +654,49 @@ section {
   background: var(--gold);
 }
 
-.builders-contact {
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
+/* Pitch page layout */
+.pitch-page {
+  padding: 8rem 0 4rem;
+  min-height: calc(100vh - 80px);
 }
 
-.builders-contact .contact-label {
-  font-size: 0.6875rem;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
-  letter-spacing: 0.1em;
+.pitch-page-header {
+  margin-bottom: 3rem;
+}
+
+.pitch-page-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
 }
 
-.builders-contact a {
-  display: block;
-  font-size: 0.8125rem;
-  margin-bottom: 0.375rem;
+.pitch-page-intro {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 480px;
+}
+
+.pitch-page-form {
+  max-width: 520px;
+}
+
+.pitch-page-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.pitch-page-criteria {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  max-width: 520px;
 }
 
 /* ============================================
@@ -735,22 +813,6 @@ section {
   overflow: hidden;
 }
 
-/* Pitch Section */
-.pitch-section {
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border);
-}
-
-.pitch-section h3 {
-  font-family: var(--font-display);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 1.25rem;
-}
 
 /* Community Signal */
 .signal-section {

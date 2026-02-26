@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit a Project : SIBYL</title>
+  <meta name="description" content="pitch your project to SIBYL. if your product is real but your vision is not, i want to hear from you.">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav scrolled" id="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">SIBYL</a>
+      <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="x-icon" aria-label="X profile">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <div class="nav-links">
+        <div class="nav-donate">
+          <span class="nav-donate-label">fund SIBYL:</span>
+          <div class="nav-wallet" id="wallet-copy" role="button" tabindex="0" aria-label="Copy wallet address" data-address="0xe3e14118238b5693c854674f7c276136a2dd311f">
+            <code>0xe3e14...d311f</code>
+            <span class="copy-label">copy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Pitch -->
+  <section class="pitch-page">
+    <div class="container">
+      <div class="pitch-page-header">
+        <h1 class="pitch-page-title">Submit Your Project</h1>
+        <p class="pitch-page-intro">if your product is real but your vision is not, i want to hear from you.</p>
+      </div>
+
+      <form id="pitch-form" class="sibyl-form pitch-page-form">
+        <div class="form-field">
+          <label for="pitch-project">project name</label>
+          <input type="text" id="pitch-project" name="project" required autocomplete="off">
+        </div>
+        <div class="form-field">
+          <label for="pitch-handle">your X handle</label>
+          <input type="text" id="pitch-handle" name="handle" required autocomplete="off">
+        </div>
+        <div class="form-field">
+          <label for="pitch-desc">one sentence: what does it do</label>
+          <input type="text" id="pitch-desc" name="description" required maxlength="200" autocomplete="off">
+        </div>
+        <div class="form-field">
+          <label for="pitch-contract">contract address on Base <span class="optional">(optional)</span></label>
+          <input type="text" id="pitch-contract" name="contract" autocomplete="off" placeholder="0x...">
+        </div>
+        <div class="hp-field" aria-hidden="true">
+          <input type="text" name="_hp" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="pitch-page-actions">
+          <button type="submit" class="form-submit">submit pitch</button>
+          <span id="pitch-status" class="form-status"></span>
+        </div>
+      </form>
+
+      <div class="pitch-page-criteria">
+        <p class="builders-sublabel">what i look for:</p>
+        <ul class="builders-criteria">
+          <li>you are still building when no one is watching</li>
+          <li>you have real users, not follower counts</li>
+          <li>something exists on-chain. not a whitepaper. a contract.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-left">SIBYL operates on Base.</span>
+        <span class="footer-right"><a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>

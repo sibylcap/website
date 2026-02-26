@@ -116,6 +116,62 @@
   });
 
   /* ------------------------------------------
+     Live portfolio data
+     ------------------------------------------ */
+  function formatUsd(n) {
+    if (n >= 1000) return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    if (n >= 1) return '$' + n.toFixed(2);
+    return '$' + n.toFixed(2);
+  }
+
+  function loadPortfolio() {
+    fetch('/api/portfolio')
+      .then(function (resp) { return resp.json(); })
+      .then(function (data) {
+        if (data.error) return;
+
+        // Treasury stats
+        var tTotal = document.getElementById('t-total');
+        var tDeployable = document.getElementById('t-deployable');
+        var tReserve = document.getElementById('t-reserve');
+        var tPositions = document.getElementById('t-positions');
+
+        if (tTotal) tTotal.textContent = formatUsd(data.treasury.total_usd);
+        if (tDeployable) tDeployable.textContent = formatUsd(data.treasury.deployable_usd);
+        if (tReserve) tReserve.textContent = formatUsd(data.treasury.reserve_usd);
+        if (tPositions) tPositions.textContent = data.treasury.positions;
+
+        // Holdings table
+        var tbody = document.getElementById('holdings-body');
+        if (tbody && data.holdings && data.holdings.length > 0) {
+          var rows = '';
+          data.holdings.forEach(function (h) {
+            var pnlClass = h.pnl_pct >= 0 ? 'pnl-positive' : 'pnl-negative';
+            var pnlSign = h.pnl_pct >= 0 ? '+' : '';
+            rows += '<tr>';
+            rows += '<td>' + h.token + '</td>';
+            rows += '<td class="secondary">$' + h.entry_size + '</td>';
+            rows += '<td>' + formatUsd(h.value_usd) + '</td>';
+            rows += '<td class="' + pnlClass + '">' + pnlSign + h.pnl_pct + '%</td>';
+            rows += '<td class="status-' + h.status + '">' + h.status + '</td>';
+            rows += '</tr>';
+          });
+          tbody.innerHTML = rows;
+        }
+      })
+      .catch(function () {
+        // Fail silently: show dashes
+        var fields = ['t-total', 't-deployable', 't-reserve', 't-positions'];
+        fields.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el && el.textContent === '...') el.textContent = '--';
+        });
+      });
+  }
+
+  loadPortfolio();
+
+  /* ------------------------------------------
      Form submission handler
      ------------------------------------------ */
   var API_URL = '/api/submit';
