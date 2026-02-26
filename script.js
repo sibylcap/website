@@ -59,7 +59,7 @@
      ------------------------------------------ */
   var walletBtn = document.getElementById('wallet-copy');
   if (walletBtn) {
-    var address = walletBtn.querySelector('code').textContent.trim();
+    var address = walletBtn.getAttribute('data-address') || walletBtn.querySelector('code').textContent.trim();
     var copyLabel = walletBtn.querySelector('.copy-label');
 
     function handleCopy() {
