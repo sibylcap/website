@@ -18,7 +18,7 @@
 var x402 = require('./_x402');
 var RPC = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
 var X_BEARER = process.env.X_BEARER_TOKEN || '';
-var PRICE_USD = 1.00;
+var PRICE_USD = 0.50;
 
 // Narrative classification patterns (same as narrative.js)
 var NARRATIVES = {

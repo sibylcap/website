@@ -11,7 +11,7 @@
 */
 
 var x402 = require('./_x402');
-var PRICE_USD = 0.25;
+var PRICE_USD = 0.10;
 
 // Narrative classification patterns
 var NARRATIVES = {
