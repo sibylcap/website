@@ -1474,29 +1474,22 @@ a.mind-source:hover {
   opacity: 0.8;
 }
 
-.mind-exo-desc {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-top: 0.75rem;
-}
-
-.mind-exo-desc a {
-  color: var(--gold);
-}
-
-.mind-exo-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  margin-top: 0.5rem;
+.mind-exo-verify {
+  display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.625rem;
-  color: var(--text-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 0.5rem 1.25rem;
+  margin-top: 0.75rem;
+  transition: background 0.3s, color 0.3s;
 }
 
-.mind-exo-meta a {
-  color: var(--text-secondary);
+.mind-exo-verify:hover {
+  background: var(--gold);
+  color: var(--bg);
 }
 
 .mind-wallet-arch {
