@@ -17,12 +17,17 @@ var TOKENS = {
   weth:  { address: '0x4200000000000000000000000000000000000006', decimals: 18 },
   usdc:  { address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', decimals: 6 },
   tgate: { address: '0xfaded58c5fac3d95643a14ee33b7ea9f50084b9a', decimals: 18 },
+  sigil: { address: '0xDacE999d08eA443E800996208dF40a6D13A9c1Bd', decimals: 18 },
 };
 
 // Holdings metadata: updated when trades happen
 var HOLDINGS_META = [
   { token: 'TGATE', entry_date: '2026-02-26', entry_size: 224, status: 'active' },
+  { token: 'SIGIL', entry_date: '2026-02-26', entry_size: 346, status: 'active' },
 ];
+
+// SIGIL is held across stealth wallets + cold, not bankr. Query these separately.
+var SIGIL_WALLETS = ['stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'cold'];
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -42,7 +47,7 @@ module.exports = async function handler(req, res) {
       calls.push({ method: 'eth_getBalance', params: [WALLETS[walletNames[i]], 'latest'] });
     }
 
-    // ERC20 balances for bankr wallet
+    // ERC20 balances for bankr wallet (WETH, USDC, TGATE)
     var tokenNames = Object.keys(TOKENS);
     var bankrAddr = WALLETS.bankr.toLowerCase().replace('0x', '');
     for (var j = 0; j < tokenNames.length; j++) {
@@ -50,16 +55,26 @@ module.exports = async function handler(req, res) {
       calls.push({ method: 'eth_call', params: [{ to: TOKENS[tokenNames[j]].address, data: calldata }, 'latest'] });
     }
 
+    // SIGIL balances across stealth + cold wallets
+    var sigilCallStart = calls.length;
+    for (var s = 0; s < SIGIL_WALLETS.length; s++) {
+      var sAddr = WALLETS[SIGIL_WALLETS[s]].toLowerCase().replace('0x', '');
+      var sCalldata = '0x70a08231' + '000000000000000000000000' + sAddr;
+      calls.push({ method: 'eth_call', params: [{ to: TOKENS.sigil.address, data: sCalldata }, 'latest'] });
+    }
+
     // Fetch balances and prices in parallel
     var results = await Promise.all([
       batchRpc(calls),
       fetchEthPrice(),
       fetchTgatePrice(),
+      fetchTokenPrice(TOKENS.sigil.address),
     ]);
 
     var rpcResults = results[0];
     var ethPrice = results[1];
     var tgatePrice = results[2];
+    var sigilPrice = results[3];
 
     // Parse ETH balances
     var ethBalances = {};
@@ -76,6 +91,15 @@ module.exports = async function handler(req, res) {
       tokenBalances[tokenNames[m]] = (tr && tr.result) ? parseInt(tr.result, 16) / Math.pow(10, dec) : 0;
     }
 
+    // Parse SIGIL balances across stealth + cold wallets
+    var totalSigilTokens = 0;
+    for (var si = 0; si < SIGIL_WALLETS.length; si++) {
+      var sr = rpcResults[sigilCallStart + si];
+      if (sr && sr.result) {
+        totalSigilTokens += parseInt(sr.result, 16) / Math.pow(10, TOKENS.sigil.decimals);
+      }
+    }
+
     // Calculate totals
     var totalEthUsd = 0;
     for (var w in ethBalances) {
@@ -86,8 +110,9 @@ module.exports = async function handler(req, res) {
 
     var totalUsdcUsd = tokenBalances.usdc || 0;
     var totalTgateUsd = (tokenBalances.tgate || 0) * tgatePrice;
-    var totalUsd = totalEthUsd + totalUsdcUsd + totalTgateUsd;
-    var deployed = totalTgateUsd;
+    var totalSigilUsd = totalSigilTokens * sigilPrice;
+    var totalUsd = totalEthUsd + totalUsdcUsd + totalTgateUsd + totalSigilUsd;
+    var deployed = totalTgateUsd + totalSigilUsd;
     var reserve = totalUsd * 0.4;
     var deployable = Math.max(0, totalUsd * 0.6 - deployed);
 
@@ -107,6 +132,9 @@ module.exports = async function handler(req, res) {
       if (h.token === 'TGATE') {
         balance = Math.round(tokenBalances.tgate || 0);
         valueUsd = round(totalTgateUsd, 2);
+      } else if (h.token === 'SIGIL') {
+        balance = Math.round(totalSigilTokens);
+        valueUsd = round(totalSigilUsd, 2);
       }
       var pnl = h.entry_size > 0 ? round((valueUsd / h.entry_size - 1) * 100, 1) : 0;
       return {
@@ -125,6 +153,7 @@ module.exports = async function handler(req, res) {
       prices: {
         eth: round(ethPrice, 2),
         tgate: tgatePrice,
+        sigil: sigilPrice,
       },
       wallets: walletDetails,
       treasury: {
@@ -185,8 +214,12 @@ async function fetchEthPrice() {
 }
 
 async function fetchTgatePrice() {
+  return fetchTokenPrice(TOKENS.tgate.address);
+}
+
+async function fetchTokenPrice(tokenAddress) {
   try {
-    var resp = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + TOKENS.tgate.address, {
+    var resp = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + tokenAddress, {
       headers: { 'Accept': 'application/json' },
     });
     var data = await resp.json();
@@ -199,7 +232,7 @@ async function fetchTgatePrice() {
     }
     return 0;
   } catch (e) {
-    console.error('tgate_price_failed:', e.message);
+    console.error('token_price_failed:', tokenAddress, e.message);
     return 0;
   }
 }
