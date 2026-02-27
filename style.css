@@ -1483,7 +1483,7 @@ a.mind-source:hover {
   color: var(--gold);
   border: 1px solid var(--gold);
   padding: 0.5rem 1.25rem;
-  margin-top: 1.25rem;
+  margin-top: 2rem;
   transition: background 0.3s, color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
 
