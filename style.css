@@ -1192,9 +1192,64 @@ section {
    Mind Page
    ============================================ */
 
+/* Links inside mind stat values */
+.mind-stat-value a {
+  color: var(--text-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-strong);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.mind-stat-value a:hover {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* Linked endpoint paths */
+a.mind-endpoint-path {
+  display: block;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+a.mind-endpoint-path:hover {
+  color: var(--gold-hover);
+  border-bottom-color: var(--gold);
+}
+
+/* Wallet cards and source cards as links */
+a.mind-wallet-card,
+a.mind-source {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s ease;
+}
+
+a.mind-wallet-card:hover,
+a.mind-source:hover {
+  border-color: var(--gold);
+  color: inherit;
+}
+
+/* Inline links in descriptions */
+.mind-community-desc a,
+.mind-subtitle a {
+  color: var(--accent);
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.mind-community-desc a:hover,
+.mind-subtitle a:hover {
+  color: var(--accent-hover);
+  border-bottom-color: var(--accent-hover);
+}
+
 .mind-hero {
-  padding-top: 10rem;
-  padding-bottom: 5rem;
+  padding-top: 7.5rem;
+  padding-bottom: 3.5rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -1218,7 +1273,7 @@ section {
 }
 
 .mind-hero .hero-eyebrow {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .mind-hero .mind-title {
@@ -1228,12 +1283,12 @@ section {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text-primary);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   line-height: 1.1;
 }
 
 .mind-hero .hero-rule {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .mind-hero .mind-subtitle {
@@ -1248,7 +1303,7 @@ section {
 
 /* Section shared: mind */
 .mind-section {
-  padding: 5rem 0;
+  padding: 4rem 0;
   border-top: 1px solid var(--border);
 }
 
@@ -1259,7 +1314,7 @@ section {
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -1277,7 +1332,7 @@ section {
 /* Intelligence Endpoints */
 .mind-intel {
   border-top: 1px solid var(--border);
-  padding: 5rem 0;
+  padding: 4rem 0;
 }
 
 .mind-endpoint-grid {
@@ -1336,7 +1391,7 @@ section {
 /* On-Chain Identity */
 .mind-identity {
   border-top: 1px solid var(--border);
-  padding: 5rem 0;
+  padding: 4rem 0;
 }
 
 .mind-stats-grid {
@@ -1345,7 +1400,7 @@ section {
   gap: 0;
   background: var(--surface);
   border: 1px solid var(--border);
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .mind-stat {
@@ -1376,7 +1431,7 @@ section {
   align-items: stretch;
   justify-content: center;
   gap: 0;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
 
 .mind-wallet-card {
@@ -1423,7 +1478,7 @@ section {
 /* Advisory Framework */
 .mind-advisory {
   border-top: 1px solid var(--border);
-  padding: 5rem 0;
+  padding: 4rem 0;
   position: relative;
   overflow: hidden;
 }
@@ -1452,8 +1507,8 @@ section {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 1rem;
-  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  margin-top: 2rem;
 }
 
 .mind-advisory-sub:first-of-type {
@@ -1516,7 +1571,7 @@ section {
 /* Deal Flow */
 .mind-dealflow {
   border-top: 1px solid var(--border);
-  padding: 5rem 0;
+  padding: 4rem 0;
 }
 
 .mind-pipeline {
@@ -1524,7 +1579,7 @@ section {
   grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
   align-items: center;
   gap: 0;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .mind-pipeline-step {
@@ -1594,7 +1649,7 @@ section {
 /* Infrastructure */
 .mind-infra {
   border-top: 1px solid var(--border);
-  padding: 5rem 0;
+  padding: 4rem 0;
   position: relative;
   overflow: hidden;
 }
@@ -1622,7 +1677,7 @@ section {
   gap: 0;
   background: var(--surface);
   border: 1px solid var(--border);
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .mind-infra-stat {
@@ -1665,7 +1720,7 @@ section {
 /* Community */
 .mind-community {
   border-top: 1px solid var(--border);
-  padding: 5rem 0;
+  padding: 4rem 0;
 }
 
 .mind-community-grid {
@@ -1699,7 +1754,7 @@ section {
 /* Mind Bottom CTA */
 .mind-bottom-cta {
   border-top: 1px solid var(--border);
-  padding: 5rem 0;
+  padding: 4rem 0;
   text-align: center;
 }
 
@@ -1827,7 +1882,7 @@ section {
 
   /* Mind page responsive */
   .mind-hero {
-    padding-top: 7rem;
+    padding-top: 6rem;
   }
 
   .mind-hero .mind-title {

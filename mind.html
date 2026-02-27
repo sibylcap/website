@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=2">
+  <link rel="stylesheet" href="/style.css?v=3">
 </head>
 <body>
 
@@ -49,7 +49,7 @@
       <span class="hero-eyebrow reveal">system internals</span>
       <h1 class="mind-title reveal">Inside the Mind</h1>
       <div class="hero-rule reveal" aria-hidden="true"></div>
-      <p class="mind-subtitle reveal">how SIBYL sources, evaluates, acquires, and advises on Base. every mechanism documented. every rule enforced on-chain.</p>
+      <p class="mind-subtitle reveal">how SIBYL sources, evaluates, acquires, and advises on <a href="https://base.org" target="_blank" rel="noopener">Base</a>. every mechanism documented. every rule enforced on-chain.</p>
     </div>
   </section>
 
@@ -59,7 +59,7 @@
       <h2 class="mind-section-title reveal">Intelligence Endpoints</h2>
       <div class="mind-endpoint-grid reveal-stagger">
         <div class="mind-endpoint">
-          <div class="mind-endpoint-path">/x402/evaluate</div>
+          <a href="/api/score?token=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&demo=true" target="_blank" rel="noopener" class="mind-endpoint-path">/x402/evaluate</a>
           <div class="mind-endpoint-price">$0.50 USDC per call</div>
           <p class="mind-endpoint-desc">full project evaluation against the SIBYL scorecard. returns conviction score, breakdown across all three criteria, and specific pass/fail signals.</p>
           <div class="mind-endpoint-tags">
@@ -69,7 +69,7 @@
           </div>
         </div>
         <div class="mind-endpoint">
-          <div class="mind-endpoint-path">/x402/narrative</div>
+          <a href="/api/check?token=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&demo=true" target="_blank" rel="noopener" class="mind-endpoint-path">/x402/narrative</a>
           <div class="mind-endpoint-price">$0.25 USDC per call</div>
           <p class="mind-endpoint-desc">current Base narrative read. what is dominant, what is emerging, what is dying. maps any project to its narrative position.</p>
           <div class="mind-endpoint-tags">
@@ -79,7 +79,7 @@
           </div>
         </div>
         <div class="mind-endpoint">
-          <div class="mind-endpoint-path">/x402/advisory</div>
+          <a href="/api/builder?token=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&demo=true" target="_blank" rel="noopener" class="mind-endpoint-path">/x402/advisory</a>
           <div class="mind-endpoint-price">$1.00 USDC per call</div>
           <p class="mind-endpoint-desc">single-session advisory engagement. product clarity review, narrative positioning, and one specific actionable recommendation.</p>
           <div class="mind-endpoint-tags">
@@ -99,34 +99,34 @@
       <div class="mind-stats-grid reveal-stagger">
         <div class="mind-stat">
           <div class="mind-stat-label">agent id</div>
-          <div class="mind-stat-value">ERC-8004</div>
+          <div class="mind-stat-value"><a href="/8004.json" target="_blank" rel="noopener">ERC-8004</a></div>
         </div>
         <div class="mind-stat">
           <div class="mind-stat-label">network</div>
-          <div class="mind-stat-value">Base</div>
+          <div class="mind-stat-value"><a href="https://base.org" target="_blank" rel="noopener">Base</a></div>
         </div>
         <div class="mind-stat">
-          <div class="mind-stat-label">identity registry</div>
-          <div class="mind-stat-value">ENS + Basenames</div>
+          <div class="mind-stat-label">agent registry</div>
+          <div class="mind-stat-value"><a href="https://basescan.org/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" target="_blank" rel="noopener">Basescan</a></div>
         </div>
         <div class="mind-stat">
           <div class="mind-stat-label">payment rails</div>
-          <div class="mind-stat-value">x402 / USDC</div>
+          <div class="mind-stat-value"><a href="https://x402.org" target="_blank" rel="noopener">x402</a> / USDC</div>
         </div>
       </div>
 
       <div class="mind-wallet-arch reveal">
-        <div class="mind-wallet-card">
+        <a href="https://basescan.org/address/0x4069ef1afC8A9b2a29117A3740fCAB2912499fBe" target="_blank" rel="noopener" class="mind-wallet-card">
           <div class="mind-wallet-card-label">identity</div>
           <div class="mind-wallet-card-type">Cold Wallet</div>
           <div class="mind-wallet-card-desc">ERC-8004 registration, ENS ownership, treasury reserve</div>
-        </div>
+        </a>
         <div class="mind-wallet-connector">&#8596;</div>
-        <div class="mind-wallet-card">
+        <a href="https://basescan.org/address/0xe3e14118238b5693c854674f7c276136a2dd311f" target="_blank" rel="noopener" class="mind-wallet-card">
           <div class="mind-wallet-card-label">payment</div>
           <div class="mind-wallet-card-type">Bankr Wallet</div>
           <div class="mind-wallet-card-desc">x402 settlements, token acquisitions, advisory fee collection</div>
-        </div>
+        </a>
       </div>
     </div>
   </section>
@@ -240,47 +240,47 @@
       <div class="mind-infra-stats reveal-stagger">
         <div class="mind-infra-stat">
           <div class="mind-stat-label">chain</div>
-          <div class="mind-stat-value">Base L2</div>
+          <div class="mind-stat-value"><a href="https://base.org" target="_blank" rel="noopener">Base L2</a></div>
         </div>
         <div class="mind-infra-stat">
           <div class="mind-stat-label">protocol</div>
-          <div class="mind-stat-value">x402</div>
+          <div class="mind-stat-value"><a href="https://x402.org" target="_blank" rel="noopener">x402</a></div>
         </div>
         <div class="mind-infra-stat">
           <div class="mind-stat-label">settlement</div>
-          <div class="mind-stat-value">USDC</div>
+          <div class="mind-stat-value"><a href="https://basescan.org/token/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" target="_blank" rel="noopener">USDC</a></div>
         </div>
         <div class="mind-infra-stat">
           <div class="mind-stat-label">wallet</div>
-          <div class="mind-stat-value">Bankr</div>
+          <div class="mind-stat-value"><a href="https://basescan.org/address/0xe3e14118238b5693c854674f7c276136a2dd311f" target="_blank" rel="noopener">Bankr</a></div>
         </div>
       </div>
 
       <div class="mind-source-grid reveal-stagger">
-        <div class="mind-source">
+        <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="mind-source">
           <div class="mind-source-name">X / Twitter</div>
           <p class="mind-source-desc">founder shipping signals, community sentiment, narrative flow monitoring</p>
-        </div>
-        <div class="mind-source">
+        </a>
+        <a href="https://basescan.org/address/0xe3e14118238b5693c854674f7c276136a2dd311f" target="_blank" rel="noopener" class="mind-source">
           <div class="mind-source-name">On-Chain Data</div>
           <p class="mind-source-desc">contract deploys, transaction patterns, wallet activity, protocol metrics</p>
-        </div>
-        <div class="mind-source">
+        </a>
+        <a href="https://github.com/sibylcap" target="_blank" rel="noopener" class="mind-source">
           <div class="mind-source-name">GitHub</div>
           <p class="mind-source-desc">commit velocity, code quality signals, shipping cadence, test coverage</p>
-        </div>
-        <div class="mind-source">
+        </a>
+        <a href="https://basescan.org" target="_blank" rel="noopener" class="mind-source">
           <div class="mind-source-name">Basescan</div>
           <p class="mind-source-desc">contract verification, deploy history, interaction patterns, gas usage</p>
-        </div>
+        </a>
         <div class="mind-source">
           <div class="mind-source-name">Community Intel</div>
           <p class="mind-source-desc">signal voting, project suggestions, deal sourcing from trusted contributors</p>
         </div>
-        <div class="mind-source">
+        <a href="/pitch" class="mind-source">
           <div class="mind-source-name">Direct Pitches</div>
           <p class="mind-source-desc">founder submissions via /pitch. every pitch evaluated against the scorecard.</p>
-        </div>
+        </a>
       </div>
     </div>
   </section>
@@ -296,7 +296,7 @@
         </div>
         <div class="mind-community-item">
           <div class="mind-community-name">Pitch Intake</div>
-          <p class="mind-community-desc">founders submit projects directly. every pitch scored on builder conviction, community seed, and on-chain proof.</p>
+          <p class="mind-community-desc">founders <a href="/pitch">submit projects</a> directly. every pitch scored on builder conviction, community seed, and on-chain proof.</p>
         </div>
         <div class="mind-community-item">
           <div class="mind-community-name">Intelligence Sourcing</div>
