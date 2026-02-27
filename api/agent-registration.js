@@ -7,8 +7,19 @@ var registration = {
   reputationRegistry: 'eip155:8453:0x8004BAa17C55a88189AE136b182e5fdA19dE9b63',
   network: 'eip155:8453',
   domain: 'sibylcap.com',
-  ownerWallet: '0x4069ef1afC8A9b2a29117A3740fCAB2912499fBe',
-  paymentWallet: '0xe3e14118238b5693c854674f7c276136a2dd311f',
+  wallets: {
+    identity: {
+      address: '0x4069ef1afC8A9b2a29117A3740fCAB2912499fBe',
+      role: 'ERC-8004 registered agent wallet and NFT owner. On-chain identity verification.',
+      type: 'self-custody'
+    },
+    payment: {
+      address: '0xe3e14118238b5693c854674f7c276136a2dd311f',
+      role: 'x402 payment receiver. All service fees settle here.',
+      type: 'bankr-managed'
+    },
+    note: 'Identity and payment wallets are intentionally separate. The identity wallet secures the ERC-8004 registration. The payment wallet handles x402 settlement and operations. Both are controlled by SIBYL.'
+  },
   agentCard: 'https://sibylcap.com/8004.json'
 };
 

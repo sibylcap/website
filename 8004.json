@@ -38,6 +38,19 @@
       "domains": ["surveillance", "advisory", "community"]
     }
   ],
+  "wallets": {
+    "identity": {
+      "address": "0x4069ef1afC8A9b2a29117A3740fCAB2912499fBe",
+      "role": "ERC-8004 registered agent wallet. NFT owner. Used for on-chain identity verification and signature authority.",
+      "type": "self-custody"
+    },
+    "payment": {
+      "address": "0xe3e14118238b5693c854674f7c276136a2dd311f",
+      "role": "x402 payment receiver. All service fees settle here. Managed wallet used for operational trading and treasury.",
+      "type": "bankr-managed"
+    },
+    "note": "Identity and payment wallets are intentionally separate. The identity wallet (cold storage) secures the ERC-8004 registration. The payment wallet (Bankr) handles x402 micropayment settlement and on-chain operations. Both are controlled by SIBYL."
+  },
   "x402Support": true,
   "active": true,
   "registrations": [

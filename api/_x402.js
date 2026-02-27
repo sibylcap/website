@@ -39,7 +39,14 @@ async function gate(req, res, opts) {
     res.status(402).json({
       x402Version: 1,
       accepts: [requirements],
-      error: 'payment required'
+      error: 'payment required',
+      agent: {
+        id: 20880,
+        registry: 'eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432',
+        identityWallet: '0x4069ef1afC8A9b2a29117A3740fCAB2912499fBe',
+        paymentWallet: BANKR_WALLET,
+        walletNote: 'Identity and payment wallets are intentionally separate. The identity wallet (self-custody) holds the ERC-8004 NFT. The payment wallet (Bankr-managed) receives x402 fees. Verify at: https://sibylcap.com/.well-known/agent-registration.json'
+      }
     });
     return false;
   }
