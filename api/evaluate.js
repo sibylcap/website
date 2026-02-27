@@ -45,7 +45,7 @@ module.exports = async function handler(req, res) {
   var isDemo = req.query.demo === 'true';
 
   try {
-    // Fetch all data sources in parallel
+    // Phase 1: Fetch core data + auto-discover GitHub if not provided
     var fetches = [
       fetchDexScreener(token),
       checkBytecode(token),
@@ -53,7 +53,10 @@ module.exports = async function handler(req, res) {
     ];
     if (twitter) fetches.push(fetchXActivity(twitter));
     else fetches.push(Promise.resolve(null));
-    if (github) fetches.push(fetchGitHubActivity(github));
+
+    // If no github provided, run auto-discovery in parallel with core fetches
+    if (!github && twitter) fetches.push(discoverGitHubFromX(twitter));
+    else if (!github) fetches.push(discoverGitHubFromNpm(null));
     else fetches.push(Promise.resolve(null));
 
     var results = await Promise.all(fetches);
@@ -61,9 +64,33 @@ module.exports = async function handler(req, res) {
     var hasCode = results[1];
     var totalSupply = results[2];
     var xData = results[3];
-    var ghData = results[4];
+    var discovery = results[4];
 
-    var result = computeEvaluation(token, dexData, hasCode, totalSupply, xData, ghData, twitter, github, isDemo);
+    // If we discovered a GitHub handle, use it
+    var discoveredGithub = null;
+    if (!github && discovery && discovery.handle) {
+      github = discovery.handle;
+      discoveredGithub = discovery;
+    }
+
+    // Also try npm discovery if X bio didn't find anything and we have a symbol from DexScreener
+    if (!github && dexData && dexData.pairs && dexData.pairs.length > 0) {
+      var symForNpm = (dexData.pairs[0].baseToken && dexData.pairs[0].baseToken.symbol) || '';
+      var nameForNpm = (dexData.pairs[0].baseToken && dexData.pairs[0].baseToken.name) || '';
+      var npmResult = await discoverGitHubFromNpm(symForNpm, nameForNpm);
+      if (npmResult && npmResult.handle) {
+        github = npmResult.handle;
+        discoveredGithub = npmResult;
+      }
+    }
+
+    // Phase 2: Fetch GitHub activity if we now have a handle
+    var ghData = null;
+    if (github) {
+      ghData = await fetchGitHubActivity(github);
+    }
+
+    var result = computeEvaluation(token, dexData, hasCode, totalSupply, xData, ghData, twitter, github, isDemo, discoveredGithub);
 
     res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
     return res.status(200).json(result);
@@ -75,7 +102,7 @@ module.exports = async function handler(req, res) {
 
 // ── EVALUATION ENGINE ──
 
-function computeEvaluation(tokenAddr, dexData, hasCode, totalSupply, xData, ghData, twitter, github, isDemo) {
+function computeEvaluation(tokenAddr, dexData, hasCode, totalSupply, xData, ghData, twitter, github, isDemo, discoveredGithub) {
   var flags = [];
   var dataSources = ['dexscreener', 'base-rpc'];
   if (twitter) dataSources.push('x-api');
@@ -290,6 +317,7 @@ function computeEvaluation(tokenAddr, dexData, hasCode, totalSupply, xData, ghDa
       onchain_proof: { score: onchainScore, max: 10, signals: onchainSignals }
     },
     product_clarity: productClarity,
+    github_discovered: discoveredGithub || null,
     flags: flags,
     recommendation: rec,
     summary: parts.join(' '),
@@ -542,6 +570,109 @@ function processGitHubEvents(events, username) {
     commits_per_week: r1(commits / 4.3),
     pushes_per_week: r1(pushes.length / 4.3)
   };
+}
+
+// ── GITHUB AUTO-DISCOVERY ──
+
+// Extract github.com links from X/Twitter user bio
+async function discoverGitHubFromX(handle) {
+  var bearer = X_BEARER;
+  if (!bearer) return null;
+  if (bearer.indexOf('%') !== -1) {
+    try { bearer = decodeURIComponent(bearer); } catch (e) {}
+  }
+
+  try {
+    var url = 'https://api.twitter.com/2/users/by/username/' + encodeURIComponent(handle)
+      + '?user.fields=description,entities,url';
+
+    var controller = new AbortController();
+    var timeout = setTimeout(function() { controller.abort(); }, 5000);
+    var resp = await fetch(url, {
+      headers: { 'Authorization': 'Bearer ' + bearer },
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (!resp.ok) return null;
+
+    var data = await resp.json();
+    var user = data.data;
+    if (!user) return null;
+
+    // Check expanded URLs in entities (bio links, profile URL)
+    var urls = [];
+    if (user.entities) {
+      if (user.entities.url && user.entities.url.urls) {
+        user.entities.url.urls.forEach(function(u) { urls.push(u.expanded_url || u.url || ''); });
+      }
+      if (user.entities.description && user.entities.description.urls) {
+        user.entities.description.urls.forEach(function(u) { urls.push(u.expanded_url || u.url || ''); });
+      }
+    }
+
+    // Also regex the raw description text for github links
+    var desc = user.description || '';
+    var ghMatch = desc.match(/github\.com\/([a-zA-Z0-9_-]+)/i);
+    if (ghMatch) urls.push('https://github.com/' + ghMatch[1]);
+
+    // Find first github.com URL and extract the username/org
+    for (var i = 0; i < urls.length; i++) {
+      var match = urls[i].match(/github\.com\/([a-zA-Z0-9_-]+)/i);
+      if (match && match[1].toLowerCase() !== 'topics' && match[1].toLowerCase() !== 'search') {
+        return { handle: match[1].toLowerCase(), source: 'x_bio', x_handle: handle };
+      }
+    }
+
+    return null;
+  } catch (err) {
+    return null;
+  }
+}
+
+// Look up npm registry for a package matching the token symbol/name
+async function discoverGitHubFromNpm(symbol, name) {
+  if (!symbol && !name) return null;
+
+  // Try symbol as package name first, then lowercase name
+  var candidates = [];
+  if (symbol) candidates.push(symbol.toLowerCase());
+  if (name) {
+    var cleaned = name.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (cleaned && candidates.indexOf(cleaned) === -1) candidates.push(cleaned);
+    // Also try hyphenated version of multi-word names
+    var hyphenated = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    if (hyphenated && candidates.indexOf(hyphenated) === -1) candidates.push(hyphenated);
+  }
+
+  for (var i = 0; i < candidates.length; i++) {
+    try {
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 3000);
+      var resp = await fetch('https://registry.npmjs.org/' + encodeURIComponent(candidates[i]), {
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      if (!resp.ok) continue;
+
+      var pkg = await resp.json();
+      var repoUrl = '';
+      if (pkg.repository) {
+        repoUrl = typeof pkg.repository === 'string' ? pkg.repository : (pkg.repository.url || '');
+      }
+
+      var match = repoUrl.match(/github\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_.-]+)/i);
+      if (match) {
+        return { handle: match[1].toLowerCase(), source: 'npm_registry', npm_package: candidates[i], repo: match[1] + '/' + match[2].replace(/\.git$/, '') };
+      }
+    } catch (e) {
+      continue;
+    }
+  }
+
+  return null;
 }
 
 // ── UTILS ──
