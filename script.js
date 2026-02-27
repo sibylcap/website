@@ -44,7 +44,10 @@
     var parallaxSections = [
       { el: document.querySelector('.hero'), speed: 0.25 },
       { el: document.querySelector('.process'), speed: 0.15 },
-      { el: document.querySelector('.record'), speed: 0.15 }
+      { el: document.querySelector('.record'), speed: 0.15 },
+      { el: document.querySelector('.mind-hero'), speed: 0.2 },
+      { el: document.querySelector('.mind-advisory'), speed: 0.15 },
+      { el: document.querySelector('.mind-infra'), speed: 0.15 }
     ];
 
     var ticking = false;

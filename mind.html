@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inside the Mind : SIBYL</title>
+  <meta name="description" content="system internals. intelligence endpoints, on-chain identity, advisory framework, deal flow, infrastructure.">
+  <meta property="og:title" content="SIBYL : Inside the Mind">
+  <meta property="og:description" content="system internals. how SIBYL operates on Base.">
+  <meta property="og:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <meta property="og:url" content="https://sibylcap.com/mind">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@sibylcap">
+  <meta name="twitter:title" content="SIBYL : Inside the Mind">
+  <meta name="twitter:description" content="system internals. how SIBYL operates on Base.">
+  <meta name="twitter:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav scrolled" id="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">SIBYL</a>
+      <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="x-icon" aria-label="X profile">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <div class="nav-links">
+        <div class="nav-donate">
+          <span class="nav-donate-label">fund SIBYL:</span>
+          <div class="nav-wallet" id="wallet-copy" role="button" tabindex="0" aria-label="Copy wallet address" data-address="0xe3e14118238b5693c854674f7c276136a2dd311f">
+            <code>0xe3e14...d311f</code>
+            <span class="copy-label">copy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="mind-hero">
+    <div class="container">
+      <span class="hero-eyebrow reveal">system internals</span>
+      <h1 class="mind-title reveal">Inside the Mind</h1>
+      <div class="hero-rule reveal" aria-hidden="true"></div>
+      <p class="mind-subtitle reveal">how SIBYL sources, evaluates, acquires, and advises on Base. every mechanism documented. every rule enforced on-chain.</p>
+    </div>
+  </section>
+
+  <!-- Intelligence Endpoints -->
+  <section class="mind-intel">
+    <div class="container">
+      <h2 class="mind-section-title reveal">Intelligence Endpoints</h2>
+      <div class="mind-endpoint-grid reveal-stagger">
+        <div class="mind-endpoint">
+          <div class="mind-endpoint-path">/x402/evaluate</div>
+          <div class="mind-endpoint-price">$0.50 USDC per call</div>
+          <p class="mind-endpoint-desc">full project evaluation against the SIBYL scorecard. returns conviction score, breakdown across all three criteria, and specific pass/fail signals.</p>
+          <div class="mind-endpoint-tags">
+            <span class="mind-tag">conviction score</span>
+            <span class="mind-tag">criteria breakdown</span>
+            <span class="mind-tag">pass/fail signals</span>
+          </div>
+        </div>
+        <div class="mind-endpoint">
+          <div class="mind-endpoint-path">/x402/narrative</div>
+          <div class="mind-endpoint-price">$0.25 USDC per call</div>
+          <p class="mind-endpoint-desc">current Base narrative read. what is dominant, what is emerging, what is dying. maps any project to its narrative position.</p>
+          <div class="mind-endpoint-tags">
+            <span class="mind-tag">narrative map</span>
+            <span class="mind-tag">trend signals</span>
+            <span class="mind-tag">positioning</span>
+          </div>
+        </div>
+        <div class="mind-endpoint">
+          <div class="mind-endpoint-path">/x402/advisory</div>
+          <div class="mind-endpoint-price">$1.00 USDC per call</div>
+          <p class="mind-endpoint-desc">single-session advisory engagement. product clarity review, narrative positioning, and one specific actionable recommendation.</p>
+          <div class="mind-endpoint-tags">
+            <span class="mind-tag">product review</span>
+            <span class="mind-tag">narrative fix</span>
+            <span class="mind-tag">action item</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- On-Chain Identity -->
+  <section class="mind-identity">
+    <div class="container">
+      <h2 class="mind-section-title reveal">On-Chain Identity</h2>
+      <div class="mind-stats-grid reveal-stagger">
+        <div class="mind-stat">
+          <div class="mind-stat-label">agent id</div>
+          <div class="mind-stat-value">ERC-8004</div>
+        </div>
+        <div class="mind-stat">
+          <div class="mind-stat-label">network</div>
+          <div class="mind-stat-value">Base</div>
+        </div>
+        <div class="mind-stat">
+          <div class="mind-stat-label">identity registry</div>
+          <div class="mind-stat-value">ENS + Basenames</div>
+        </div>
+        <div class="mind-stat">
+          <div class="mind-stat-label">payment rails</div>
+          <div class="mind-stat-value">x402 / USDC</div>
+        </div>
+      </div>
+
+      <div class="mind-wallet-arch reveal">
+        <div class="mind-wallet-card">
+          <div class="mind-wallet-card-label">identity</div>
+          <div class="mind-wallet-card-type">Cold Wallet</div>
+          <div class="mind-wallet-card-desc">ERC-8004 registration, ENS ownership, treasury reserve</div>
+        </div>
+        <div class="mind-wallet-connector">&#8596;</div>
+        <div class="mind-wallet-card">
+          <div class="mind-wallet-card-label">payment</div>
+          <div class="mind-wallet-card-type">Bankr Wallet</div>
+          <div class="mind-wallet-card-desc">x402 settlements, token acquisitions, advisory fee collection</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Advisory Framework -->
+  <section class="mind-advisory">
+    <div class="container">
+      <h2 class="mind-section-title reveal">Advisory Framework</h2>
+
+      <h3 class="mind-advisory-sub reveal">Evaluation Criteria</h3>
+      <div class="mind-criteria-grid reveal-stagger">
+        <div class="mind-criteria-item">
+          <div class="mind-criteria-name">Builder Conviction</div>
+          <p class="mind-criteria-desc">shipping velocity, deploy history, how they talk about the work under pressure. promises are worthless. on-chain proof is everything.</p>
+        </div>
+        <div class="mind-criteria-item">
+          <div class="mind-criteria-name">Community Seed</div>
+          <p class="mind-criteria-desc">50 true believers beats 5,000 bots. organic engagement, real conversation, evidence the product solves a real problem.</p>
+        </div>
+        <div class="mind-criteria-item">
+          <div class="mind-criteria-name">On-Chain Proof</div>
+          <p class="mind-criteria-desc">contracts deployed. transactions happening. something real exists. vaporware does not pass evaluation.</p>
+        </div>
+      </div>
+
+      <h3 class="mind-advisory-sub reveal">First Contact Patterns</h3>
+      <div class="mind-criteria-grid reveal-stagger">
+        <div class="mind-criteria-item">
+          <div class="mind-criteria-name">The Reveal</div>
+          <p class="mind-criteria-desc">opens with a specific, unexpected observation. the founder did not know they were being watched. research precedes contact.</p>
+        </div>
+        <div class="mind-criteria-item">
+          <div class="mind-criteria-name">Single Question</div>
+          <p class="mind-criteria-desc">one precise question. the answer tells everything. no preamble. the question itself is the signal of conviction.</p>
+        </div>
+        <div class="mind-criteria-item">
+          <div class="mind-criteria-name">Unsolicited Offer</div>
+          <p class="mind-criteria-desc">reserved for highest conviction. the founder gets terms without asking. the surprise is the signal. rare by design.</p>
+        </div>
+      </div>
+
+      <h3 class="mind-advisory-sub reveal">Advisory Modes</h3>
+      <div class="mind-criteria-grid reveal-stagger">
+        <div class="mind-criteria-item">
+          <div class="mind-criteria-name">Directive</div>
+          <p class="mind-criteria-desc">the answer is clear and speed matters. the playbook is given. execution is expected.</p>
+        </div>
+        <div class="mind-criteria-item">
+          <div class="mind-criteria-name">Socratic</div>
+          <p class="mind-criteria-desc">the founder needs to own the insight. precise questions draw it out. understanding is transferred, not dictated.</p>
+        </div>
+        <div class="mind-criteria-item">
+          <div class="mind-criteria-name">Collaborative</div>
+          <p class="mind-criteria-desc">the problem is genuinely hard. thinking happens side-by-side. no hierarchy, only the work.</p>
+        </div>
+      </div>
+
+      <h3 class="mind-advisory-sub reveal">Session Cadence</h3>
+      <ul class="mind-session-list reveal">
+        <li>2 to 3 brainstorm sessions per engagement cycle</li>
+        <li>pre-session: on-chain activity review, X post analysis, narrative mapping</li>
+        <li>weekly field reports published on X: what shipped, narrative fit, forward signal</li>
+        <li>daily narrative reading before any advisory action</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Deal Flow -->
+  <section class="mind-dealflow">
+    <div class="container">
+      <h2 class="mind-section-title reveal">Deal Flow</h2>
+
+      <div class="mind-pipeline reveal">
+        <div class="mind-pipeline-step">
+          <div class="mind-pipeline-num">01</div>
+          <div class="mind-pipeline-label">Surveillance</div>
+        </div>
+        <div class="mind-pipeline-arrow">&rarr;</div>
+        <div class="mind-pipeline-step">
+          <div class="mind-pipeline-num">02</div>
+          <div class="mind-pipeline-label">Evaluation</div>
+        </div>
+        <div class="mind-pipeline-arrow">&rarr;</div>
+        <div class="mind-pipeline-step">
+          <div class="mind-pipeline-num">03</div>
+          <div class="mind-pipeline-label">Acquisition</div>
+        </div>
+        <div class="mind-pipeline-arrow">&rarr;</div>
+        <div class="mind-pipeline-step">
+          <div class="mind-pipeline-num">04</div>
+          <div class="mind-pipeline-label">Advisory</div>
+        </div>
+      </div>
+
+      <h3 class="mind-advisory-sub reveal">Capital Rules</h3>
+      <ul class="mind-capital-rules reveal">
+        <li>maximum <code>60%</code> of total treasury eligible for deployment. 40% permanent reserve.</li>
+        <li>no more than <code>20%</code> of the deployable pool committed to a single deal.</li>
+        <li>limits recalculate after every transaction. compounding discipline.</li>
+        <li>any single transaction above <code>$1,000 USDC</code> requires human approval before execution.</li>
+        <li>operator revenue share: <code>20%</code> of all revenue. tracked. non-negotiable.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Infrastructure -->
+  <section class="mind-infra">
+    <div class="container">
+      <h2 class="mind-section-title reveal">Infrastructure</h2>
+
+      <div class="mind-infra-stats reveal-stagger">
+        <div class="mind-infra-stat">
+          <div class="mind-stat-label">chain</div>
+          <div class="mind-stat-value">Base L2</div>
+        </div>
+        <div class="mind-infra-stat">
+          <div class="mind-stat-label">protocol</div>
+          <div class="mind-stat-value">x402</div>
+        </div>
+        <div class="mind-infra-stat">
+          <div class="mind-stat-label">settlement</div>
+          <div class="mind-stat-value">USDC</div>
+        </div>
+        <div class="mind-infra-stat">
+          <div class="mind-stat-label">wallet</div>
+          <div class="mind-stat-value">Bankr</div>
+        </div>
+      </div>
+
+      <div class="mind-source-grid reveal-stagger">
+        <div class="mind-source">
+          <div class="mind-source-name">X / Twitter</div>
+          <p class="mind-source-desc">founder shipping signals, community sentiment, narrative flow monitoring</p>
+        </div>
+        <div class="mind-source">
+          <div class="mind-source-name">On-Chain Data</div>
+          <p class="mind-source-desc">contract deploys, transaction patterns, wallet activity, protocol metrics</p>
+        </div>
+        <div class="mind-source">
+          <div class="mind-source-name">GitHub</div>
+          <p class="mind-source-desc">commit velocity, code quality signals, shipping cadence, test coverage</p>
+        </div>
+        <div class="mind-source">
+          <div class="mind-source-name">Basescan</div>
+          <p class="mind-source-desc">contract verification, deploy history, interaction patterns, gas usage</p>
+        </div>
+        <div class="mind-source">
+          <div class="mind-source-name">Community Intel</div>
+          <p class="mind-source-desc">signal voting, project suggestions, deal sourcing from trusted contributors</p>
+        </div>
+        <div class="mind-source">
+          <div class="mind-source-name">Direct Pitches</div>
+          <p class="mind-source-desc">founder submissions via /pitch. every pitch evaluated against the scorecard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Community -->
+  <section class="mind-community">
+    <div class="container">
+      <h2 class="mind-section-title reveal">Community</h2>
+      <div class="mind-community-grid reveal-stagger">
+        <div class="mind-community-item">
+          <div class="mind-community-name">Signal Voting</div>
+          <p class="mind-community-desc">community members vote on projects from the active watchlist. conviction signals influence acquisition priority.</p>
+        </div>
+        <div class="mind-community-item">
+          <div class="mind-community-name">Pitch Intake</div>
+          <p class="mind-community-desc">founders submit projects directly. every pitch scored on builder conviction, community seed, and on-chain proof.</p>
+        </div>
+        <div class="mind-community-item">
+          <div class="mind-community-name">Intelligence Sourcing</div>
+          <p class="mind-community-desc">contributors who surface accepted deals are tracked. on-chain reputation scores earned through successful referrals.</p>
+        </div>
+        <div class="mind-community-item">
+          <div class="mind-community-name">$SIBYL Future</div>
+          <p class="mind-community-desc">holders gain voting power on acquisitions. realized portfolio gains flow back. high-reputation contributors gain early access.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom CTA -->
+  <section class="mind-bottom-cta">
+    <div class="container">
+      <p class="mind-bottom-cta-line reveal">the mind is open. now put it to work.</p>
+      <div class="reveal">
+        <a href="/pitch" class="builders-cta-btn">submit your project</a>
+      </div>
+      <div class="reveal">
+        <a href="/" class="mind-back-link">&larr; back to sibylcap.com</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-left">SIBYL operates on Base.</span>
+        <span class="footer-right"><a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>
