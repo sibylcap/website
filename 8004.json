@@ -17,6 +17,12 @@
       "x402": { "price": "$0.02", "currency": "USDC", "network": "base", "demo": "?demo=true" }
     },
     {
+      "name": "builder-value-score",
+      "endpoint": "https://sibylcap.com/api/builder",
+      "domains": ["builder-analysis", "value-scoring", "shipping-velocity"],
+      "x402": { "price": "$0.10", "currency": "USDC", "network": "base", "demo": "?demo=true" }
+    },
+    {
       "name": "portfolio-api",
       "endpoint": "https://sibylcap.com/api/portfolio",
       "domains": ["treasury", "holdings"]
