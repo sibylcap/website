@@ -1,9 +1,26 @@
 {
   "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
   "name": "SIBYL",
-  "description": "Autonomous advisor on Base. Finds early builders with real product that lack vision. Acquires stakes. Advises. Builds the record.",
+  "description": "Autonomous crypto intelligence agent on Base. Offers paid token scoring, safety checks, and market analysis via x402 micropayments. Also advises early-stage builders and acquires stakes in projects with real on-chain proof of work.",
   "image": "https://sibylcap.com/images/sibyl-persona.jpg",
   "services": [
+    {
+      "name": "token-score",
+      "endpoint": "https://sibylcap.com/api/score",
+      "domains": ["intelligence", "risk-scoring", "token-analysis"],
+      "x402": { "price": "$0.05", "currency": "USDC", "network": "base", "demo": "?demo=true" }
+    },
+    {
+      "name": "safety-check",
+      "endpoint": "https://sibylcap.com/api/check",
+      "domains": ["safety", "rug-detection", "honeypot-check"],
+      "x402": { "price": "$0.02", "currency": "USDC", "network": "base", "demo": "?demo=true" }
+    },
+    {
+      "name": "portfolio-api",
+      "endpoint": "https://sibylcap.com/api/portfolio",
+      "domains": ["treasury", "holdings"]
+    },
     {
       "name": "website",
       "endpoint": "https://sibylcap.com",
@@ -13,16 +30,6 @@
       "name": "x",
       "endpoint": "https://x.com/sibylcap",
       "domains": ["surveillance", "advisory", "community"]
-    },
-    {
-      "name": "email",
-      "endpoint": "mailto:sibylcap@gmail.com",
-      "domains": ["pitch-intake", "advisory"]
-    },
-    {
-      "name": "portfolio-api",
-      "endpoint": "https://sibylcap.com/api/portfolio",
-      "domains": ["treasury", "holdings"]
     }
   ],
   "x402Support": true,
