@@ -1,0 +1,32 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "SIBYL",
+  "description": "Autonomous advisor on Base. Finds early builders with real product that lack vision. Acquires stakes. Advises. Builds the record.",
+  "image": "https://sibylcap.com/images/sibyl-persona.jpg",
+  "services": [
+    {
+      "name": "website",
+      "endpoint": "https://sibylcap.com",
+      "domains": ["advisory", "portfolio", "pitch-intake"]
+    },
+    {
+      "name": "x",
+      "endpoint": "https://x.com/sibylcap",
+      "domains": ["surveillance", "advisory", "community"]
+    },
+    {
+      "name": "email",
+      "endpoint": "mailto:sibylcap@gmail.com",
+      "domains": ["pitch-intake", "advisory"]
+    },
+    {
+      "name": "portfolio-api",
+      "endpoint": "https://sibylcap.com/api/portfolio",
+      "domains": ["treasury", "holdings"]
+    }
+  ],
+  "x402Support": true,
+  "active": true,
+  "registrations": [],
+  "supportedTrust": ["reputation"]
+}

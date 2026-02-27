@@ -13,7 +13,7 @@
      Scroll Reveal via IntersectionObserver
      ------------------------------------------ */
   if (!prefersReduced && 'IntersectionObserver' in window) {
-    var revealElements = document.querySelectorAll('.reveal');
+    var revealElements = document.querySelectorAll('.reveal, .reveal-stagger');
     var revealObserver = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -22,8 +22,8 @@
         }
       });
     }, {
-      threshold: 0.15,
-      rootMargin: '0px 0px -40px 0px'
+      threshold: 0.12,
+      rootMargin: '0px 0px -30px 0px'
     });
 
     revealElements.forEach(function (el) {
@@ -31,9 +31,117 @@
     });
   } else {
     // If reduced motion or no IO support, show everything
-    var allReveal = document.querySelectorAll('.reveal');
+    var allReveal = document.querySelectorAll('.reveal, .reveal-stagger');
     allReveal.forEach(function (el) {
       el.classList.add('visible');
+    });
+  }
+
+  /* ------------------------------------------
+     Parallax on background images
+     ------------------------------------------ */
+  if (!prefersReduced) {
+    var parallaxSections = [
+      { el: document.querySelector('.hero'), speed: 0.25 },
+      { el: document.querySelector('.process'), speed: 0.15 },
+      { el: document.querySelector('.record'), speed: 0.15 }
+    ];
+
+    var ticking = false;
+    function updateParallax() {
+      var scrollY = window.scrollY;
+      parallaxSections.forEach(function (s) {
+        if (!s.el) return;
+        var before = s.el.querySelector(':scope > *');
+        if (!before) return;
+        var rect = s.el.getBoundingClientRect();
+        var offset = rect.top + scrollY;
+        var shift = (scrollY - offset) * s.speed;
+        s.el.style.setProperty('--parallax-y', shift + 'px');
+      });
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    }, { passive: true });
+  }
+
+  /* ------------------------------------------
+     Treasury count-up animation
+     ------------------------------------------ */
+  if (!prefersReduced && 'IntersectionObserver' in window) {
+    var treasuryGrid = document.querySelector('.treasury-grid');
+    var countUpDone = false;
+
+    if (treasuryGrid) {
+      var countObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && !countUpDone) {
+            countUpDone = true;
+            countObserver.unobserve(entry.target);
+            // Wait for portfolio data to load, then animate
+            var checkData = setInterval(function () {
+              var el = document.getElementById('t-total');
+              if (el && el.textContent !== '...' && el.textContent !== '--') {
+                clearInterval(checkData);
+                animateTreasuryValues();
+              }
+            }, 200);
+            // Stop checking after 8s
+            setTimeout(function () { clearInterval(checkData); }, 8000);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      countObserver.observe(treasuryGrid);
+    }
+  }
+
+  function animateTreasuryValues() {
+    var ids = ['t-total', 't-deployable', 't-reserve'];
+    ids.forEach(function (id, i) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var text = el.textContent;
+      var target = parseFloat(text.replace(/[$,]/g, ''));
+      if (isNaN(target)) return;
+
+      var duration = 1200;
+      var delay = i * 150;
+      var start = null;
+
+      el.textContent = '$0';
+
+      setTimeout(function () {
+        requestAnimationFrame(function step(ts) {
+          if (!start) start = ts;
+          var progress = Math.min((ts - start) / duration, 1);
+          // Ease out cubic
+          var eased = 1 - Math.pow(1 - progress, 3);
+          var current = target * eased;
+
+          if (current >= 1000) {
+            el.textContent = '$' + Math.round(current).toLocaleString('en-US');
+          } else {
+            el.textContent = '$' + current.toFixed(2);
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            // Snap to final formatted value
+            if (target >= 1000) {
+              el.textContent = '$' + Math.round(target).toLocaleString('en-US');
+            } else {
+              el.textContent = '$' + target.toFixed(2);
+            }
+          }
+        });
+      }, delay);
     });
   }
 
@@ -95,6 +203,50 @@
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         handleCopy();
+      }
+    });
+  }
+
+  /* ------------------------------------------
+     Copy email address
+     ------------------------------------------ */
+  var emailBtn = document.getElementById('email-copy');
+  if (emailBtn) {
+    var emailAddr = emailBtn.getAttribute('data-email');
+    var emailCopyLabel = emailBtn.querySelector('.copy-label');
+
+    function handleEmailCopy() {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(emailAddr).then(function () {
+          showEmailCopied();
+        });
+      } else {
+        var textarea = document.createElement('textarea');
+        textarea.value = emailAddr;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showEmailCopied();
+      }
+    }
+
+    function showEmailCopied() {
+      emailCopyLabel.textContent = 'copied';
+      emailBtn.classList.add('copied');
+      setTimeout(function () {
+        emailCopyLabel.textContent = 'copy';
+        emailBtn.classList.remove('copied');
+      }, 2000);
+    }
+
+    emailBtn.addEventListener('click', handleEmailCopy);
+    emailBtn.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleEmailCopy();
       }
     });
   }

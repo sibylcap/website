@@ -129,8 +129,9 @@ section {
 
 .reveal {
   opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: translateY(16px);
+  transition: opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .reveal.visible {
@@ -138,13 +139,53 @@ section {
   transform: translateY(0);
 }
 
+/* Stagger children inside grids when parent becomes visible */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.reveal-stagger.visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-stagger.visible > *:nth-child(1) { transition-delay: 0s; }
+.reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.1s; }
+.reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.2s; }
+.reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.3s; }
+.reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.4s; }
+
+/* Hero rule expands from center */
+.hero-rule {
+  transform: scaleX(0);
+  transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) 0.3s;
+}
+
+.hero-rule.visible {
+  transform: scaleX(1);
+}
+
+/* Count-up values start invisible until animated */
+.count-up {
+  transition: opacity 0.3s ease;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .reveal,
+  .reveal-stagger > * {
     opacity: 1;
     transform: none;
     transition: none;
   }
-  .reveal.visible {
+  .reveal.visible,
+  .reveal-stagger.visible > * {
+    transform: none;
+    transition: none;
+  }
+  .hero-rule {
     transform: none;
     transition: none;
   }
@@ -283,6 +324,24 @@ section {
   text-align: center;
   padding: 6rem 2rem 3rem;
   position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -20% 0;
+  background: url('/images/bg-hero.png') center center / cover no-repeat;
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+  transform: translateY(var(--parallax-y, 0));
+  will-change: transform;
+}
+
+.hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-eyebrow {
@@ -321,12 +380,36 @@ section {
 
 .hero-contact {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.875rem;
   margin-top: 2.5rem;
 }
 
-.hero-contact a {
+.hero-x {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.hero-x svg {
+  width: 16px;
+  height: 16px;
+  fill: var(--text-muted);
+  transition: fill 0.2s ease;
+}
+
+.hero-x:hover svg {
+  fill: var(--text-primary);
+}
+
+.hero-email {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   color: var(--text-muted);
@@ -334,14 +417,26 @@ section {
   transition: color 0.2s ease;
 }
 
-.hero-contact a:hover {
-  color: var(--accent);
+.hero-email:hover {
+  color: var(--text-secondary);
 }
 
-.hero-contact-sep {
-  width: 1px;
-  height: 12px;
-  background: var(--border-strong);
+.hero-email .copy-label {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.hero-email:hover .copy-label {
+  opacity: 1;
+}
+
+.hero-email.copied .copy-label {
+  color: var(--gold);
+  opacity: 1;
 }
 
 .scroll-indicator {
@@ -385,6 +480,25 @@ section {
 
 .process {
   border-top: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.process::before {
+  content: '';
+  position: absolute;
+  inset: -20% 0;
+  background: url('/images/bg-process.png') center center / cover no-repeat;
+  opacity: 0.2;
+  z-index: 0;
+  pointer-events: none;
+  transform: translateY(var(--parallax-y, 0));
+  will-change: transform;
+}
+
+.process > * {
+  position: relative;
+  z-index: 1;
 }
 
 .process-grid {
@@ -437,6 +551,25 @@ section {
 .record {
   padding: 6rem 0;
   border-top: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.record::before {
+  content: '';
+  position: absolute;
+  inset: -20% 0;
+  background: url('/images/bg-record.png') center center / cover no-repeat;
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+  transform: translateY(var(--parallax-y, 0));
+  will-change: transform;
+}
+
+.record > * {
+  position: relative;
+  z-index: 1;
 }
 
 .treasury-grid {
@@ -530,6 +663,9 @@ section {
 /* Watchlist */
 .watchlist-section {
   margin-top: 3rem;
+  padding: 2rem;
+  background: var(--elevated);
+  border: 1px solid var(--border-strong);
 }
 
 .watchlist-section h3 {
@@ -603,23 +739,25 @@ section {
   line-height: 1.8;
 }
 
-.builders-cta {
+.builders-cta-btn {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-strong);
+  color: var(--bg);
+  background: var(--gold);
+  border: 1px solid var(--gold);
   padding: 0.75rem 2rem;
   margin-top: 0.5rem;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   border-radius: 2px;
 }
 
-.builders-cta:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+.builders-cta-btn:hover {
+  background: var(--gold-hover);
+  border-color: var(--gold-hover);
+  color: var(--bg);
 }
 
 /* Pitch page (shared criteria styles) */
@@ -817,8 +955,9 @@ section {
 /* Community Signal */
 .signal-section {
   margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border);
+  padding: 2rem;
+  background: var(--elevated);
+  border: 1px solid var(--border-strong);
 }
 
 .signal-section h3 {
@@ -891,7 +1030,7 @@ section {
 .suggest-wrap {
   margin-top: 1.5rem;
   padding-top: 1.25rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-strong);
 }
 
 .suggest-wrap h4 {
