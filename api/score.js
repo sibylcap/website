@@ -187,7 +187,8 @@ function computeScore(pair, pairCount, hasCode, totalSupply, tokenAddress, isDem
   var conScore = 0;
   var conSignals = [];
 
-  if (hasCode) { conScore += 8; conSignals.push('bytecode verified on Base'); }
+  if (hasCode === true) { conScore += 8; conSignals.push('bytecode verified on Base'); }
+  else if (hasCode === null) { conScore += 4; conSignals.push('bytecode check inconclusive (RPC timeout)'); }
   else { conSignals.push('no bytecode found'); flags.push('DANGER: no contract code at this address.'); }
 
   if (totalSupply !== null) {
@@ -311,36 +312,50 @@ async function fetchDexScreener(token) {
 }
 
 async function checkBytecode(token) {
-  try {
-    var resp = await fetch(RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_getCode', params: [token, 'latest'], id: 1 })
-    });
-    var data = await resp.json();
-    return data.result && data.result !== '0x' && data.result.length > 2;
-  } catch (e) {
-    console.error('bytecode_check_failed:', e.message);
-    return false;
+  var rpcs = [RPC, 'https://mainnet.base.org', 'https://base.llamarpc.com'];
+  for (var i = 0; i < rpcs.length; i++) {
+    try {
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 3000);
+      var resp = await fetch(rpcs[i], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_getCode', params: [token, 'latest'], id: 1 }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      var data = await resp.json();
+      if (data.result && data.result !== '0x' && data.result.length > 2) return true;
+      if (data.result === '0x') return false;
+    } catch (e) {
+      continue;
+    }
   }
+  return null;
 }
 
 async function fetchTotalSupply(token) {
-  try {
-    var resp = await fetch(RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_call', params: [{ to: token, data: '0x18160ddd' }, 'latest'], id: 1 })
-    });
-    var data = await resp.json();
-    if (data.result && data.result !== '0x') {
-      return parseInt(data.result, 16) / 1e18;
+  var rpcs = [RPC, 'https://mainnet.base.org', 'https://base.llamarpc.com'];
+  for (var i = 0; i < rpcs.length; i++) {
+    try {
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 3000);
+      var resp = await fetch(rpcs[i], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_call', params: [{ to: token, data: '0x18160ddd' }, 'latest'], id: 1 }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      var data = await resp.json();
+      if (data.result && data.result !== '0x') {
+        return parseInt(data.result, 16) / 1e18;
+      }
+    } catch (e) {
+      continue;
     }
-    return null;
-  } catch (e) {
-    console.error('total_supply_failed:', e.message);
-    return null;
   }
+  return null;
 }
 
 // ── FORMATTERS ──

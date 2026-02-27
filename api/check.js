@@ -56,7 +56,10 @@ module.exports = async function handler(req, res) {
     var warnings = [];
     var riskLevel = 'low';
 
-    if (!hasCode) {
+    if (hasCode === null) {
+      checks.contract_exists = null;
+      warnings.push('bytecode check inconclusive. RPC timeout.');
+    } else if (!hasCode) {
       warnings.push('no contract bytecode at this address.');
       riskLevel = 'critical';
     }
@@ -195,15 +198,24 @@ async function fetchDexScreener(token) {
 }
 
 async function checkBytecode(token) {
-  try {
-    var resp = await fetch(RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_getCode', params: [token, 'latest'], id: 1 })
-    });
-    var data = await resp.json();
-    return data.result && data.result !== '0x' && data.result.length > 2;
-  } catch (e) {
-    return false;
+  var rpcs = [RPC, 'https://mainnet.base.org', 'https://base.llamarpc.com'];
+  for (var i = 0; i < rpcs.length; i++) {
+    try {
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 3000);
+      var resp = await fetch(rpcs[i], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_getCode', params: [token, 'latest'], id: 1 }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      var data = await resp.json();
+      if (data.result && data.result !== '0x' && data.result.length > 2) return true;
+      if (data.result === '0x') return false; // definitive: no code
+    } catch (e) {
+      continue; // try next RPC
+    }
   }
+  return null; // inconclusive, all RPCs failed
 }
