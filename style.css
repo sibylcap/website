@@ -1478,8 +1478,8 @@ a.mind-source:hover {
 .mind-exo-desc {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  line-height: 1.5;
-  margin-top: 0.5rem;
+  line-height: 1.7;
+  margin-top: 0.75rem;
 }
 
 .mind-exo-desc a {
