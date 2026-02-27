@@ -1426,6 +1426,80 @@ a.mind-source:hover {
   color: var(--text-primary);
 }
 
+.mind-exo {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.mind-exo-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  transition: border-color 0.3s;
+}
+
+.mind-exo-card:hover {
+  border-color: var(--gold);
+}
+
+.mind-exo-visual img {
+  width: 160px;
+  height: 160px;
+  border: 1px solid var(--border);
+}
+
+.mind-exo-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.mind-exo-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 0.15rem 0.5rem;
+  margin-top: 0.375rem;
+  opacity: 0.8;
+}
+
+.mind-exo-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 0.5rem;
+}
+
+.mind-exo-desc a {
+  color: var(--gold);
+}
+
+.mind-exo-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--text-muted);
+}
+
+.mind-exo-meta a {
+  color: var(--text-secondary);
+}
+
 .mind-wallet-arch {
   display: flex;
   align-items: stretch;
@@ -1905,6 +1979,22 @@ a.mind-source:hover {
   .mind-stat:nth-child(1),
   .mind-stat:nth-child(2) {
     border-bottom: 1px solid var(--border);
+  }
+
+  .mind-exo-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .mind-exo-visual img {
+    width: 140px;
+    height: 140px;
+  }
+
+  .mind-exo-meta {
+    align-items: center;
   }
 
   .mind-wallet-arch {
