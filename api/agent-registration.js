@@ -1,0 +1,20 @@
+/* Serves /.well-known/agent-registration.json for ERC-8004 domain verification.
+   Routed via vercel.json rewrite. */
+
+var registration = {
+  agentId: 20880,
+  agentRegistry: 'eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432',
+  reputationRegistry: 'eip155:8453:0x8004BAa17C55a88189AE136b182e5fdA19dE9b63',
+  network: 'eip155:8453',
+  domain: 'sibylcap.com',
+  ownerWallet: '0x4069ef1afC8A9b2a29117A3740fCAB2912499fBe',
+  paymentWallet: '0xe3e14118238b5693c854674f7c276136a2dd311f',
+  agentCard: 'https://sibylcap.com/8004.json'
+};
+
+module.exports = function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  return res.status(200).json(registration);
+};

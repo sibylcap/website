@@ -36,6 +36,12 @@
       ]
     }
   ],
+  "rewrites": [
+    {
+      "source": "/.well-known/agent-registration.json",
+      "destination": "/api/agent-registration"
+    }
+  ],
   "cleanUrls": true,
   "trailingSlash": false
 }
