@@ -17,8 +17,10 @@ var TOKENS = {
   weth:  { address: '0x4200000000000000000000000000000000000006', decimals: 18 },
   usdc:  { address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', decimals: 6 },
   tgate: { address: '0xfaded58c5fac3d95643a14ee33b7ea9f50084b9a', decimals: 18 },
-  sigil: { address: '0xDacE999d08eA443E800996208dF40a6D13A9c1Bd', decimals: 18 },
 };
+
+// SIGIL tracked separately: held across stealth+cold, not bankr
+var SIGIL = { address: '0xDacE999d08eA443E800996208dF40a6D13A9c1Bd', decimals: 18 };
 
 // Holdings metadata: updated when trades happen
 var HOLDINGS_META = [
@@ -55,26 +57,28 @@ module.exports = async function handler(req, res) {
       calls.push({ method: 'eth_call', params: [{ to: TOKENS[tokenNames[j]].address, data: calldata }, 'latest'] });
     }
 
-    // SIGIL balances across stealth + cold wallets
-    var sigilCallStart = calls.length;
+    // SIGIL balances across stealth + cold wallets (separate batch to stay under limits)
+    var sigilCalls = [];
     for (var s = 0; s < SIGIL_WALLETS.length; s++) {
       var sAddr = WALLETS[SIGIL_WALLETS[s]].toLowerCase().replace('0x', '');
       var sCalldata = '0x70a08231' + '000000000000000000000000' + sAddr;
-      calls.push({ method: 'eth_call', params: [{ to: TOKENS.sigil.address, data: sCalldata }, 'latest'] });
+      sigilCalls.push({ method: 'eth_call', params: [{ to: SIGIL.address, data: sCalldata }, 'latest'] });
     }
 
-    // Fetch balances and prices in parallel
+    // Fetch balances and prices in parallel (two separate RPC batches to stay under limits)
     var results = await Promise.all([
       batchRpc(calls),
+      batchRpc(sigilCalls),
       fetchEthPrice(),
       fetchTgatePrice(),
-      fetchTokenPrice(TOKENS.sigil.address),
+      fetchTokenPrice(SIGIL.address),
     ]);
 
     var rpcResults = results[0];
-    var ethPrice = results[1];
-    var tgatePrice = results[2];
-    var sigilPrice = results[3];
+    var sigilResults = results[1];
+    var ethPrice = results[2];
+    var tgatePrice = results[3];
+    var sigilPrice = results[4];
 
     // Parse ETH balances
     var ethBalances = {};
@@ -94,9 +98,9 @@ module.exports = async function handler(req, res) {
     // Parse SIGIL balances across stealth + cold wallets
     var totalSigilTokens = 0;
     for (var si = 0; si < SIGIL_WALLETS.length; si++) {
-      var sr = rpcResults[sigilCallStart + si];
+      var sr = sigilResults[si];
       if (sr && sr.result) {
-        totalSigilTokens += parseInt(sr.result, 16) / Math.pow(10, TOKENS.sigil.decimals);
+        totalSigilTokens += parseInt(sr.result, 16) / Math.pow(10, SIGIL.decimals);
       }
     }
 
