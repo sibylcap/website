@@ -58,15 +58,13 @@ module.exports = async function handler(req, res) {
   var isDemo = req.query.demo === 'true';
 
   try {
-    // Phase 1: Fetch core data + auto-discover GitHub if not provided
+    // Fetch core data in parallel
     var fetches = [
       // Evaluation data
       fetchDexScreener(token),
       checkBytecode(token),
       fetchTotalSupply(token),
       twitter ? fetchXActivity(twitter) : Promise.resolve(null),
-      // GitHub discovery if needed
-      (!github && twitter) ? discoverGitHubFromX(twitter) : Promise.resolve(null),
       // Narrative data
       fetchBoostedTokens(),
       fetchTokenProfiles()
@@ -77,16 +75,10 @@ module.exports = async function handler(req, res) {
     var hasCode = results[1];
     var totalSupply = results[2];
     var xData = results[3];
-    var discovery = results[4];
-    var boosted = results[5];
-    var profiles = results[6];
+    var boosted = results[4];
+    var profiles = results[5];
 
-    // If we discovered a GitHub handle, use it
-    if (!github && discovery && discovery.handle) {
-      github = discovery.handle;
-    }
-
-    // Also try npm discovery if X bio didn't find anything
+    // Auto-discover GitHub via npm registry if not provided (free, no auth)
     if (!github && dexData && dexData.pairs && dexData.pairs.length > 0) {
       var symForNpm = (dexData.pairs[0].baseToken && dexData.pairs[0].baseToken.symbol) || '';
       var nameForNpm = (dexData.pairs[0].baseToken && dexData.pairs[0].baseToken.name) || '';
@@ -96,7 +88,7 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // Phase 2: Fetch GitHub activity if we now have a handle
+    // Fetch GitHub activity if we have a handle (provided or discovered)
     var ghData = null;
     if (github) {
       ghData = await fetchGitHubActivity(github);
@@ -786,59 +778,7 @@ async function fetchTokenProfiles() {
   }
 }
 
-// ── GITHUB AUTO-DISCOVERY ──
-
-async function discoverGitHubFromX(handle) {
-  var bearer = X_BEARER;
-  if (!bearer) return null;
-  if (bearer.indexOf('%') !== -1) {
-    try { bearer = decodeURIComponent(bearer); } catch (e) {}
-  }
-
-  try {
-    var url = 'https://api.twitter.com/2/users/by/username/' + encodeURIComponent(handle)
-      + '?user.fields=description,entities,url';
-
-    var controller = new AbortController();
-    var timeout = setTimeout(function() { controller.abort(); }, 5000);
-    var resp = await fetch(url, {
-      headers: { 'Authorization': 'Bearer ' + bearer },
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-
-    if (!resp.ok) return null;
-
-    var data = await resp.json();
-    var user = data.data;
-    if (!user) return null;
-
-    var urls = [];
-    if (user.entities) {
-      if (user.entities.url && user.entities.url.urls) {
-        user.entities.url.urls.forEach(function(u) { urls.push(u.expanded_url || u.url || ''); });
-      }
-      if (user.entities.description && user.entities.description.urls) {
-        user.entities.description.urls.forEach(function(u) { urls.push(u.expanded_url || u.url || ''); });
-      }
-    }
-
-    var desc = user.description || '';
-    var ghMatch = desc.match(/github\.com\/([a-zA-Z0-9_-]+)/i);
-    if (ghMatch) urls.push('https://github.com/' + ghMatch[1]);
-
-    for (var i = 0; i < urls.length; i++) {
-      var match = urls[i].match(/github\.com\/([a-zA-Z0-9_-]+)/i);
-      if (match && match[1].toLowerCase() !== 'topics' && match[1].toLowerCase() !== 'search') {
-        return { handle: match[1].toLowerCase(), source: 'x_bio', x_handle: handle };
-      }
-    }
-
-    return null;
-  } catch (err) {
-    return null;
-  }
-}
+// ── GITHUB AUTO-DISCOVERY (npm only, free, no auth) ──
 
 async function discoverGitHubFromNpm(symbol, name) {
   if (!symbol && !name) return null;

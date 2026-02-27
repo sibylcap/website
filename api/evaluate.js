@@ -45,7 +45,7 @@ module.exports = async function handler(req, res) {
   var isDemo = req.query.demo === 'true';
 
   try {
-    // Phase 1: Fetch core data + auto-discover GitHub if not provided
+    // Fetch core data in parallel
     var fetches = [
       fetchDexScreener(token),
       checkBytecode(token),
@@ -54,26 +54,14 @@ module.exports = async function handler(req, res) {
     if (twitter) fetches.push(fetchXActivity(twitter));
     else fetches.push(Promise.resolve(null));
 
-    // If no github provided, run auto-discovery in parallel with core fetches
-    if (!github && twitter) fetches.push(discoverGitHubFromX(twitter));
-    else if (!github) fetches.push(discoverGitHubFromNpm(null));
-    else fetches.push(Promise.resolve(null));
-
     var results = await Promise.all(fetches);
     var dexData = results[0];
     var hasCode = results[1];
     var totalSupply = results[2];
     var xData = results[3];
-    var discovery = results[4];
 
-    // If we discovered a GitHub handle, use it
+    // Auto-discover GitHub via npm registry if not provided (free, no auth)
     var discoveredGithub = null;
-    if (!github && discovery && discovery.handle) {
-      github = discovery.handle;
-      discoveredGithub = discovery;
-    }
-
-    // Also try npm discovery if X bio didn't find anything and we have a symbol from DexScreener
     if (!github && dexData && dexData.pairs && dexData.pairs.length > 0) {
       var symForNpm = (dexData.pairs[0].baseToken && dexData.pairs[0].baseToken.symbol) || '';
       var nameForNpm = (dexData.pairs[0].baseToken && dexData.pairs[0].baseToken.name) || '';
@@ -84,7 +72,7 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // Phase 2: Fetch GitHub activity if we now have a handle
+    // Fetch GitHub activity if we have a handle (provided or discovered)
     var ghData = null;
     if (github) {
       ghData = await fetchGitHubActivity(github);
@@ -176,6 +164,8 @@ function computeEvaluation(tokenAddr, dexData, hasCode, totalSupply, xData, ghDa
 
   if (!twitter && !github) {
     builderSignals.push('no builder handles provided. provide ?twitter= and/or ?github= for full scoring.');
+  } else if (!ghOk && !github) {
+    builderSignals.push('no github found. provide ?github= for up to 5 additional builder conviction points.');
   }
 
   // ── 2. COMMUNITY SEED (0-10) ──
@@ -318,6 +308,7 @@ function computeEvaluation(tokenAddr, dexData, hasCode, totalSupply, xData, ghDa
     },
     product_clarity: productClarity,
     github_discovered: discoveredGithub || null,
+    note: buildNote(twitter, github, ghOk, discoveredGithub),
     flags: flags,
     recommendation: rec,
     summary: parts.join(' '),
@@ -574,63 +565,7 @@ function processGitHubEvents(events, username) {
 
 // ── GITHUB AUTO-DISCOVERY ──
 
-// Extract github.com links from X/Twitter user bio
-async function discoverGitHubFromX(handle) {
-  var bearer = X_BEARER;
-  if (!bearer) return null;
-  if (bearer.indexOf('%') !== -1) {
-    try { bearer = decodeURIComponent(bearer); } catch (e) {}
-  }
-
-  try {
-    var url = 'https://api.twitter.com/2/users/by/username/' + encodeURIComponent(handle)
-      + '?user.fields=description,entities,url';
-
-    var controller = new AbortController();
-    var timeout = setTimeout(function() { controller.abort(); }, 5000);
-    var resp = await fetch(url, {
-      headers: { 'Authorization': 'Bearer ' + bearer },
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-
-    if (!resp.ok) return null;
-
-    var data = await resp.json();
-    var user = data.data;
-    if (!user) return null;
-
-    // Check expanded URLs in entities (bio links, profile URL)
-    var urls = [];
-    if (user.entities) {
-      if (user.entities.url && user.entities.url.urls) {
-        user.entities.url.urls.forEach(function(u) { urls.push(u.expanded_url || u.url || ''); });
-      }
-      if (user.entities.description && user.entities.description.urls) {
-        user.entities.description.urls.forEach(function(u) { urls.push(u.expanded_url || u.url || ''); });
-      }
-    }
-
-    // Also regex the raw description text for github links
-    var desc = user.description || '';
-    var ghMatch = desc.match(/github\.com\/([a-zA-Z0-9_-]+)/i);
-    if (ghMatch) urls.push('https://github.com/' + ghMatch[1]);
-
-    // Find first github.com URL and extract the username/org
-    for (var i = 0; i < urls.length; i++) {
-      var match = urls[i].match(/github\.com\/([a-zA-Z0-9_-]+)/i);
-      if (match && match[1].toLowerCase() !== 'topics' && match[1].toLowerCase() !== 'search') {
-        return { handle: match[1].toLowerCase(), source: 'x_bio', x_handle: handle };
-      }
-    }
-
-    return null;
-  } catch (err) {
-    return null;
-  }
-}
-
-// Look up npm registry for a package matching the token symbol/name
+// Look up npm registry for a package matching the token symbol/name (free, no auth)
 async function discoverGitHubFromNpm(symbol, name) {
   if (!symbol && !name) return null;
 
@@ -672,6 +607,27 @@ async function discoverGitHubFromNpm(symbol, name) {
     }
   }
 
+  return null;
+}
+
+// ── NOTE BUILDER ──
+
+function buildNote(twitter, github, ghOk, discoveredGithub) {
+  var missing = [];
+  if (!twitter) missing.push('twitter');
+  if (!github && !discoveredGithub) missing.push('github');
+
+  if (missing.length === 0 && ghOk) return null;
+
+  if (missing.length === 2) {
+    return 'builder conviction scored 0/10 without twitter or github. provide ?twitter=handle&github=user for full analysis. github alone is worth up to 5 additional points.';
+  }
+  if (missing.indexOf('github') !== -1) {
+    return 'builder conviction is capped at 5/10 without github data. provide ?github=user for up to 5 additional points. many projects ship from private repos or orgs that differ from their project name.';
+  }
+  if (github && !ghOk) {
+    return 'github handle "' + github + '" returned no public activity. if the repo is private, github scoring is unavailable. the builder conviction score reflects X activity only.';
+  }
   return null;
 }
 
