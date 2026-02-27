@@ -1,0 +1,563 @@
+/* SIBYL Full Project Evaluation API.
+   Scores projects on the three SIBYL criteria: Builder Conviction, Community Seed,
+   On-Chain Proof of Work. Returns a conviction score out of 30 with tier classification.
+   Payment: x402 ($0.50 USDC per call). Free with ?demo=true.
+
+   Usage:
+     GET /api/evaluate?token=0x...                                    (paid, $0.50 USDC)
+     GET /api/evaluate?token=0x...&twitter=handle&github=user         (paid, full analysis)
+     GET /api/evaluate?token=0x...&demo=true                          (free, same output)
+
+   Params:
+     token   (required) — ERC-20 contract address on Base
+     twitter (optional) — X handle (without @)
+     github  (optional) — GitHub username or org
+     demo    (optional) — bypass payment gate
+*/
+
+var x402 = require('./_x402');
+var RPC = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
+var X_BEARER = process.env.X_BEARER_TOKEN || '';
+var PRICE_USD = 0.50;
+
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-PAYMENT');
+  res.setHeader('Access-Control-Expose-Headers', 'X-PAYMENT-RESPONSE');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  var token = (req.query.token || '').toLowerCase();
+  if (!token || !/^0x[a-f0-9]{40}$/.test(token)) {
+    return res.status(400).json({ error: 'invalid token address. use ?token=0x...' });
+  }
+
+  var twitter = (req.query.twitter || '').replace(/^@/, '').toLowerCase();
+  var github = (req.query.github || '').toLowerCase();
+
+  var paid = await x402.gate(req, res, {
+    priceUsd: PRICE_USD,
+    description: 'SIBYL full project evaluation'
+  });
+  if (!paid) return;
+
+  var isDemo = req.query.demo === 'true';
+
+  try {
+    // Fetch all data sources in parallel
+    var fetches = [
+      fetchDexScreener(token),
+      checkBytecode(token),
+      fetchTotalSupply(token)
+    ];
+    if (twitter) fetches.push(fetchXActivity(twitter));
+    else fetches.push(Promise.resolve(null));
+    if (github) fetches.push(fetchGitHubActivity(github));
+    else fetches.push(Promise.resolve(null));
+
+    var results = await Promise.all(fetches);
+    var dexData = results[0];
+    var hasCode = results[1];
+    var totalSupply = results[2];
+    var xData = results[3];
+    var ghData = results[4];
+
+    var result = computeEvaluation(token, dexData, hasCode, totalSupply, xData, ghData, twitter, github, isDemo);
+
+    res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
+    return res.status(200).json(result);
+  } catch (err) {
+    console.error('evaluate_error:', err.message, err.stack);
+    return res.status(500).json({ error: 'evaluation failed', detail: err.message });
+  }
+};
+
+// ── EVALUATION ENGINE ──
+
+function computeEvaluation(tokenAddr, dexData, hasCode, totalSupply, xData, ghData, twitter, github, isDemo) {
+  var flags = [];
+  var dataSources = ['dexscreener', 'base-rpc'];
+  if (twitter) dataSources.push('x-api');
+  if (github) dataSources.push('github-api');
+
+  // Parse market data from DexScreener
+  var mc = 0, fdv = 0, liquidity = 0, vol24h = 0, priceUsd = 0;
+  var symbol = 'UNKNOWN', name = 'Unknown';
+  var pairAge = 0, pairCount = 0;
+  var txns24h = { buys: 0, sells: 0 };
+  var hasDex = false;
+
+  if (dexData && dexData.pairs && dexData.pairs.length > 0) {
+    hasDex = true;
+    var pairs = dexData.pairs
+      .filter(function(p) { return p.chainId === 'base'; })
+      .sort(function(a, b) { return ((b.liquidity && b.liquidity.usd) || 0) - ((a.liquidity && a.liquidity.usd) || 0); });
+    if (pairs.length === 0) {
+      pairs = dexData.pairs.sort(function(a, b) { return ((b.liquidity && b.liquidity.usd) || 0) - ((a.liquidity && a.liquidity.usd) || 0); });
+    }
+    var pair = pairs[0];
+    pairCount = pairs.length;
+    mc = pair.marketCap || pair.fdv || 0;
+    fdv = pair.fdv || 0;
+    liquidity = (pair.liquidity && pair.liquidity.usd) || 0;
+    vol24h = (pair.volume && pair.volume.h24) || 0;
+    symbol = (pair.baseToken && pair.baseToken.symbol) || 'UNKNOWN';
+    name = (pair.baseToken && pair.baseToken.name) || 'Unknown';
+    pairAge = pair.pairCreatedAt ? (Date.now() - pair.pairCreatedAt) / 86400000 : 0;
+    priceUsd = parseFloat(pair.priceUsd) || 0;
+    txns24h = (pair.txns && pair.txns.h24) || { buys: 0, sells: 0 };
+  }
+
+  // ── 1. BUILDER CONVICTION (0-10) ──
+  // "Is the founder still building when no one is watching?"
+  var builderScore = 0;
+  var builderSignals = [];
+
+  var xOk = xData && !xData.error;
+  var ghOk = ghData && !ghData.error;
+
+  if (xOk) {
+    var shipTweets = xData.shipping_tweets || 0;
+    var tpd = xData.tweets_per_day || 0;
+
+    // Shipping signal density (0-5)
+    if (shipTweets >= 8)       { builderScore += 5; builderSignals.push(shipTweets + ' shipping signals in 7d (prolific)'); }
+    else if (shipTweets >= 4)  { builderScore += 4; builderSignals.push(shipTweets + ' shipping signals in 7d (active)'); }
+    else if (shipTweets >= 2)  { builderScore += 3; builderSignals.push(shipTweets + ' shipping signals in 7d (moderate)'); }
+    else if (shipTweets >= 1)  { builderScore += 2; builderSignals.push(shipTweets + ' shipping signal in 7d'); }
+    else if (tpd > 0)         { builderScore += 1; builderSignals.push('posting but no shipping signals detected'); }
+    else                       { builderSignals.push('no X activity in 7 days'); flags.push('WARNING: zero X posting in past 7 days.'); }
+  } else if (twitter) {
+    builderSignals.push('X data unavailable: ' + (xData ? xData.error : 'fetch failed'));
+  }
+
+  if (ghOk) {
+    var cpw = ghData.commits_per_week || 0;
+    var activeDays = ghData.active_days || 0;
+
+    // Commit velocity + consistency (0-5)
+    if (cpw >= 15 && activeDays >= 15) { builderScore += 5; builderSignals.push(cpw + ' commits/week, ' + activeDays + '/30 active days (relentless)'); }
+    else if (cpw >= 8)                 { builderScore += 4; builderSignals.push(cpw + ' commits/week, ' + activeDays + '/30 active days (strong)'); }
+    else if (cpw >= 4)                 { builderScore += 3; builderSignals.push(cpw + ' commits/week, ' + activeDays + '/30 active days (steady)'); }
+    else if (cpw >= 1)                 { builderScore += 2; builderSignals.push(cpw + ' commits/week, ' + activeDays + '/30 active days (light)'); }
+    else if (activeDays > 0)           { builderScore += 1; builderSignals.push('some GitHub activity but minimal commits'); }
+    else                               { builderSignals.push('no GitHub commits in 30 days'); flags.push('WARNING: zero GitHub commits in past 30 days.'); }
+  } else if (github) {
+    builderSignals.push('GitHub data unavailable: ' + (ghData ? ghData.error : 'fetch failed'));
+  }
+
+  if (!twitter && !github) {
+    builderSignals.push('no builder handles provided. provide ?twitter= and/or ?github= for full scoring.');
+  }
+
+  // ── 2. COMMUNITY SEED (0-10) ──
+  // "Are there real humans who genuinely care?"
+  var communityScore = 0;
+  var communitySignals = [];
+
+  if (hasDex) {
+    var buys = txns24h.buys || 0;
+    var sells = txns24h.sells || 0;
+    var totalTxns = buys + sells;
+    var bsRatio = sells > 0 ? buys / sells : (buys > 0 ? 99 : 0);
+
+    // Transaction count as proxy for community activity (0-4)
+    if (totalTxns >= 1000)     { communityScore += 4; communitySignals.push(fmt(totalTxns) + ' txns/24h (high activity)'); }
+    else if (totalTxns >= 200) { communityScore += 3; communitySignals.push(fmt(totalTxns) + ' txns/24h (moderate activity)'); }
+    else if (totalTxns >= 50)  { communityScore += 2; communitySignals.push(totalTxns + ' txns/24h (low activity)'); }
+    else if (totalTxns > 0)    { communityScore += 1; communitySignals.push(totalTxns + ' txns/24h (minimal)'); }
+    else                        { communitySignals.push('zero transactions in 24h'); flags.push('DANGER: no trading activity in 24 hours.'); }
+
+    // Buy/sell ratio health (0-3)
+    if (bsRatio >= 1.3 && bsRatio < 50)       { communityScore += 3; communitySignals.push(bsRatio.toFixed(2) + ':1 buy/sell ratio (buyers dominant)'); }
+    else if (bsRatio >= 0.8 && bsRatio < 1.3) { communityScore += 2; communitySignals.push(bsRatio.toFixed(2) + ':1 buy/sell ratio (balanced)'); }
+    else if (bsRatio >= 0.5)                   { communityScore += 1; communitySignals.push(bsRatio.toFixed(2) + ':1 buy/sell ratio (sell pressure)'); }
+    else if (totalTxns > 0)                    { communityScore += 0; communitySignals.push(bsRatio.toFixed(2) + ':1 buy/sell ratio (heavy selling)'); flags.push('WARNING: heavy sell pressure.'); }
+
+    if (buys > 10 && sells === 0) {
+      communityScore = Math.max(0, communityScore - 2);
+      flags.push('DANGER: zero sells with ' + buys + ' buys. possible honeypot.');
+    }
+
+    // Volume relative to market cap (0-3)
+    var volMcRatio = mc > 0 ? vol24h / mc * 100 : 0;
+    if (volMcRatio >= 5 && volMcRatio <= 50)       { communityScore += 3; communitySignals.push(volMcRatio.toFixed(1) + '% vol/MC (healthy engagement)'); }
+    else if (volMcRatio >= 1 && volMcRatio < 5)    { communityScore += 2; communitySignals.push(volMcRatio.toFixed(1) + '% vol/MC (quiet)'); }
+    else if (volMcRatio > 50 && volMcRatio <= 100) { communityScore += 1; communitySignals.push(volMcRatio.toFixed(1) + '% vol/MC (elevated, possible wash)'); }
+    else if (volMcRatio > 100)                     { communityScore += 0; communitySignals.push(volMcRatio.toFixed(1) + '% vol/MC (excessive)'); flags.push('WARNING: volume exceeds market cap. possible wash trading.'); }
+    else                                            { communityScore += 0; communitySignals.push(volMcRatio.toFixed(1) + '% vol/MC (dead)'); }
+  } else {
+    communitySignals.push('no trading pairs found. cannot assess community activity.');
+    flags.push('NO_DATA: no DEX pairs found for this token.');
+  }
+
+  // ── 3. ON-CHAIN PROOF (0-10) ──
+  // "Contracts deployed. Transactions happening. Something real exists."
+  var onchainScore = 0;
+  var onchainSignals = [];
+
+  // Bytecode verified (0-3)
+  if (hasCode === true)  { onchainScore += 3; onchainSignals.push('contract bytecode verified on Base'); }
+  else if (hasCode === null) { onchainScore += 1; onchainSignals.push('bytecode check inconclusive (RPC timeout)'); }
+  else { onchainSignals.push('no bytecode found at address'); flags.push('DANGER: no contract code at this address.'); }
+
+  // Total supply check (0-1)
+  if (totalSupply !== null && totalSupply > 0) {
+    onchainScore += 1;
+    onchainSignals.push('supply: ' + fmtSupply(totalSupply));
+  }
+
+  // Pair maturity (0-3)
+  if (hasDex) {
+    if (pairAge > 30)      { onchainScore += 3; onchainSignals.push(Math.floor(pairAge) + 'd pair age (established)'); }
+    else if (pairAge > 14) { onchainScore += 2; onchainSignals.push(Math.floor(pairAge) + 'd pair age (maturing)'); }
+    else if (pairAge > 3)  { onchainScore += 1; onchainSignals.push(pairAge.toFixed(1) + 'd pair age (young)'); }
+    else                   { onchainScore += 0; onchainSignals.push(pairAge.toFixed(1) + 'd pair age (very new)'); flags.push('CAUTION: pair less than 3 days old.'); }
+  }
+
+  // Liquidity depth (0-2)
+  if (liquidity >= 50000)      { onchainScore += 2; onchainSignals.push('$' + fmt(liquidity) + ' liquidity (strong)'); }
+  else if (liquidity >= 10000) { onchainScore += 1; onchainSignals.push('$' + fmt(liquidity) + ' liquidity (thin)'); }
+  else if (liquidity > 0)      { onchainScore += 0; onchainSignals.push('$' + fmt(liquidity) + ' liquidity (dangerous)'); flags.push('DANGER: liquidity below $10K.'); }
+
+  // DEX pair distribution (0-1)
+  if (pairCount > 1)     { onchainScore += 1; onchainSignals.push(pairCount + ' DEX pairs (distributed)'); }
+  else if (pairCount > 0) { onchainSignals.push('single DEX pair'); }
+
+  // ── AGGREGATE ──
+  var convictionScore = builderScore + communityScore + onchainScore;
+  var convictionMax = 30;
+
+  var convictionTier;
+  if (convictionScore >= 25)      convictionTier = 'high';
+  else if (convictionScore >= 20) convictionTier = 'medium-high';
+  else if (convictionScore >= 15) convictionTier = 'medium';
+  else if (convictionScore >= 10) convictionTier = 'low';
+  else                            convictionTier = 'no conviction';
+
+  // ── PRODUCT CLARITY ──
+  var productClarity = 'unknown';
+  if (xOk || ghOk) {
+    var hasBuilderSignals = (xOk && (xData.shipping_tweets || 0) >= 2) || (ghOk && (ghData.commits_per_week || 0) >= 2);
+    var weakMarket = mc < 100000 || liquidity < 5000;
+    if (hasBuilderSignals && weakMarket) {
+      productClarity = 'correctable';
+    } else if (hasBuilderSignals) {
+      productClarity = 'clear';
+    } else {
+      productClarity = 'unclear';
+    }
+  }
+
+  // ── RECOMMENDATION ──
+  var rec;
+  var dangerCount = flags.filter(function(f) { return f.startsWith('DANGER'); }).length;
+  if (convictionScore >= 25 && dangerCount === 0) {
+    rec = 'high conviction. meets SIBYL acquisition criteria. deep engagement warranted.';
+  } else if (convictionScore >= 20 && dangerCount === 0) {
+    rec = 'strong signals across criteria. worth active surveillance and potential position.';
+  } else if (convictionScore >= 15) {
+    rec = 'moderate conviction. builder signals present but gaps remain. monitor.';
+  } else if (convictionScore >= 10) {
+    rec = 'low conviction. insufficient signals for acquisition. revisit if builder activity increases.';
+  } else {
+    rec = 'does not pass evaluation. ' + dangerCount + ' critical flag(s).';
+  }
+
+  // ── SUMMARY ──
+  var parts = [];
+  parts.push(symbol + ' conviction score: ' + convictionScore + '/' + convictionMax + ' (' + convictionTier + ').');
+  parts.push('builder: ' + builderScore + '/10, community: ' + communityScore + '/10, on-chain: ' + onchainScore + '/10.');
+  if (hasDex) parts.push('MC: $' + fmt(mc) + ', liquidity: $' + fmt(liquidity) + '.');
+  if (productClarity === 'correctable') parts.push('product clarity is correctable: builder is shipping but market has not recognized it.');
+  if (dangerCount > 0) parts.push(dangerCount + ' critical flag(s).');
+
+  return {
+    agent: 'SIBYL #20880',
+    version: 'evaluate-v1',
+    token: tokenAddr,
+    symbol: symbol,
+    name: name,
+    chain: 'base',
+    timestamp: new Date().toISOString(),
+    conviction_score: convictionScore,
+    conviction_max: convictionMax,
+    conviction_tier: convictionTier,
+    criteria: {
+      builder_conviction: { score: builderScore, max: 10, signals: builderSignals },
+      community_seed: { score: communityScore, max: 10, signals: communitySignals },
+      onchain_proof: { score: onchainScore, max: 10, signals: onchainSignals }
+    },
+    product_clarity: productClarity,
+    flags: flags,
+    recommendation: rec,
+    summary: parts.join(' '),
+    data_sources: dataSources,
+    demo: isDemo
+  };
+}
+
+// ── DATA FETCHERS ──
+
+async function fetchDexScreener(token) {
+  var resp = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + token, {
+    headers: { 'Accept': 'application/json' }
+  });
+  if (!resp.ok) throw new Error('DexScreener: ' + resp.status);
+  return resp.json();
+}
+
+async function checkBytecode(token) {
+  var rpcs = [RPC, 'https://mainnet.base.org', 'https://base.llamarpc.com'];
+  for (var i = 0; i < rpcs.length; i++) {
+    try {
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 3000);
+      var resp = await fetch(rpcs[i], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_getCode', params: [token, 'latest'], id: 1 }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      var data = await resp.json();
+      if (data.result && data.result !== '0x' && data.result.length > 2) return true;
+      if (data.result === '0x') return false;
+    } catch (e) {
+      continue;
+    }
+  }
+  return null;
+}
+
+async function fetchTotalSupply(token) {
+  var rpcs = [RPC, 'https://mainnet.base.org', 'https://base.llamarpc.com'];
+  for (var i = 0; i < rpcs.length; i++) {
+    try {
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 3000);
+      var resp = await fetch(rpcs[i], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_call', params: [{ to: token, data: '0x18160ddd' }, 'latest'], id: 1 }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      var data = await resp.json();
+      if (data.result && data.result !== '0x') {
+        return parseInt(data.result, 16) / 1e18;
+      }
+    } catch (e) {
+      continue;
+    }
+  }
+  return null;
+}
+
+async function fetchXActivity(handle) {
+  var bearer = X_BEARER;
+  if (!bearer) return { error: 'no_bearer_token' };
+  if (bearer.indexOf('%') !== -1) {
+    try { bearer = decodeURIComponent(bearer); } catch (e) {}
+  }
+
+  try {
+    var url = 'https://api.twitter.com/2/tweets/search/recent'
+      + '?query=from:' + encodeURIComponent(handle)
+      + '&max_results=100'
+      + '&tweet.fields=created_at,public_metrics';
+
+    var controller = new AbortController();
+    var timeout = setTimeout(function() { controller.abort(); }, 8000);
+    var resp = await fetch(url, {
+      headers: { 'Authorization': 'Bearer ' + bearer },
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (resp.status === 403 || resp.status === 401 || resp.status === 429) {
+      return fetchXActivityV1(handle, bearer);
+    }
+
+    if (!resp.ok) return { error: 'x_api_' + resp.status };
+
+    var data = await resp.json();
+    var tweets = data.data || [];
+    return classifyTweets(tweets, handle, 'v2');
+  } catch (err) {
+    if (err.name === 'AbortError') return { error: 'x_api_timeout' };
+    return { error: err.message };
+  }
+}
+
+async function fetchXActivityV1(handle, bearer) {
+  try {
+    var url = 'https://api.twitter.com/1.1/statuses/user_timeline.json'
+      + '?screen_name=' + encodeURIComponent(handle)
+      + '&count=200&exclude_replies=false&include_rts=false';
+
+    var controller = new AbortController();
+    var timeout = setTimeout(function() { controller.abort(); }, 8000);
+    var resp = await fetch(url, {
+      headers: { 'Authorization': 'Bearer ' + bearer },
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (!resp.ok) return { error: 'x_api_v1_' + resp.status };
+
+    var tweets = await resp.json();
+    var cutoff = Date.now() - 7 * 86400000;
+    var recent = tweets.filter(function(t) { return new Date(t.created_at).getTime() > cutoff; });
+
+    var SHIP_RE = /deploy|ship|launch|release|update|commit|push|build|fix|refactor|merge|v\d|beta|alpha|testnet|mainnet|live|audit|contract|integrat/i;
+    var shipCount = recent.filter(function(t) { return SHIP_RE.test(t.text || t.full_text || ''); }).length;
+
+    var engagement = 0;
+    recent.forEach(function(t) { engagement += (t.favorite_count || 0) + (t.retweet_count || 0); });
+
+    return {
+      handle: handle,
+      period: '7d',
+      total_tweets: recent.length,
+      shipping_tweets: shipCount,
+      avg_engagement: recent.length > 0 ? Math.round(engagement / recent.length) : 0,
+      tweets_per_day: r1(recent.length / 7),
+      shipping_ratio: recent.length > 0 ? Math.round(shipCount / recent.length * 100) : 0,
+      source: 'v1.1'
+    };
+  } catch (err) {
+    if (err.name === 'AbortError') return { error: 'x_api_v1_timeout' };
+    return { error: 'v1_' + err.message };
+  }
+}
+
+function classifyTweets(tweets, handle, source) {
+  var SHIP_RE = /deploy|ship|launch|release|update|commit|push|build|fix|refactor|merge|v\d|beta|alpha|testnet|mainnet|live|audit|contract|integrat/i;
+
+  var shipCount = tweets.filter(function(t) { return SHIP_RE.test(t.text || ''); }).length;
+  var engagement = 0;
+  tweets.forEach(function(t) {
+    if (t.public_metrics) {
+      engagement += (t.public_metrics.like_count || 0)
+        + (t.public_metrics.retweet_count || 0)
+        + (t.public_metrics.reply_count || 0);
+    }
+  });
+
+  return {
+    handle: handle,
+    period: '7d',
+    total_tweets: tweets.length,
+    shipping_tweets: shipCount,
+    avg_engagement: tweets.length > 0 ? Math.round(engagement / tweets.length) : 0,
+    tweets_per_day: r1(tweets.length / 7),
+    shipping_ratio: tweets.length > 0 ? Math.round(shipCount / tweets.length * 100) : 0,
+    source: source
+  };
+}
+
+async function fetchGitHubActivity(username) {
+  try {
+    var events = [];
+    for (var page = 1; page <= 3; page++) {
+      var url = 'https://api.github.com/users/' + encodeURIComponent(username)
+        + '/events?per_page=100&page=' + page;
+
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 5000);
+      var resp = await fetch(url, {
+        headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' },
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      if (!resp.ok) {
+        if (resp.status === 404) return fetchGitHubOrgActivity(username);
+        if (page === 1) return { error: 'github_' + resp.status };
+        break;
+      }
+      var batch = await resp.json();
+      if (batch.length === 0) break;
+      events = events.concat(batch);
+    }
+    return processGitHubEvents(events, username);
+  } catch (err) {
+    if (err.name === 'AbortError') return { error: 'github_timeout' };
+    return { error: err.message };
+  }
+}
+
+async function fetchGitHubOrgActivity(orgName) {
+  try {
+    var controller = new AbortController();
+    var timeout = setTimeout(function() { controller.abort(); }, 5000);
+    var resp = await fetch(
+      'https://api.github.com/orgs/' + encodeURIComponent(orgName) + '/events?per_page=100',
+      {
+        headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' },
+        signal: controller.signal
+      }
+    );
+    clearTimeout(timeout);
+    if (!resp.ok) return { error: 'github_org_' + resp.status };
+    var events = await resp.json();
+    return processGitHubEvents(events, orgName);
+  } catch (err) {
+    if (err.name === 'AbortError') return { error: 'github_org_timeout' };
+    return { error: 'org_' + err.message };
+  }
+}
+
+function processGitHubEvents(events, username) {
+  var cutoff = Date.now() - 30 * 86400000;
+  var recent = events.filter(function(e) { return new Date(e.created_at).getTime() > cutoff; });
+
+  var pushes = recent.filter(function(e) { return e.type === 'PushEvent'; });
+  var prs = recent.filter(function(e) { return e.type === 'PullRequestEvent'; });
+  var issues = recent.filter(function(e) { return e.type === 'IssuesEvent'; });
+
+  var commits = 0;
+  pushes.forEach(function(e) {
+    commits += (e.payload && e.payload.commits) ? e.payload.commits.length : 0;
+  });
+
+  var repos = {};
+  recent.forEach(function(e) { if (e.repo) repos[e.repo.name] = true; });
+
+  var days = {};
+  recent.forEach(function(e) { days[e.created_at.slice(0, 10)] = true; });
+
+  return {
+    username: username,
+    period: '30d',
+    total_events: recent.length,
+    push_events: pushes.length,
+    commits: commits,
+    pull_requests: prs.length,
+    issues_activity: issues.length,
+    repos_active: Object.keys(repos).length,
+    active_days: Object.keys(days).length,
+    commits_per_week: r1(commits / 4.3),
+    pushes_per_week: r1(pushes.length / 4.3)
+  };
+}
+
+// ── UTILS ──
+
+function fmt(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return String(Math.round(n));
+}
+
+function fmtSupply(n) {
+  if (n >= 1e15) return (n / 1e15).toFixed(1) + 'Q';
+  if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  return String(Math.round(n));
+}
+
+function r1(n) { return Math.round(n * 10) / 10; }
