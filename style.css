@@ -1483,13 +1483,15 @@ a.mind-source:hover {
   color: var(--gold);
   border: 1px solid var(--gold);
   padding: 0.5rem 1.25rem;
-  margin-top: 0.75rem;
-  transition: background 0.3s, color 0.3s;
+  margin-top: 1.25rem;
+  transition: background 0.3s, color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
 
 .mind-exo-verify:hover {
   background: var(--gold);
   color: var(--bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.2);
 }
 
 .mind-wallet-arch {
