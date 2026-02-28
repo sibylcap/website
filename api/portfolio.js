@@ -22,14 +22,21 @@ var TOKENS = {
 // SIGIL tracked separately: held across stealth+cold, not bankr
 var SIGIL = { address: '0xDacE999d08eA443E800996208dF40a6D13A9c1Bd', decimals: 18 };
 
+// CRED tracked separately: held across bankr+cold
+var CRED = { address: '0xAB3f23c2ABcB4E12Cc8B593C218A7ba64Ed17Ba3', decimals: 18 };
+
 // Holdings metadata: updated when trades happen
 var HOLDINGS_META = [
   { token: 'TGATE', entry_date: '2026-02-26', entry_size: 224, status: 'active' },
   { token: 'SIGIL', entry_date: '2026-02-26', entry_size: 346, status: 'active' },
+  { token: 'CRED', entry_date: '2026-02-27', entry_size: 252, status: 'active' },
 ];
 
 // SIGIL is held across stealth wallets + cold, not bankr. Query these separately.
 var SIGIL_WALLETS = ['stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'cold'];
+
+// CRED is held across bankr + cold
+var CRED_WALLETS = ['bankr', 'cold'];
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -65,20 +72,32 @@ module.exports = async function handler(req, res) {
       sigilCalls.push({ method: 'eth_call', params: [{ to: SIGIL.address, data: sCalldata }, 'latest'] });
     }
 
-    // Fetch balances and prices in parallel (two separate RPC batches to stay under limits)
+    // CRED balances across bankr + cold
+    var credCalls = [];
+    for (var c = 0; c < CRED_WALLETS.length; c++) {
+      var cAddr = WALLETS[CRED_WALLETS[c]].toLowerCase().replace('0x', '');
+      var cCalldata = '0x70a08231' + '000000000000000000000000' + cAddr;
+      credCalls.push({ method: 'eth_call', params: [{ to: CRED.address, data: cCalldata }, 'latest'] });
+    }
+
+    // Fetch balances and prices in parallel (separate RPC batches to stay under limits)
     var results = await Promise.all([
       batchRpc(calls),
       batchRpc(sigilCalls),
+      batchRpc(credCalls),
       fetchEthPrice(),
       fetchTgatePrice(),
       fetchTokenPrice(SIGIL.address),
+      fetchTokenPrice(CRED.address),
     ]);
 
     var rpcResults = results[0];
     var sigilResults = results[1];
-    var ethPrice = results[2];
-    var tgatePrice = results[3];
-    var sigilPrice = results[4];
+    var credResults = results[2];
+    var ethPrice = results[3];
+    var tgatePrice = results[4];
+    var sigilPrice = results[5];
+    var credPrice = results[6];
 
     // Parse ETH balances
     var ethBalances = {};
@@ -104,6 +123,15 @@ module.exports = async function handler(req, res) {
       }
     }
 
+    // Parse CRED balances across bankr + cold
+    var totalCredTokens = 0;
+    for (var ci = 0; ci < CRED_WALLETS.length; ci++) {
+      var cr = credResults[ci];
+      if (cr && cr.result) {
+        totalCredTokens += parseInt(cr.result, 16) / Math.pow(10, CRED.decimals);
+      }
+    }
+
     // Calculate totals
     var totalEthUsd = 0;
     for (var w in ethBalances) {
@@ -115,8 +143,9 @@ module.exports = async function handler(req, res) {
     var totalUsdcUsd = tokenBalances.usdc || 0;
     var totalTgateUsd = (tokenBalances.tgate || 0) * tgatePrice;
     var totalSigilUsd = totalSigilTokens * sigilPrice;
-    var totalUsd = totalEthUsd + totalUsdcUsd + totalTgateUsd + totalSigilUsd;
-    var deployed = totalTgateUsd + totalSigilUsd;
+    var totalCredUsd = totalCredTokens * credPrice;
+    var totalUsd = totalEthUsd + totalUsdcUsd + totalTgateUsd + totalSigilUsd + totalCredUsd;
+    var deployed = totalTgateUsd + totalSigilUsd + totalCredUsd;
     var reserve = totalUsd * 0.4;
     var deployable = Math.max(0, totalUsd * 0.6 - deployed);
 
@@ -139,6 +168,9 @@ module.exports = async function handler(req, res) {
       } else if (h.token === 'SIGIL') {
         balance = Math.round(totalSigilTokens);
         valueUsd = round(totalSigilUsd, 2);
+      } else if (h.token === 'CRED') {
+        balance = Math.round(totalCredTokens);
+        valueUsd = round(totalCredUsd, 2);
       }
       var pnl = h.entry_size > 0 ? round((valueUsd / h.entry_size - 1) * 100, 1) : 0;
       return {
@@ -158,6 +190,7 @@ module.exports = async function handler(req, res) {
         eth: round(ethPrice, 2),
         tgate: tgatePrice,
         sigil: sigilPrice,
+        cred: credPrice,
       },
       wallets: walletDetails,
       treasury: {
