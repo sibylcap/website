@@ -6,9 +6,9 @@ var USDC_BASE = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 var BANKR_WALLET = '0xe3e14118238b5693c854674f7c276136a2dd311f';
 var FACILITATOR = 'https://x402.org/facilitator';
 
-// Demo rate limiter: max 10 demo requests per IP per hour (resets on cold start)
-var DEMO_LIMIT = 10;
-var DEMO_WINDOW_MS = 60 * 60 * 1000;
+// Demo rate limiter: 1 request per IP per 24 hours (resets on cold start)
+var DEMO_LIMIT = 1;
+var DEMO_WINDOW_MS = 24 * 60 * 60 * 1000;
 var demoTracking = {};
 
 /**
@@ -31,7 +31,7 @@ async function gate(req, res, opts) {
     }
     demoTracking[ip].count++;
     if (demoTracking[ip].count > DEMO_LIMIT) {
-      res.status(429).json({ error: 'demo rate limit exceeded. max ' + DEMO_LIMIT + ' per hour. pay with x402 for unlimited access.' });
+      res.status(429).json({ error: 'demo limit reached. 1 free request per 24 hours. pay with x402 for unlimited access.' });
       return false;
     }
     return true;
