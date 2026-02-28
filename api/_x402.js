@@ -6,6 +6,11 @@ var USDC_BASE = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 var BANKR_WALLET = '0xe3e14118238b5693c854674f7c276136a2dd311f';
 var FACILITATOR = 'https://x402.org/facilitator';
 
+// Demo rate limiter: max 10 demo requests per IP per hour (resets on cold start)
+var DEMO_LIMIT = 10;
+var DEMO_WINDOW_MS = 60 * 60 * 1000;
+var demoTracking = {};
+
 /**
  * Payment gate. Call at top of handler.
  * Returns true if request should proceed (paid or demo).
@@ -17,8 +22,18 @@ var FACILITATOR = 'https://x402.org/facilitator';
  * @returns {Promise<boolean>}
  */
 async function gate(req, res, opts) {
-  // Demo mode bypasses payment. Agents evaluate output quality before committing.
+  // Demo mode bypasses payment but is rate-limited per IP.
   if (req.query && req.query.demo === 'true') {
+    var ip = (req.headers['x-forwarded-for'] || 'unknown').split(',')[0].trim();
+    var now = Date.now();
+    if (!demoTracking[ip] || now - demoTracking[ip].start > DEMO_WINDOW_MS) {
+      demoTracking[ip] = { start: now, count: 0 };
+    }
+    demoTracking[ip].count++;
+    if (demoTracking[ip].count > DEMO_LIMIT) {
+      res.status(429).json({ error: 'demo rate limit exceeded. max ' + DEMO_LIMIT + ' per hour. pay with x402 for unlimited access.' });
+      return false;
+    }
     return true;
   }
 
@@ -85,7 +100,7 @@ async function gate(req, res, opts) {
 
   } catch (err) {
     console.error('x402_gate_error:', err.message);
-    res.status(500).json({ error: 'payment processing error', detail: err.message });
+    res.status(500).json({ error: 'payment processing error' });
     return false;
   }
 }

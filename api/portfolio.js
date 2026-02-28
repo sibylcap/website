@@ -205,7 +205,7 @@ module.exports = async function handler(req, res) {
 
   } catch (err) {
     console.error('portfolio_error:', err.message, err.stack);
-    return res.status(500).json({ error: 'failed to fetch portfolio data', detail: err.message });
+    return res.status(500).json({ error: 'failed to fetch portfolio data' });
   }
 };
 

@@ -104,7 +104,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(result);
   } catch (err) {
     console.error('advisory_error:', err.message, err.stack);
-    return res.status(500).json({ error: 'advisory session failed', detail: err.message });
+    return res.status(500).json({ error: 'advisory session failed' });
   }
 };
 

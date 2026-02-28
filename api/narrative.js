@@ -90,7 +90,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(result);
   } catch (err) {
     console.error('narrative_error:', err.message, err.stack);
-    return res.status(500).json({ error: 'narrative read failed', detail: err.message });
+    return res.status(500).json({ error: 'narrative read failed' });
   }
 };
 

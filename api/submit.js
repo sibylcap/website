@@ -2,7 +2,9 @@
    Logs to Vercel function logs (always). Writes to Google Sheet (when enabled). */
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  var origin = req.headers.origin || '';
+  var allowed = origin === 'https://sibylcap.com' || origin === 'http://localhost:3000';
+  res.setHeader('Access-Control-Allow-Origin', allowed ? origin : 'https://sibylcap.com');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 

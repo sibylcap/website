@@ -83,7 +83,7 @@ module.exports = async function handler(req, res) {
 
   } catch (err) {
     console.error('score_error:', err.message, err.stack);
-    return res.status(500).json({ error: 'scoring failed', detail: err.message });
+    return res.status(500).json({ error: 'scoring failed' });
   }
 };
 

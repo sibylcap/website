@@ -299,19 +299,26 @@
         // Holdings table
         var tbody = document.getElementById('holdings-body');
         if (tbody && data.holdings && data.holdings.length > 0) {
-          var rows = '';
+          tbody.innerHTML = '';
           data.holdings.forEach(function (h) {
             var pnlClass = h.pnl_pct >= 0 ? 'pnl-positive' : 'pnl-negative';
             var pnlSign = h.pnl_pct >= 0 ? '+' : '';
-            rows += '<tr>';
-            rows += '<td>' + h.token + '</td>';
-            rows += '<td class="secondary">$' + h.entry_size + '</td>';
-            rows += '<td>' + formatUsd(h.value_usd) + '</td>';
-            rows += '<td class="' + pnlClass + '">' + pnlSign + h.pnl_pct + '%</td>';
-            rows += '<td class="status-' + h.status + '">' + h.status + '</td>';
-            rows += '</tr>';
+            var tr = document.createElement('tr');
+            var cells = [
+              { text: String(h.token || ''), cls: '' },
+              { text: '$' + h.entry_size, cls: 'secondary' },
+              { text: formatUsd(h.value_usd), cls: '' },
+              { text: pnlSign + h.pnl_pct + '%', cls: pnlClass },
+              { text: String(h.status || ''), cls: 'status-' + (h.status || '') }
+            ];
+            cells.forEach(function (c) {
+              var td = document.createElement('td');
+              td.textContent = c.text;
+              if (c.cls) td.className = c.cls;
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
           });
-          tbody.innerHTML = rows;
         }
       })
       .catch(function () {
