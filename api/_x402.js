@@ -18,7 +18,8 @@ var demoTracking = {};
  *
  * @param {object} req - Vercel request
  * @param {object} res - Vercel response
- * @param {object} opts - { priceUsd: number, description: string }
+ * @param {object} opts - { priceUsd, description, discovery }
+ *   discovery (optional): { input, inputSchema, output } for Bazaar listing
  * @returns {Promise<boolean>}
  */
 async function gate(req, res, opts) {
@@ -51,7 +52,7 @@ async function gate(req, res, opts) {
   };
 
   if (!payment) {
-    res.status(402).json({
+    var response = {
       x402Version: 1,
       accepts: [requirements],
       error: 'payment required',
@@ -62,7 +63,23 @@ async function gate(req, res, opts) {
         paymentWallet: BANKR_WALLET,
         walletNote: 'Identity and payment wallets are intentionally separate. The identity wallet (self-custody) holds the ERC-8004 NFT. The payment wallet (Bankr-managed) receives x402 fees. Verify at: https://sibylcap.com/.well-known/agent-registration.json'
       }
-    });
+    };
+
+    // Bazaar discovery extension: makes this endpoint discoverable by agents
+    if (opts.discovery) {
+      response.extensions = {
+        discovery: {
+          discoverable: true,
+          description: opts.description || '',
+          method: (req.method || 'GET').toUpperCase(),
+          input: opts.discovery.input || {},
+          inputSchema: opts.discovery.inputSchema || {},
+          output: opts.discovery.output || {}
+        }
+      };
+    }
+
+    res.status(402).json(response);
     return false;
   }
 

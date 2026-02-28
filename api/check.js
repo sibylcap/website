@@ -27,7 +27,12 @@ module.exports = async function handler(req, res) {
 
   var paid = await x402.gate(req, res, {
     priceUsd: PRICE_USD,
-    description: 'SIBYL safety check'
+    description: 'SIBYL token safety check. quick pass/fail pre-trade screening with danger flags.',
+    discovery: {
+      input: { token: '0x...' },
+      inputSchema: { properties: { token: { type: 'string', description: 'ERC-20 contract address on Base' } }, required: ['token'] },
+      output: { example: { safe: true, flags: [], verdict: 'pass' } }
+    }
   });
   if (!paid) return;
 

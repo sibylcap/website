@@ -62,7 +62,12 @@ module.exports = async function handler(req, res) {
 
   var paid = await x402.gate(req, res, {
     priceUsd: PRICE_USD,
-    description: 'SIBYL Base narrative read'
+    description: 'SIBYL Base narrative read. current meta analysis: dominant, emerging, and fading narratives on Base. optionally maps a token to its narrative position.',
+    discovery: {
+      input: { token: '0x... (optional)' },
+      inputSchema: { properties: { token: { type: 'string', description: 'optional ERC-20 address to map to narrative position' } }, required: [] },
+      output: { example: { narratives: { dominant: [], emerging: [], fading: [] }, token_position: {} } }
+    }
   });
   if (!paid) return;
 

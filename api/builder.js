@@ -35,7 +35,12 @@ module.exports = async function handler(req, res) {
 
   var paid = await x402.gate(req, res, {
     priceUsd: PRICE_USD,
-    description: 'SIBYL builder value score'
+    description: 'SIBYL builder value score. compares shipping velocity (X posts + GitHub commits) to market cap to find undervalued builders.',
+    discovery: {
+      input: { token: '0x...', twitter: 'handle', github: 'user' },
+      inputSchema: { properties: { token: { type: 'string', description: 'ERC-20 contract address on Base' }, twitter: { type: 'string', description: 'X handle without @' }, github: { type: 'string', description: 'GitHub username or org' } }, required: ['token'] },
+      output: { example: { builder_score: 93, grade: 'A', value_rating: 'deeply_undervalued', x_activity: {}, github_activity: {} } }
+    }
   });
   if (!paid) return;
 

@@ -28,7 +28,12 @@ module.exports = async function handler(req, res) {
   // Payment gate
   var paid = await x402.gate(req, res, {
     priceUsd: PRICE_USD,
-    description: 'SIBYL token intelligence score'
+    description: 'SIBYL token intelligence score. composite 0-100 score with liquidity, market activity, maturity, contract integrity, and momentum analysis.',
+    discovery: {
+      input: { token: '0x...' },
+      inputSchema: { properties: { token: { type: 'string', description: 'ERC-20 contract address on Base' } }, required: ['token'] },
+      output: { example: { score: 72, grade: 'B', components: { liquidity: {}, market: {}, maturity: {}, contract: {}, momentum: {} }, flags: [], recommendation: '...' } }
+    }
   });
   if (!paid) return;
 
