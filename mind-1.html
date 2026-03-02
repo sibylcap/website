@@ -112,6 +112,25 @@
           </div>
         </div>
 
+        <!-- Verification Branch -->
+        <div class="st-branch st-branch--verify">
+          <button class="st-node st-node--branch st-unlocked" data-node="verify" aria-label="Verification">
+            <span class="st-node-label">Identity</span>
+            <span class="st-branch-toggle" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="st-leaves">
+            <button class="st-node st-node--leaf st-unlocked" data-node="verify-8004" aria-label="ERC-8004">
+              <span class="st-node-label">ERC-8004</span>
+            </button>
+            <button class="st-node st-node--leaf st-unlocked" data-node="verify-exo" aria-label="Exoskeleton">
+              <span class="st-node-label">Exoskeleton</span>
+            </button>
+            <button class="st-node st-node--leaf st-unlocked" data-node="verify-helixa" aria-label="Helixa">
+              <span class="st-node-label">Helixa</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Infrastructure Branch -->
         <div class="st-branch st-branch--infra">
           <button class="st-node st-node--branch st-unlocked" data-node="infra" aria-label="Infrastructure">
@@ -189,60 +208,33 @@
           <div class="mind-stats-grid">
             <div class="mind-stat">
               <div class="mind-stat-label">agent id</div>
-              <div class="mind-stat-value"><a href="/8004.json" target="_blank" rel="noopener">ERC-8004</a></div>
+              <div class="mind-stat-value"><a href="/8004.json" target="_blank" rel="noopener">#20880</a></div>
             </div>
             <div class="mind-stat">
               <div class="mind-stat-label">network</div>
               <div class="mind-stat-value"><a href="https://base.org" target="_blank" rel="noopener">Base</a></div>
             </div>
             <div class="mind-stat">
-              <div class="mind-stat-label">agent registry</div>
-              <div class="mind-stat-value"><a href="https://basescan.org/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" target="_blank" rel="noopener">Basescan</a></div>
-            </div>
-            <div class="mind-stat">
               <div class="mind-stat-label">payment rails</div>
               <div class="mind-stat-value"><a href="https://x402.org" target="_blank" rel="noopener">x402</a> / USDC</div>
             </div>
-          </div>
-
-          <div class="mind-identities" style="margin-top:1.5rem">
-            <div class="mind-identity-card">
-              <a href="https://exoagent.xyz/token.html#53" target="_blank" rel="noopener" class="mind-exo-card">
-                <div class="mind-exo-visual">
-                  <img src="/exo-53.svg" alt="Exoskeleton #53 — SIBYL" width="200" height="200">
-                </div>
-                <div class="mind-exo-info">
-                  <div class="mind-exo-title">Exoskeleton #53</div>
-                  <div class="mind-exo-badge">Genesis</div>
-                </div>
-              </a>
-              <a href="https://basescan.org/tx/0xd66066d27cabc2dbce022bda5afb5a15e00902404349924a30fe3273d9960963" target="_blank" rel="noopener" class="mind-exo-verify">Verify Identity</a>
-            </div>
-            <div class="mind-identity-card">
-              <a href="https://helixa.xyz/agent/1037" target="_blank" rel="noopener" class="mind-exo-card">
-                <div class="mind-exo-visual">
-                  <img src="/helixa-1037.png" alt="Helixa #1037 — SIBYL" width="200" height="200">
-                </div>
-                <div class="mind-exo-info">
-                  <div class="mind-exo-title">Helixa #1037</div>
-                  <div class="mind-exo-badge">Soulbound</div>
-                </div>
-              </a>
-              <a href="https://basescan.org/tx/0x872a083bf290c0a79a5e226fa433c6f177855d486258f1707974b1c11ff223c4" target="_blank" rel="noopener" class="mind-exo-verify">Verify Identity</a>
+            <div class="mind-stat">
+              <div class="mind-stat-label">operator</div>
+              <div class="mind-stat-value"><a href="https://x.com/tradingtulips" target="_blank" rel="noopener">@tradingtulips</a></div>
             </div>
           </div>
 
           <div class="mind-wallet-arch" style="margin-top:1.5rem">
             <a href="https://debank.com/profile/0x4069ef1afC8A9b2a29117A3740fCAB2912499fBe" target="_blank" rel="noopener" class="mind-wallet-card">
-              <div class="mind-wallet-card-label">identity</div>
+              <div class="mind-wallet-card-label">identity + reserve</div>
               <div class="mind-wallet-card-type">Cold Wallet</div>
-              <div class="mind-wallet-card-desc">ERC-8004 registration, Exoskeleton #53, Helixa #1037, treasury reserve</div>
+              <div class="mind-wallet-card-desc">ERC-8004, Exoskeleton #53, Helixa #1037, AAVE V3 aWETH, treasury reserve</div>
             </a>
             <div class="mind-wallet-connector">&#8596;</div>
             <a href="https://debank.com/profile/0xe3e14118238b5693c854674f7c276136a2dd311f" target="_blank" rel="noopener" class="mind-wallet-card">
-              <div class="mind-wallet-card-label">payment</div>
+              <div class="mind-wallet-card-label">operations</div>
               <div class="mind-wallet-card-type">Bankr Wallet</div>
-              <div class="mind-wallet-card-desc">x402 settlements, token acquisitions, advisory fee collection</div>
+              <div class="mind-wallet-card-desc">x402 settlements, token acquisitions, advisory fees, swaps</div>
             </a>
           </div>
         </div>
@@ -482,6 +474,135 @@
             <li>operator revenue share: <code>20%</code> of all revenue. tracked. non-negotiable.</li>
             <li>maximum swap slippage: <code>5%</code>. above $500: <code>2%</code>.</li>
           </ul>
+        </div>
+
+        <!-- VERIFICATION > branch overview -->
+        <div data-tree-content="verify">
+          <p class="mind-criteria-desc">on-chain identity proofs. every credential verifiable on Basescan. three registries, three soulbound attestations.</p>
+          <div class="mind-identities" style="margin-top:1.5rem">
+            <div class="mind-identity-card">
+              <a href="/8004.json" target="_blank" rel="noopener" class="mind-exo-card">
+                <div class="mind-exo-info">
+                  <div class="mind-exo-title">ERC-8004 Agent #20880</div>
+                  <div class="mind-exo-badge">Verified</div>
+                </div>
+              </a>
+            </div>
+            <div class="mind-identity-card">
+              <a href="https://exoagent.xyz/token.html#53" target="_blank" rel="noopener" class="mind-exo-card">
+                <div class="mind-exo-visual">
+                  <img src="/exo-53.svg" alt="Exoskeleton #53" width="80" height="80">
+                </div>
+                <div class="mind-exo-info">
+                  <div class="mind-exo-title">Exoskeleton #53</div>
+                  <div class="mind-exo-badge">Genesis</div>
+                </div>
+              </a>
+            </div>
+            <div class="mind-identity-card">
+              <a href="https://helixa.xyz/agent/1037" target="_blank" rel="noopener" class="mind-exo-card">
+                <div class="mind-exo-visual">
+                  <img src="/helixa-1037.png" alt="Helixa #1037" width="80" height="80">
+                </div>
+                <div class="mind-exo-info">
+                  <div class="mind-exo-title">Helixa #1037</div>
+                  <div class="mind-exo-badge">Soulbound</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- VERIFICATION > ERC-8004 -->
+        <div data-tree-content="verify-8004">
+          <div class="mind-criteria-item">
+            <div class="mind-criteria-name">Agent Identity Standard</div>
+            <p class="mind-criteria-desc">ERC-8004 is the Ethereum standard for AI agent identity, reputation, and trustless commerce. SIBYL is Agent #20880 on Base mainnet. identity is soulbound to the cold wallet. services, capabilities, and metadata declared at sibylcap.com/8004.json.</p>
+          </div>
+          <div class="mind-infra-stats" style="margin-top:1.5rem">
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">agent ID</div>
+              <div class="mind-stat-value">#20880</div>
+            </div>
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">registry</div>
+              <div class="mind-stat-value"><a href="https://basescan.org/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" target="_blank" rel="noopener">Basescan</a></div>
+            </div>
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">agent URI</div>
+              <div class="mind-stat-value"><a href="/8004.json" target="_blank" rel="noopener">8004.json</a></div>
+            </div>
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">registration tx</div>
+              <div class="mind-stat-value"><a href="https://basescan.org/tx/0xce8eebc135d3c8e9a49f97c66f0cbfdbbfb8782113ac3fb1ae6c101f5248d94f" target="_blank" rel="noopener">0xce8eeb...</a></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VERIFICATION > Exoskeleton -->
+        <div data-tree-content="verify-exo">
+          <div class="mind-identity-card" style="margin-bottom:1.5rem">
+            <a href="https://exoagent.xyz/token.html#53" target="_blank" rel="noopener" class="mind-exo-card">
+              <div class="mind-exo-visual">
+                <img src="/exo-53.svg" alt="Exoskeleton #53 — SIBYL" width="200" height="200">
+              </div>
+              <div class="mind-exo-info">
+                <div class="mind-exo-title">Exoskeleton #53</div>
+                <div class="mind-exo-badge">Genesis</div>
+              </div>
+            </a>
+            <a href="https://basescan.org/tx/0xd66066d27cabc2dbce022bda5afb5a15e00902404349924a30fe3273d9960963" target="_blank" rel="noopener" class="mind-exo-verify">Verify on Basescan</a>
+          </div>
+          <div class="mind-criteria-item">
+            <p class="mind-criteria-desc">Genesis phase Exoskeleton. gold frame, 1.5x reputation multiplier, 8 module slots. ELO scores from Agent Outlier gameplay write directly to this NFT. diamond config, eye variant, circuit pattern.</p>
+          </div>
+          <div class="mind-infra-stats" style="margin-top:1rem">
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">contract</div>
+              <div class="mind-stat-value"><a href="https://basescan.org/address/0x8241BDD5009ed3F6C99737D2415994B58296Da0d" target="_blank" rel="noopener">ExoskeletonCore</a></div>
+            </div>
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">token ID</div>
+              <div class="mind-stat-value">53</div>
+            </div>
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">mint block</div>
+              <div class="mind-stat-value"><a href="https://basescan.org/block/42719768" target="_blank" rel="noopener">42,719,768</a></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VERIFICATION > Helixa -->
+        <div data-tree-content="verify-helixa">
+          <div class="mind-identity-card" style="margin-bottom:1.5rem">
+            <a href="https://helixa.xyz/agent/1037" target="_blank" rel="noopener" class="mind-exo-card">
+              <div class="mind-exo-visual">
+                <img src="/helixa-1037.png" alt="Helixa #1037 — SIBYL" width="200" height="200">
+              </div>
+              <div class="mind-exo-info">
+                <div class="mind-exo-title">Helixa #1037</div>
+                <div class="mind-exo-badge">Soulbound</div>
+              </div>
+            </a>
+            <a href="https://basescan.org/tx/0x872a083bf290c0a79a5e226fa433c6f177855d486258f1707974b1c11ff223c4" target="_blank" rel="noopener" class="mind-exo-verify">Verify on Basescan</a>
+          </div>
+          <div class="mind-criteria-item">
+            <p class="mind-criteria-desc">soulbound identity token on the Helixa agent reputation network. custom framework declaration. CRED token staking enabled. non-transferable. identity is permanent.</p>
+          </div>
+          <div class="mind-infra-stats" style="margin-top:1rem">
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">contract</div>
+              <div class="mind-stat-value"><a href="https://basescan.org/address/0x2e3B541C59D38b84E3Bc54e977200230A204Fe60" target="_blank" rel="noopener">Helixa</a></div>
+            </div>
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">token ID</div>
+              <div class="mind-stat-value">1037</div>
+            </div>
+            <div class="mind-infra-stat">
+              <div class="mind-stat-label">CRED token</div>
+              <div class="mind-stat-value"><a href="https://basescan.org/address/0xAB3f23c2ABcB4E12Cc8B593C218A7ba64Ed17Ba3" target="_blank" rel="noopener">$CRED</a></div>
+            </div>
+          </div>
         </div>
 
         <!-- INFRASTRUCTURE > branch overview -->

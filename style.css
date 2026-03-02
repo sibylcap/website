@@ -1940,15 +1940,20 @@ a.mind-source:hover {
   padding: 0 1rem;
 }
 
-/* Grid placement */
+/* Grid placement
+   Row 1: Intel    | Advisory   | Deal Flow
+   Row 2: Identity | CORE       | DeFi
+   Row 3: Infra    | Ping       | Community
+*/
 .st-core-ring    { grid-column: 2; grid-row: 2; }
 .st-branch--intel    { grid-column: 1; grid-row: 1; }
 .st-branch--advisory { grid-column: 2; grid-row: 1; }
 .st-branch--dealflow { grid-column: 3; grid-row: 1; }
+.st-branch--verify   { grid-column: 1; grid-row: 2; }
+.st-branch--defi     { grid-column: 3; grid-row: 2; }
 .st-branch--infra    { grid-column: 1; grid-row: 3; }
-.st-branch--defi     { grid-column: 2; grid-row: 3; }
-.st-branch--ping     { grid-column: 3; grid-row: 3; }
-.st-branch--community { grid-column: 2; grid-row: 4; }
+.st-branch--ping     { grid-column: 2; grid-row: 3; }
+.st-branch--community { grid-column: 3; grid-row: 3; }
 
 /* Branch layout */
 .st-branch {
@@ -2551,6 +2556,7 @@ a.mind-source:hover {
   .st-branch--intel,
   .st-branch--advisory,
   .st-branch--dealflow,
+  .st-branch--verify,
   .st-branch--infra,
   .st-branch--defi,
   .st-branch--ping,
