@@ -2062,6 +2062,18 @@ a.mind-source:hover {
   text-shadow: 0 0 12px rgba(201, 168, 76, 0.3);
 }
 
+/* Branch icon (e.g. Ping logo inside hex) */
+.st-branch-icon {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px rgba(201, 168, 76, 0.2));
+  margin-bottom: 2px;
+}
+
 /* Branch node */
 .st-node--branch {
   width: 110px;

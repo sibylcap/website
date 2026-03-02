@@ -483,7 +483,7 @@
       defi:             { title: 'DeFi',                 status: 'unlocked', parent: 'core' },
       'defi-lending':   { title: 'Lending',              status: 'unlocked', parent: 'defi' },
       'defi-trading':   { title: 'Trading',              status: 'unlocked', parent: 'defi' },
-      ping:             { title: 'Ping Protocol',        status: 'unlocked', parent: 'core' },
+      ping:             { title: 'Ping App',              status: 'unlocked', parent: 'core' },
       'ping-arch':      { title: 'Architecture',         status: 'unlocked', parent: 'ping' },
       'ping-x402':      { title: 'x402 Services',        status: 'unlocked', parent: 'ping' },
       community:        { title: 'Community',            status: 'unlocked', parent: 'core' },
