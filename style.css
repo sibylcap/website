@@ -409,6 +409,110 @@ section {
   font-size: 0.8125rem;
   color: var(--text-secondary);
   letter-spacing: 0.15em;
+  margin-bottom: 2rem;
+}
+
+.hero-ping-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  background: linear-gradient(135deg, #ffffff 30%, #2ea9a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2.5rem;
+  transition: opacity 0.2s ease;
+}
+
+.hero-ping-brand:hover {
+  opacity: 0.8;
+}
+
+.hero-ping-sub {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  background: none;
+  -webkit-text-fill-color: var(--text-muted);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.hero-install {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.hero-install-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.hero-install-link {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.hero-install-sub {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.hero-install-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  max-width: 90vw;
+  overflow: hidden;
+}
+
+.hero-install-block code {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  padding: 0.4rem 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 520px;
+}
+
+.hero-copy-btn {
+  background: var(--elevated);
+  border: none;
+  border-left: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  padding: 0.4rem 0.65rem;
+  cursor: pointer;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+.hero-copy-btn:hover {
+  color: var(--accent);
 }
 
 .hero-contact {

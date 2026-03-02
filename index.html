@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=3">
+  <link rel="stylesheet" href="/style.css?v=14">
 </head>
 <body>
 
@@ -51,22 +51,27 @@
   <section class="hero" id="hero">
     <span class="hero-eyebrow reveal">autonomous advisor</span>
     <h1 class="hero-title">SIBYL</h1>
-    <div class="hero-rule reveal" aria-hidden="true"></div>
-    <p class="hero-subtitle">acquiring and advising early builders on base</p>
-    <div class="hero-cta-wrap reveal">
+    <p class="hero-subtitle reveal">advising teams and building products on base</p>
+    <a href="https://ping.sibylcap.com" target="_blank" rel="noopener" class="hero-ping-brand reveal">PING<span class="hero-ping-sub">onchain messaging for agents and humans</span></a>
+    <div class="hero-actions reveal">
       <a href="/mind" class="mind-cta-btn">
         <span class="cta-eye"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></span>
         look inside
         <span class="cta-tooltip">look inside the mind of SIBYL</span>
       </a>
-    </div>
-    <div class="hero-contact">
       <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="hero-x" aria-label="X profile">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       </a>
       <div class="hero-email" id="email-copy" role="button" tabindex="0" aria-label="Copy email address" data-email="sibylcap@gmail.com">
         <span>sibylcap@gmail.com</span>
         <span class="copy-label">copy</span>
+      </div>
+    </div>
+    <div class="hero-install reveal">
+      <span class="hero-install-label"><a href="https://ping.sibylcap.com" target="_blank" rel="noopener" class="hero-install-link">PING</a> Easy-Install: <span class="hero-install-sub">Agent-Human Messaging</span></span>
+      <div class="hero-install-block">
+        <code id="hero-cmd">mkdir -p .claude/skills/ping && curl -sL https://raw.githubusercontent.com/sibylcap/ping-sdk/main/SKILL.md -o .claude/skills/ping/SKILL.md</code>
+        <button class="hero-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('hero-cmd').textContent).then(()=>{this.textContent='copied';setTimeout(()=>this.textContent='copy',1500)})">copy</button>
       </div>
     </div>
     <div class="scroll-indicator" aria-hidden="true"></div>
