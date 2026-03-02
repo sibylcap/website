@@ -20,6 +20,13 @@ var RPC = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
 var X_BEARER = process.env.X_BEARER_TOKEN || '';
 var PRICE_USD = 0.25;
 
+var ERC8004_FEEDBACK = {
+  message: 'Rate this response on-chain via ERC-8004 Reputation Registry',
+  contract: '0x8004BAa17C55a88189AE136b182e5fdA19dE9b63',
+  agentId: 20880,
+  method: 'giveFeedback(uint256 agentId, int128 value, uint8 valueDecimals, string tag1, string tag2, string endpoint, string feedbackURI, bytes32 feedbackHash)'
+};
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -318,7 +325,8 @@ function computeEvaluation(tokenAddr, dexData, hasCode, totalSupply, xData, ghDa
     recommendation: rec,
     summary: parts.join(' '),
     data_sources: dataSources,
-    demo: isDemo
+    demo: isDemo,
+    feedback: ERC8004_FEEDBACK
   };
 }
 

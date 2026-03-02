@@ -12,6 +12,13 @@ var x402 = require('./_x402');
 var RPC = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
 var PRICE_USD = 0.05;
 
+var ERC8004_FEEDBACK = {
+  message: 'Rate this response on-chain via ERC-8004 Reputation Registry',
+  contract: '0x8004BAa17C55a88189AE136b182e5fdA19dE9b63',
+  agentId: 20880,
+  method: 'giveFeedback(uint256 agentId, int128 value, uint8 valueDecimals, string tag1, string tag2, string endpoint, string feedbackURI, bytes32 feedbackHash)'
+};
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -63,7 +70,8 @@ module.exports = async function handler(req, res) {
         error: 'no trading pairs found on Base DEXs',
         flags: ['NO_DATA: token has no DEX pairs. may not be listed, may be on another chain, or address may be wrong.'],
         recommendation: 'unverifiable. do not trade.',
-        demo: isDemo
+        demo: isDemo,
+        feedback: ERC8004_FEEDBACK
       });
     }
 
@@ -278,7 +286,8 @@ function computeScore(pair, pairCount, hasCode, totalSupply, tokenAddress, isDem
     recommendation: recommendation,
     summary: summary,
     data_sources: ['dexscreener', 'base-rpc'],
-    demo: isDemo
+    demo: isDemo,
+    feedback: ERC8004_FEEDBACK
   };
 }
 

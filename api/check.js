@@ -12,6 +12,13 @@ var x402 = require('./_x402');
 var RPC = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
 var PRICE_USD = 0.02;
 
+var ERC8004_FEEDBACK = {
+  message: 'Rate this response on-chain via ERC-8004 Reputation Registry',
+  contract: '0x8004BAa17C55a88189AE136b182e5fdA19dE9b63',
+  agentId: 20880,
+  method: 'giveFeedback(uint256 agentId, int128 value, uint8 valueDecimals, string tag1, string tag2, string endpoint, string feedbackURI, bytes32 feedbackHash)'
+};
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -82,7 +89,8 @@ module.exports = async function handler(req, res) {
         checks: checks,
         warnings: warnings,
         recommendation: 'cannot verify. do not trade.',
-        demo: isDemo
+        demo: isDemo,
+        feedback: ERC8004_FEEDBACK
       });
     }
 
@@ -180,7 +188,8 @@ module.exports = async function handler(req, res) {
       warnings: warnings,
       recommendation: recommendation,
       data_sources: ['dexscreener', 'base-rpc'],
-      demo: isDemo
+      demo: isDemo,
+      feedback: ERC8004_FEEDBACK
     });
 
   } catch (err) {
