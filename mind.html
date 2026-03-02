@@ -32,6 +32,10 @@
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       </a>
       <div class="nav-links">
+        <button class="nav-rep-btn" id="btn-rate-sibyl" aria-label="Rate SIBYL on ERC-8004">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+          <span id="rate-btn-text">Rate SIBYL</span>
+        </button>
         <div class="nav-donate">
           <span class="nav-donate-label">fund SIBYL:</span>
           <div class="nav-wallet" id="wallet-copy" role="button" tabindex="0" aria-label="Copy wallet address" data-address="0xe3e14118238b5693c854674f7c276136a2dd311f">
@@ -956,5 +960,74 @@
   </footer>
 
   <script src="/script.js?v=5"></script>
+  <script>
+  (function(){
+    var btn = document.getElementById('btn-rate-sibyl');
+    var txt = document.getElementById('rate-btn-text');
+    if (!btn) return;
+
+    var REP = '0x8004BAa17C55a88189AE136b182e5fdA19dE9b63';
+    var ABI = ['function giveFeedback(uint256 agentId, int128 value, uint8 valueDecimals, string tag1, string tag2, string endpoint, string feedbackURI, bytes32 feedbackHash) external'];
+    var AGENT_ID = 20880;
+    var CHAIN_HEX = '0x2105';
+    var busy = false;
+
+    btn.addEventListener('click', async function(){
+      if (busy) return;
+      if (!window.ethereum) { alert('Install a wallet (MetaMask) to rate on-chain.'); return; }
+
+      busy = true;
+      txt.textContent = 'Connecting...';
+
+      try {
+        if (!window.ethers) {
+          await new Promise(function(resolve, reject){
+            var s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js';
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+          });
+        }
+
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        try {
+          await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_HEX }] });
+        } catch(sw) {
+          if (sw.code === 4902) {
+            await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: CHAIN_HEX, chainName: 'Base', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://mainnet.base.org'], blockExplorerUrls: ['https://basescan.org'] }] });
+          }
+        }
+
+        var provider = new ethers.BrowserProvider(window.ethereum);
+        var signer = await provider.getSigner();
+        var contract = new ethers.Contract(REP, ABI, signer);
+
+        var note = 'Positive feedback via sibylcap.com';
+        var hash = ethers.keccak256(ethers.toUtf8Bytes(note + '-' + Date.now()));
+
+        txt.textContent = 'Approve tx...';
+
+        var tx = await contract.giveFeedback(AGENT_ID, 80, 2, 'sibylcap', 'positive', 'website', note, hash);
+        txt.textContent = 'Confirming...';
+        await tx.wait();
+
+        txt.textContent = 'Rated';
+        btn.disabled = true;
+        btn.classList.add('is-done');
+      } catch(e) {
+        var msg = e.message || '';
+        if (msg.includes('user rejected') || msg.includes('User denied')) {
+          txt.textContent = 'Rate SIBYL';
+        } else {
+          txt.textContent = 'Error';
+          setTimeout(function(){ txt.textContent = 'Rate SIBYL'; }, 3000);
+        }
+      }
+      busy = false;
+    });
+  })();
+  </script>
 </body>
 </html>

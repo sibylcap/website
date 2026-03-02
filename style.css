@@ -263,6 +263,39 @@ section {
   gap: 1.25rem;
 }
 
+.nav-rep-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3rem 0.625rem;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--gold);
+  background: rgba(181, 160, 112, 0.08);
+  border: 1px solid rgba(181, 160, 112, 0.2);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.nav-rep-btn:hover:not(:disabled) {
+  background: rgba(181, 160, 112, 0.15);
+  border-color: rgba(181, 160, 112, 0.35);
+  color: var(--gold-hover);
+}
+.nav-rep-btn:disabled,
+.nav-rep-btn.is-done {
+  opacity: 0.5;
+  cursor: default;
+}
+.nav-rep-btn svg {
+  stroke: var(--gold);
+  flex-shrink: 0;
+}
+
 .nav-donate {
   display: flex;
   align-items: center;
