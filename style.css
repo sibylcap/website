@@ -2020,6 +2020,24 @@ a.mind-source:hover {
 .st-node--core {
   width: 150px;
   height: 150px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.st-core-icon {
+  position: relative;
+  z-index: 1;
+  width: 48px;
+  height: 48px;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 6px rgba(201, 168, 76, 0.3));
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.st-node--core:hover .st-core-icon,
+.st-node--core.st-active .st-core-icon {
+  opacity: 1;
+  filter: drop-shadow(0 0 12px rgba(201, 168, 76, 0.5));
 }
 
 .st-node--core .st-node-label {
