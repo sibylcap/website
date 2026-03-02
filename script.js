@@ -456,4 +456,241 @@
     });
   });
 
+  /* ------------------------------------------
+     Skill Tree (Mind v2)
+     ------------------------------------------ */
+  var skillTree = document.getElementById('skill-tree');
+  if (skillTree) {
+    // Node metadata (condensed: category-level leaves, rich detail panels)
+    var SKILL_TREE_DATA = {
+      core:             { title: 'SIBYL Core',          status: 'unlocked', parent: null },
+      intel:            { title: 'Intelligence',        status: 'unlocked', parent: 'core' },
+      'x402-endpoints': { title: 'x402 Endpoints',      status: 'unlocked', parent: 'intel' },
+      advisory:         { title: 'Advisory Framework',   status: 'unlocked', parent: 'core' },
+      criteria:         { title: 'Evaluation Criteria',  status: 'unlocked', parent: 'advisory' },
+      engagement:       { title: 'Engagement Model',     status: 'unlocked', parent: 'advisory' },
+      dealflow:         { title: 'Deal Flow',            status: 'unlocked', parent: 'core' },
+      pipeline:         { title: 'Pipeline',             status: 'unlocked', parent: 'dealflow' },
+      capital:          { title: 'Capital Rules',        status: 'unlocked', parent: 'dealflow' },
+      infra:            { title: 'Infrastructure',       status: 'unlocked', parent: 'core' },
+      tooling:          { title: 'Tooling',              status: 'unlocked', parent: 'infra' },
+      'mcp-servers':    { title: 'MCP Servers',          status: 'unlocked', parent: 'infra' },
+      'data-sources':   { title: 'Data Sources',         status: 'unlocked', parent: 'infra' },
+      defi:             { title: 'DeFi',                 status: 'unlocked', parent: 'core' },
+      'defi-lending':   { title: 'Lending',              status: 'unlocked', parent: 'defi' },
+      'defi-trading':   { title: 'Trading',              status: 'unlocked', parent: 'defi' },
+      ping:             { title: 'Ping Protocol',        status: 'unlocked', parent: 'core' },
+      'ping-arch':      { title: 'Architecture',         status: 'unlocked', parent: 'ping' },
+      'ping-x402':      { title: 'x402 Services',        status: 'unlocked', parent: 'ping' },
+      community:        { title: 'Community',            status: 'unlocked', parent: 'core' },
+      participation:    { title: 'Participation',        status: 'unlocked', parent: 'community' },
+      'sibyl-token':    { title: '$SIBYL Token',         status: 'coming',   parent: 'community' }
+    };
+
+    var svgEl = document.getElementById('skill-tree-lines');
+    var overlay = document.getElementById('st-overlay');
+    var detailPanel = document.getElementById('st-detail');
+    var detailTitle = document.getElementById('st-detail-title');
+    var detailStatus = document.getElementById('st-detail-status');
+    var detailBody = document.getElementById('st-detail-body');
+    var detailClose = detailPanel ? detailPanel.querySelector('.st-detail-close') : null;
+    var activeNodeId = null;
+    var isMobile = window.innerWidth <= 768;
+
+    // --- SVG Connection Lines ---
+    function getNodeCenter(nodeEl) {
+      var rect = nodeEl.getBoundingClientRect();
+      var containerRect = svgEl.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2 - containerRect.left,
+        y: rect.top + rect.height / 2 - containerRect.top
+      };
+    }
+
+    function drawTreeLines() {
+      if (!svgEl || isMobile) return;
+      svgEl.innerHTML = '';
+      svgEl.setAttribute('width', svgEl.parentElement.offsetWidth);
+      svgEl.setAttribute('height', svgEl.parentElement.offsetHeight);
+
+      // Draw lines from core to branches and branches to leaves
+      var connections = [];
+      Object.keys(SKILL_TREE_DATA).forEach(function (id) {
+        var data = SKILL_TREE_DATA[id];
+        if (data.parent) {
+          connections.push({ from: data.parent, to: id, status: data.status });
+        }
+      });
+
+      connections.forEach(function (conn) {
+        var fromEl = skillTree.querySelector('[data-node="' + conn.from + '"]');
+        var toEl = skillTree.querySelector('[data-node="' + conn.to + '"]');
+        if (!fromEl || !toEl) return;
+
+        var from = getNodeCenter(fromEl);
+        var to = getNodeCenter(toEl);
+
+        var dx = to.x - from.x;
+        var dy = to.y - from.y;
+        var cp1x = from.x + dx * 0.2;
+        var cp1y = from.y + dy * 0.6;
+        var cp2x = from.x + dx * 0.8;
+        var cp2y = from.y + dy * 0.4;
+
+        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        var d = 'M ' + from.x + ' ' + from.y +
+                ' C ' + cp1x + ' ' + cp1y +
+                ', ' + cp2x + ' ' + cp2y +
+                ', ' + to.x + ' ' + to.y;
+        path.setAttribute('d', d);
+
+        if (conn.status === 'coming') {
+          path.classList.add('st-line--coming');
+        }
+
+        // Animate: stroke-dashoffset draw-in
+        var length = path.getTotalLength ? path.getTotalLength() : 200;
+        path.style.strokeDasharray = length;
+        path.style.strokeDashoffset = length;
+        path.style.transition = 'stroke-dashoffset 0.8s ease';
+
+        svgEl.appendChild(path);
+
+        // Trigger draw after a frame
+        requestAnimationFrame(function () {
+          path.style.strokeDashoffset = '0';
+          if (conn.status === 'coming') {
+            // After draw-in completes, switch to dashed animation
+            setTimeout(function () {
+              path.style.strokeDasharray = '6 4';
+              path.style.strokeDashoffset = '';
+              path.style.transition = '';
+            }, 850);
+          }
+        });
+      });
+    }
+
+    // Debounced resize
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      var wasMobile = isMobile;
+      isMobile = window.innerWidth <= 768;
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        if (!isMobile) drawTreeLines();
+        else if (svgEl) svgEl.innerHTML = '';
+      }, 150);
+    });
+
+    // --- Detail Panel ---
+    function openDetail(nodeId) {
+      var data = SKILL_TREE_DATA[nodeId];
+      if (!data) return;
+
+      // Content from hidden store
+      var contentEl = document.querySelector('[data-tree-content="' + nodeId + '"]');
+      if (!contentEl) return;
+
+      // Update active state
+      if (activeNodeId) {
+        var prevNode = skillTree.querySelector('[data-node="' + activeNodeId + '"]');
+        if (prevNode) prevNode.classList.remove('st-active');
+      }
+
+      var currentNode = skillTree.querySelector('[data-node="' + nodeId + '"]');
+      if (currentNode) currentNode.classList.add('st-active');
+      activeNodeId = nodeId;
+
+      // Populate panel
+      detailTitle.textContent = data.title;
+      detailStatus.textContent = data.status === 'coming' ? 'building' : data.status;
+      detailStatus.className = 'st-detail-status' + (data.status === 'coming' ? ' st-status--coming' : '');
+      detailBody.innerHTML = contentEl.innerHTML;
+
+      // Open
+      overlay.classList.add('st-open');
+      detailPanel.classList.add('st-open');
+      detailPanel.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetail() {
+      overlay.classList.remove('st-open');
+      detailPanel.classList.remove('st-open');
+      detailPanel.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+
+      if (activeNodeId) {
+        var prevNode = skillTree.querySelector('[data-node="' + activeNodeId + '"]');
+        if (prevNode) prevNode.classList.remove('st-active');
+        activeNodeId = null;
+      }
+    }
+
+    // Close handlers
+    if (overlay) overlay.addEventListener('click', closeDetail);
+    if (detailClose) detailClose.addEventListener('click', closeDetail);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && activeNodeId) closeDetail();
+    });
+
+    // --- Node click handlers ---
+    var allNodes = skillTree.querySelectorAll('.st-node');
+    allNodes.forEach(function (node) {
+      node.addEventListener('click', function (e) {
+        var nodeId = this.getAttribute('data-node');
+        var data = SKILL_TREE_DATA[nodeId];
+        if (!data) return;
+
+        // Locked nodes do nothing
+        if (data.status === 'locked') return;
+
+        // On mobile, branch nodes toggle their leaves (accordion)
+        if (isMobile && this.classList.contains('st-node--branch')) {
+          var branch = this.closest('.st-branch');
+          if (branch) {
+            branch.classList.toggle('st-expanded');
+          }
+          // Still open detail for branch
+        }
+
+        openDetail(nodeId);
+      });
+
+      // Keyboard: Enter or Space activates
+      node.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.click();
+        }
+      });
+    });
+
+    // --- Scroll-triggered entrance animation ---
+    if (!prefersReduced && 'IntersectionObserver' in window) {
+      var treeObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            skillTree.classList.add('st-tree-visible');
+            treeObserver.unobserve(entry.target);
+            // Draw SVG lines after nodes animate in
+            setTimeout(function () {
+              if (!isMobile) drawTreeLines();
+            }, 500);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      treeObserver.observe(skillTree);
+    } else {
+      // No animation, show immediately
+      skillTree.classList.add('st-tree-visible');
+      allNodes.forEach(function (n) { n.style.opacity = '1'; });
+      if (!isMobile) {
+        setTimeout(drawTreeLines, 100);
+      }
+    }
+  }
+
 })();
