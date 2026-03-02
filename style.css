@@ -2016,37 +2016,50 @@ a.mind-source:hover {
   padding: 0 8px;
 }
 
-/* Core node */
+/* Core node — brain shape replaces hexagon */
 .st-node--core {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Remove hex pseudo-elements from core */
+.st-node--core::before,
+.st-node--core::after {
+  display: none;
 }
 
 .st-core-icon {
-  position: relative;
-  z-index: 1;
-  width: 48px;
-  height: 48px;
-  opacity: 0.85;
-  filter: drop-shadow(0 0 6px rgba(201, 168, 76, 0.3));
-  transition: opacity 0.3s ease, filter 0.3s ease;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.6;
+  filter: drop-shadow(0 0 10px rgba(201, 168, 76, 0.25));
+  transition: opacity 0.4s ease, filter 0.4s ease;
+  pointer-events: none;
 }
 
 .st-node--core:hover .st-core-icon,
 .st-node--core.st-active .st-core-icon {
-  opacity: 1;
-  filter: drop-shadow(0 0 12px rgba(201, 168, 76, 0.5));
+  opacity: 0.9;
+  filter: drop-shadow(0 0 20px rgba(201, 168, 76, 0.5));
 }
 
 .st-node--core .st-node-label {
+  position: relative;
+  z-index: 1;
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--gold);
+  text-shadow: 0 0 12px rgba(201, 168, 76, 0.3);
 }
 
 /* Branch node */
@@ -2623,6 +2636,26 @@ a.mind-source:hover {
 
   .st-node--core {
     margin-bottom: 1.5rem;
+    height: auto;
+    padding: 1.25rem 1rem;
+  }
+
+  .st-node--core::before,
+  .st-node--core::after {
+    display: block;
+    clip-path: none;
+    border-radius: 2px;
+  }
+
+  .st-node--core::before { inset: 0; background: var(--gold); }
+  .st-node--core::after { inset: 1px; background: var(--surface); }
+
+  .st-core-icon {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    inset: unset;
+    margin-bottom: 4px;
   }
 
   .st-node--branch {
