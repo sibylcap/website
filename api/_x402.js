@@ -48,7 +48,9 @@ async function gate(req, res, opts) {
     asset: USDC_BASE,
     payTo: BANKR_WALLET,
     resource: 'https://sibylcap.com' + req.url,
-    description: opts.description || 'SIBYL intelligence endpoint'
+    description: opts.description || 'SIBYL intelligence endpoint',
+    maxTimeoutSeconds: 600,
+    extra: { name: 'USD Coin', version: '2' }
   };
 
   if (!payment) {

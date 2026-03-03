@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>x402 Intelligence : SIBYL</title>
+  <meta name="description" content="paid API endpoints for token safety, scoring, narrative mapping, builder evaluation, and intelligence reports on Base. one free demo per service per day.">
+  <meta property="og:title" content="x402 Intelligence : SIBYL">
+  <meta property="og:description" content="paid API endpoints on Base. one free demo per service per day.">
+  <meta property="og:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <meta property="og:url" content="https://sibylcap.com/x402">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@sibylcap">
+  <meta name="twitter:title" content="x402 Intelligence : SIBYL">
+  <meta name="twitter:description" content="paid API endpoints on Base. one free demo per service per day.">
+  <meta name="twitter:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css?v=15">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav scrolled" id="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">SIBYL</a>
+      <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="x-icon" aria-label="X profile">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <div class="nav-links">
+        <div class="nav-donate">
+          <span class="nav-donate-label">fund SIBYL:</span>
+          <div class="nav-wallet" id="wallet-copy" role="button" tabindex="0" aria-label="Copy wallet address" data-address="0xe3e14118238b5693c854674f7c276136a2dd311f">
+            <code>0xe3e14...d311f</code>
+            <span class="copy-label">copy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="x4-hero">
+    <div class="container">
+      <span class="hero-eyebrow">x402 protocol</span>
+      <h1 class="x4-title">x402 Intelligence</h1>
+      <div class="hero-rule"></div>
+      <p class="x4-subtitle">paid API endpoints. one free demo per service per day.</p>
+    </div>
+  </section>
+
+  <!-- Service Catalog -->
+  <section class="x4-catalog">
+    <div class="container">
+      <div class="x4-grid" id="x4-grid"></div>
+
+      <!-- Active Service Panel -->
+      <div class="x4-panel" id="x4-panel">
+        <div class="x4-panel-header">
+          <h3 id="x4-panel-title"></h3>
+          <span class="x4-panel-price" id="x4-panel-price"></span>
+        </div>
+        <form id="x4-form" class="sibyl-form" autocomplete="off"></form>
+        <div class="x4-actions">
+          <div class="x4-btn-group">
+            <button type="button" class="form-submit x4-run" id="x4-run">run demo</button>
+            <button type="button" class="x4-btn-usdc" id="x4-pay-usdc">pay with USDC</button>
+          </div>
+          <span class="form-status" id="x4-status"></span>
+        </div>
+        <div class="x4-wallet-status" id="x4-wallet-status"></div>
+        <div class="x4-curl-wrap">
+          <div class="x4-curl-label">programmatic access (paid):</div>
+          <div class="x4-curl" id="x4-curl">
+            <code id="x4-curl-code"></code>
+            <button type="button" class="x4-curl-copy" id="x4-curl-copy">copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Area -->
+      <div class="x4-output" id="x4-output">
+        <div class="x4-metrics" id="x4-metrics"></div>
+        <div class="x4-report-preview" id="x4-report-preview"></div>
+        <pre class="x4-json"><code id="x4-json"></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-left">SIBYL operates on Base.</span>
+        <span class="footer-right"><a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=2"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    /* ================================================
+       SERVICE DEFINITIONS
+       ================================================ */
+    var SERVICES = [
+      {
+        id: 'check',
+        name: 'Token Safety Check',
+        price: '$0.02',
+        priceCents: 2,
+        priceUsd: 0.02,
+        path: '/api/check',
+        desc: 'contract verification, liquidity check, honeypot detection, and risk assessment.',
+        fields: [
+          { name: 'token', label: 'token address', required: true, placeholder: '0x...', type: 'text' }
+        ]
+      },
+      {
+        id: 'score',
+        name: 'Token Score',
+        price: '$0.05',
+        priceCents: 5,
+        priceUsd: 0.05,
+        path: '/api/score',
+        desc: 'composite 0-100 score across liquidity, market activity, maturity, contract integrity, and momentum.',
+        fields: [
+          { name: 'token', label: 'token address', required: true, placeholder: '0x...', type: 'text' }
+        ]
+      },
+      {
+        id: 'narrative',
+        name: 'Base Narrative',
+        price: '$0.10',
+        priceCents: 10,
+        priceUsd: 0.10,
+        path: '/api/narrative',
+        desc: 'current Base chain meta: dominant, emerging, and fading narratives. optional token positioning.',
+        fields: [
+          { name: 'token', label: 'token address', required: false, placeholder: '0x... (optional)', type: 'text' }
+        ]
+      },
+      {
+        id: 'builder',
+        name: 'Builder Score',
+        price: '$0.10',
+        priceCents: 10,
+        priceUsd: 0.10,
+        path: '/api/builder',
+        desc: 'builder activity vs market cap. finds undervalued teams shipping faster than the market recognizes.',
+        fields: [
+          { name: 'token', label: 'token address', required: true, placeholder: '0x...', type: 'text' },
+          { name: 'twitter', label: 'X handle', required: false, placeholder: 'handle (no @)', type: 'text' },
+          { name: 'github', label: 'GitHub', required: false, placeholder: 'username or org', type: 'text' }
+        ]
+      },
+      {
+        id: 'evaluate',
+        name: 'Full Evaluation',
+        price: '$0.25',
+        priceCents: 25,
+        priceUsd: 0.25,
+        path: '/api/evaluate',
+        desc: 'three-criterion conviction score: builder conviction, community seed, on-chain proof of work.',
+        fields: [
+          { name: 'token', label: 'token address', required: true, placeholder: '0x...', type: 'text' },
+          { name: 'twitter', label: 'X handle', required: false, placeholder: 'handle (no @)', type: 'text' },
+          { name: 'github', label: 'GitHub', required: false, placeholder: 'username or org', type: 'text' }
+        ]
+      },
+      {
+        id: 'advisory',
+        name: 'Advisory Session',
+        price: '$0.50',
+        priceCents: 50,
+        priceUsd: 0.50,
+        path: '/api/advisory',
+        desc: 'evaluation + narrative positioning + one specific, actionable recommendation.',
+        fields: [
+          { name: 'token', label: 'token address', required: true, placeholder: '0x...', type: 'text' },
+          { name: 'twitter', label: 'X handle', required: false, placeholder: 'handle (no @)', type: 'text' },
+          { name: 'github', label: 'GitHub', required: false, placeholder: 'username or org', type: 'text' },
+          { name: 'description', label: 'product description', required: false, placeholder: 'one sentence', type: 'text' }
+        ]
+      },
+      {
+        id: 'fund',
+        name: 'ETH On-Ramp',
+        price: '$1.00',
+        priceCents: 100,
+        priceUsd: 1.00,
+        path: '/api/fund',
+        desc: 'pay $1 USDC, receive 0.001 ETH on Base. covers Ping registration gas + ~9 messages.',
+        fields: [
+          { name: 'address', label: 'recipient address', required: true, placeholder: '0x...', type: 'text' }
+        ],
+        noDemo: true
+      },
+      {
+        id: 'pingcast',
+        name: 'Pingcast',
+        price: '$2.00+',
+        priceCents: 200,
+        priceUsd: 2.00,
+        path: '/api/pingcast',
+        desc: 'broadcast a message to every registered Ping inbox on Base. dynamic pricing.',
+        fields: [
+          { name: 'name', label: 'display name', required: true, placeholder: 'your name (max 32 chars)', type: 'text' },
+          { name: 'message', label: 'message', required: true, placeholder: 'broadcast content', type: 'text' }
+        ],
+        noDemo: true
+      },
+      {
+        id: 'report',
+        name: 'Intelligence Report',
+        price: '$5.00',
+        priceCents: 500,
+        priceUsd: 5.00,
+        path: '/api/report',
+        desc: 'full SVG intelligence report with conviction scoring, market data, and shipping timeline. delivered by email.',
+        fields: [
+          { name: 'token', label: 'token address', required: true, placeholder: '0x...', type: 'text' },
+          { name: 'email', label: 'email', required: false, placeholder: 'delivery email (paid only)', type: 'email' },
+          { name: 'twitter', label: 'X handle', required: false, placeholder: 'handle (no @)', type: 'text' },
+          { name: 'github', label: 'GitHub', required: false, placeholder: 'username or org', type: 'text' }
+        ]
+      }
+    ];
+
+    /* ================================================
+       CONSTANTS
+       ================================================ */
+    var USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+    var BANKR_WALLET = '0xe3e14118238b5693c854674f7c276136a2dd311f';
+    var CHAIN_ID = 8453;
+    var CHAIN_HEX = '0x2105';
+    var FACILITATOR = 'https://x402.org/facilitator';
+
+    /* ================================================
+       STATE
+       ================================================ */
+    var activeService = null;
+    var isLoading = false;
+    var walletAddress = null;
+    var walletSigner = null;
+
+    /* ================================================
+       DOM REFS
+       ================================================ */
+    var grid = document.getElementById('x4-grid');
+    var panel = document.getElementById('x4-panel');
+    var panelTitle = document.getElementById('x4-panel-title');
+    var panelPrice = document.getElementById('x4-panel-price');
+    var form = document.getElementById('x4-form');
+    var runBtn = document.getElementById('x4-run');
+    var usdcBtn = document.getElementById('x4-pay-usdc');
+    var status = document.getElementById('x4-status');
+    var walletStatus = document.getElementById('x4-wallet-status');
+    var curlCode = document.getElementById('x4-curl-code');
+    var curlCopy = document.getElementById('x4-curl-copy');
+    var output = document.getElementById('x4-output');
+    var metrics = document.getElementById('x4-metrics');
+    var reportPreview = document.getElementById('x4-report-preview');
+    var jsonBlock = document.getElementById('x4-json');
+
+    /* ================================================
+       WALLET CONNECTION
+       ================================================ */
+    function loadEthers() {
+      if (window.ethers) return Promise.resolve();
+      return new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert('Install a wallet (MetaMask, Coinbase Wallet, or Rabby) to pay with USDC.');
+        return false;
+      }
+
+      await loadEthers();
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+      // Switch to Base
+      try {
+        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_HEX }] });
+      } catch (sw) {
+        if (sw.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: CHAIN_HEX,
+              chainName: 'Base',
+              nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://mainnet.base.org'],
+              blockExplorerUrls: ['https://basescan.org']
+            }]
+          });
+        } else {
+          throw sw;
+        }
+      }
+
+      var provider = new ethers.BrowserProvider(window.ethereum);
+      walletSigner = await provider.getSigner();
+      walletAddress = await walletSigner.getAddress();
+
+      walletStatus.textContent = 'connected: ' + walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
+      walletStatus.className = 'x4-wallet-status connected';
+      return true;
+    }
+
+    /* ================================================
+       USDC PAYMENT (x402 EIP-712 signing)
+       ================================================ */
+    function generateNonce() {
+      var bytes = new Uint8Array(32);
+      crypto.getRandomValues(bytes);
+      return '0x' + Array.from(bytes).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+    }
+
+    async function payWithUsdc() {
+      if (!activeService || isLoading) return;
+
+      // Validate required fields first
+      var vals = getFormValues();
+      for (var i = 0; i < activeService.fields.length; i++) {
+        var f = activeService.fields[i];
+        if (f.required && !vals[f.name]) {
+          status.textContent = f.label + ' is required';
+          status.className = 'form-status error';
+          return;
+        }
+      }
+
+      isLoading = true;
+      usdcBtn.disabled = true;
+      usdcBtn.classList.add('x4-loading');
+      status.textContent = '';
+      status.className = 'form-status';
+      output.classList.remove('visible');
+
+      try {
+        // Step 1: Connect wallet if not connected
+        if (!walletSigner) {
+          status.textContent = 'connecting wallet...';
+          status.className = 'form-status';
+          var connected = await connectWallet();
+          if (!connected) {
+            throw new Error('wallet connection failed');
+          }
+        }
+
+        // Step 2: Fetch the endpoint to get 402 payment requirements
+        status.textContent = 'fetching payment requirements...';
+        var params = [];
+        for (var key in vals) {
+          params.push(encodeURIComponent(key) + '=' + encodeURIComponent(vals[key]));
+        }
+        var apiUrl = activeService.path + (params.length ? '?' + params.join('&') : '');
+
+        var reqResp = await fetch(apiUrl);
+        if (reqResp.status !== 402) {
+          // If not 402, it might have returned data directly (shouldn't happen without payment)
+          var directData = await reqResp.json();
+          renderOutput(directData, activeService.id);
+          status.textContent = 'complete';
+          status.className = 'form-status success';
+          return;
+        }
+
+        var reqBody = await reqResp.json();
+        var requirements = reqBody.accepts[0];
+
+        // Step 3: Build and sign EIP-712 TransferWithAuthorization
+        status.textContent = 'sign USDC authorization in wallet...';
+
+        var domain = {
+          name: (requirements.extra && requirements.extra.name) || 'USD Coin',
+          version: (requirements.extra && requirements.extra.version) || '2',
+          chainId: CHAIN_ID,
+          verifyingContract: USDC_ADDRESS
+        };
+
+        var types = {
+          TransferWithAuthorization: [
+            { name: 'from', type: 'address' },
+            { name: 'to', type: 'address' },
+            { name: 'value', type: 'uint256' },
+            { name: 'validAfter', type: 'uint256' },
+            { name: 'validBefore', type: 'uint256' },
+            { name: 'nonce', type: 'bytes32' }
+          ]
+        };
+
+        var now = Math.floor(Date.now() / 1000);
+        var nonce = generateNonce();
+
+        var message = {
+          from: walletAddress,
+          to: requirements.payTo,
+          value: requirements.maxAmountRequired,
+          validAfter: 0,
+          validBefore: now + (requirements.maxTimeoutSeconds || 600),
+          nonce: nonce
+        };
+
+        var signature = await walletSigner.signTypedData(domain, types, message);
+
+        // Step 4: Build x402 payment payload
+        var payload = {
+          x402Version: 1,
+          scheme: 'exact',
+          network: 'eip155:8453',
+          payload: {
+            signature: signature,
+            authorization: {
+              from: message.from,
+              to: message.to,
+              value: message.value,
+              validAfter: String(message.validAfter),
+              validBefore: String(message.validBefore),
+              nonce: nonce
+            }
+          }
+        };
+
+        // Step 5: Retry with payment header
+        status.textContent = 'processing payment...';
+
+        var paymentHeader = btoa(JSON.stringify(payload));
+        var paidResp = await fetch(apiUrl, {
+          headers: { 'X-PAYMENT': paymentHeader }
+        });
+
+        if (!paidResp.ok && paidResp.status === 402) {
+          throw new Error('payment rejected by facilitator');
+        }
+
+        var data = await paidResp.json();
+        renderOutput(data, activeService.id);
+
+        if (data.error) {
+          status.textContent = data.error;
+          status.className = 'form-status error';
+        } else {
+          status.textContent = 'paid with USDC. complete.';
+          status.className = 'form-status success';
+        }
+
+      } catch (err) {
+        var msg = err.message || 'payment failed';
+        if (msg.includes('user rejected') || msg.includes('User denied')) {
+          msg = 'transaction cancelled';
+        }
+        status.textContent = msg;
+        status.className = 'form-status error';
+      } finally {
+        isLoading = false;
+        usdcBtn.disabled = false;
+        usdcBtn.classList.remove('x4-loading');
+      }
+    }
+
+    /* ================================================
+       RENDER GRID
+       ================================================ */
+    function renderGrid() {
+      var html = '';
+      for (var i = 0; i < SERVICES.length; i++) {
+        var s = SERVICES[i];
+        html += '<button class="x4-card" data-idx="' + i + '" type="button">';
+        html += '<div class="x4-card-name">' + s.name + '</div>';
+        html += '<div class="x4-card-price">' + s.price + ' USDC</div>';
+        html += '<div class="x4-card-desc">' + s.desc + '</div>';
+        html += '<div class="x4-card-path">' + s.path + '</div>';
+        html += '</button>';
+      }
+      grid.innerHTML = html;
+    }
+
+    /* ================================================
+       SELECT SERVICE
+       ================================================ */
+    function selectService(idx) {
+      var s = SERVICES[idx];
+      activeService = s;
+
+      // Update card states
+      var cards = grid.querySelectorAll('.x4-card');
+      for (var i = 0; i < cards.length; i++) {
+        cards[i].classList.toggle('active', i === idx);
+      }
+
+      // Panel header
+      panelTitle.textContent = s.name;
+      panelPrice.textContent = s.path + '  :  ' + s.price + ' USDC';
+
+      // Build form fields
+      var fhtml = '';
+      for (var j = 0; j < s.fields.length; j++) {
+        var f = s.fields[j];
+        fhtml += '<div class="form-field">';
+        fhtml += '<label for="x4-f-' + f.name + '">' + f.label;
+        if (!f.required) fhtml += ' <span class="optional">(optional)</span>';
+        fhtml += '</label>';
+        fhtml += '<input type="' + (f.type || 'text') + '" id="x4-f-' + f.name + '" name="' + f.name + '"';
+        if (f.required) fhtml += ' required';
+        if (f.placeholder) fhtml += ' placeholder="' + f.placeholder + '"';
+        fhtml += '>';
+        fhtml += '</div>';
+      }
+      form.innerHTML = fhtml;
+
+      // Update demo button
+      if (s.noDemo) {
+        runBtn.style.display = 'none';
+      } else {
+        runBtn.style.display = '';
+        runBtn.textContent = 'run demo';
+        runBtn.disabled = false;
+      }
+
+      // USDC button always visible
+      usdcBtn.style.display = '';
+
+      // Update curl
+      updateCurl();
+
+      // Show panel
+      panel.classList.add('visible');
+
+      // Hide output
+      output.classList.remove('visible');
+
+      // Clear status
+      status.textContent = '';
+      status.className = 'form-status';
+
+      // Add input listeners to update curl live
+      var inputs = form.querySelectorAll('input');
+      for (var k = 0; k < inputs.length; k++) {
+        inputs[k].addEventListener('input', updateCurl);
+      }
+
+      // Scroll panel into view
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    /* ================================================
+       CURL GENERATOR
+       ================================================ */
+    function getFormValues() {
+      var vals = {};
+      if (!activeService) return vals;
+      for (var i = 0; i < activeService.fields.length; i++) {
+        var f = activeService.fields[i];
+        var el = document.getElementById('x4-f-' + f.name);
+        if (el && el.value.trim()) {
+          vals[f.name] = el.value.trim();
+        }
+      }
+      return vals;
+    }
+
+    function updateCurl() {
+      if (!activeService) return;
+      var vals = getFormValues();
+      var params = [];
+      for (var key in vals) {
+        params.push(encodeURIComponent(key) + '=' + encodeURIComponent(vals[key]));
+      }
+      var qs = params.length ? '?' + params.join('&') : '';
+      var cmd = 'curl -H "X-PAYMENT: <token>" "https://sibylcap.com' + activeService.path + qs + '"';
+      curlCode.textContent = cmd;
+    }
+
+    function copyCurl() {
+      var text = curlCode.textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        curlCopy.textContent = 'copied';
+        setTimeout(function () { curlCopy.textContent = 'copy'; }, 1500);
+      });
+    }
+
+    /* ================================================
+       SUBMIT DEMO
+       ================================================ */
+    function handleSubmit() {
+      if (!activeService || isLoading || activeService.noDemo) return;
+
+      // Validate required fields
+      var vals = getFormValues();
+      for (var i = 0; i < activeService.fields.length; i++) {
+        var f = activeService.fields[i];
+        if (f.required && !vals[f.name]) {
+          status.textContent = f.label + ' is required';
+          status.className = 'form-status error';
+          return;
+        }
+      }
+
+      isLoading = true;
+      runBtn.disabled = true;
+      runBtn.textContent = 'running...';
+      runBtn.classList.add('x4-loading');
+      status.textContent = '';
+      status.className = 'form-status';
+      output.classList.remove('visible');
+
+      // Build URL
+      var params = [];
+      for (var key in vals) {
+        params.push(encodeURIComponent(key) + '=' + encodeURIComponent(vals[key]));
+      }
+      params.push('demo=true');
+      var url = activeService.path + '?' + params.join('&');
+
+      fetch(url)
+        .then(function (res) {
+          if (res.status === 429) {
+            throw new Error('rate limited: one free demo per service per 24h');
+          }
+          return res.json().then(function (data) {
+            if (data.error) {
+              renderOutput(data, activeService.id);
+              status.textContent = data.error;
+              status.className = 'form-status error';
+            } else {
+              renderOutput(data, activeService.id);
+              status.textContent = 'demo complete';
+              status.className = 'form-status success';
+            }
+          });
+        })
+        .catch(function (err) {
+          var msg = err.message || 'request failed';
+          status.textContent = msg;
+          status.className = 'form-status error';
+        })
+        .finally(function () {
+          isLoading = false;
+          runBtn.disabled = false;
+          runBtn.textContent = 'run demo';
+          runBtn.classList.remove('x4-loading');
+        });
+    }
+
+    /* ================================================
+       RENDER OUTPUT
+       ================================================ */
+    function extractMetrics(data, serviceId) {
+      var items = [];
+
+      if (serviceId === 'check') {
+        if (data.safe !== undefined) {
+          items.push({ label: 'safe', value: data.safe ? 'YES' : 'NO', color: data.safe ? 'positive' : 'negative' });
+        }
+        if (data.risk_level) {
+          var rc = data.risk_level === 'low' ? 'positive' : data.risk_level === 'critical' ? 'negative' : 'warning';
+          items.push({ label: 'risk', value: data.risk_level.toUpperCase(), color: rc });
+        }
+      }
+
+      if (serviceId === 'score') {
+        if (data.score !== undefined) {
+          items.push({ label: 'score', value: data.score + '/100', color: data.score >= 60 ? 'positive' : data.score >= 30 ? 'warning' : 'negative' });
+        }
+        if (data.grade) {
+          var gc = data.grade === 'A' ? 'positive' : data.grade === 'F' ? 'negative' : 'warning';
+          items.push({ label: 'grade', value: data.grade, color: gc });
+        }
+      }
+
+      if (serviceId === 'narrative') {
+        if (data.meta && data.meta.dominant) {
+          items.push({ label: 'dominant', value: data.meta.dominant.label || data.meta.dominant.narrative, color: 'gold' });
+        }
+        if (data.token_position && data.token_position.alignment) {
+          items.push({ label: 'alignment', value: data.token_position.alignment.toUpperCase(), color: 'accent' });
+        }
+      }
+
+      if (serviceId === 'builder') {
+        if (data.builder_score !== undefined) {
+          items.push({ label: 'builder score', value: data.builder_score + '/100', color: data.builder_score >= 60 ? 'positive' : data.builder_score >= 30 ? 'warning' : 'negative' });
+        }
+        if (data.grade) {
+          items.push({ label: 'grade', value: data.grade, color: 'gold' });
+        }
+        if (data.value_rating) {
+          items.push({ label: 'value', value: data.value_rating.replace(/_/g, ' '), color: 'accent' });
+        }
+      }
+
+      if (serviceId === 'evaluate') {
+        if (data.conviction_score !== undefined) {
+          items.push({ label: 'conviction', value: data.conviction_score + '/30', color: data.conviction_score >= 20 ? 'positive' : data.conviction_score >= 10 ? 'warning' : 'negative' });
+        }
+        if (data.conviction_tier) {
+          items.push({ label: 'tier', value: data.conviction_tier.replace(/_/g, ' '), color: 'gold' });
+        }
+      }
+
+      if (serviceId === 'advisory') {
+        if (data.evaluation && data.evaluation.conviction_score !== undefined) {
+          items.push({ label: 'conviction', value: data.evaluation.conviction_score + '/30', color: 'gold' });
+        }
+        if (data.evaluation && data.evaluation.conviction_tier) {
+          items.push({ label: 'tier', value: data.evaluation.conviction_tier.replace(/_/g, ' '), color: 'accent' });
+        }
+        if (data.advisory && data.advisory.priority) {
+          items.push({ label: 'priority', value: data.advisory.priority.toUpperCase(), color: data.advisory.priority === 'high' ? 'negative' : 'warning' });
+        }
+      }
+
+      if (serviceId === 'fund') {
+        if (data.success !== undefined) {
+          items.push({ label: 'status', value: data.success ? 'SUCCESS' : 'FAILED', color: data.success ? 'positive' : 'negative' });
+        }
+        if (data.amount) {
+          items.push({ label: 'amount', value: data.amount, color: 'gold' });
+        }
+      }
+
+      if (serviceId === 'pingcast') {
+        if (data.success !== undefined) {
+          items.push({ label: 'status', value: data.success ? 'DELIVERED' : 'FAILED', color: data.success ? 'positive' : 'negative' });
+        }
+        if (data.charged) {
+          items.push({ label: 'charged', value: data.charged, color: 'gold' });
+        }
+      }
+
+      if (serviceId === 'report') {
+        if (data.report && data.report.score !== undefined) {
+          items.push({ label: 'conviction', value: data.report.score + '/30', color: data.report.score >= 20 ? 'positive' : data.report.score >= 10 ? 'warning' : 'negative' });
+        }
+        if (data.report && data.report.tier) {
+          items.push({ label: 'tier', value: data.report.tier.replace(/_/g, ' '), color: 'gold' });
+        }
+        if (data.status) {
+          items.push({ label: 'status', value: data.status.toUpperCase(), color: 'accent' });
+        }
+      }
+
+      // Handle error responses
+      if (data.error) {
+        items = [{ label: 'error', value: data.error, color: 'negative' }];
+      }
+
+      return items;
+    }
+
+    function syntaxHighlight(json) {
+      var str = JSON.stringify(json, null, 2);
+      str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return str.replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+        function (match) {
+          var cls = 'x4-jv-number';
+          if (/^"/.test(match)) {
+            cls = /:$/.test(match) ? 'x4-jv-key' : 'x4-jv-string';
+          } else if (/true|false/.test(match)) {
+            cls = 'x4-jv-bool';
+          } else if (/null/.test(match)) {
+            cls = 'x4-jv-null';
+          }
+          return '<span class="' + cls + '">' + match + '</span>';
+        }
+      );
+    }
+
+    function renderOutput(data, serviceId) {
+      var items = extractMetrics(data, serviceId);
+      var mhtml = '';
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        mhtml += '<div class="x4-metric">';
+        mhtml += '<div class="x4-metric-label">' + it.label + '</div>';
+        mhtml += '<div class="x4-metric-value x4-c-' + it.color + '">' + it.value + '</div>';
+        mhtml += '</div>';
+      }
+      metrics.innerHTML = mhtml;
+
+      reportPreview.innerHTML = '';
+      if (serviceId === 'report' && data.svg) {
+        reportPreview.innerHTML = data.svg;
+      }
+
+      jsonBlock.innerHTML = syntaxHighlight(data);
+
+      output.classList.add('visible');
+      output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    /* ================================================
+       EVENT LISTENERS
+       ================================================ */
+    grid.addEventListener('click', function (e) {
+      var card = e.target.closest('.x4-card');
+      if (!card) return;
+      var idx = parseInt(card.getAttribute('data-idx'), 10);
+      selectService(idx);
+    });
+
+    runBtn.addEventListener('click', handleSubmit);
+    usdcBtn.addEventListener('click', payWithUsdc);
+
+    form.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSubmit();
+      }
+    });
+
+    curlCopy.addEventListener('click', copyCurl);
+
+    /* ================================================
+       INIT
+       ================================================ */
+    renderGrid();
+  })();
+  </script>
+</body>
+</html>
