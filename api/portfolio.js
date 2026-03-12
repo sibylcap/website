@@ -25,18 +25,63 @@ var SIGIL = { address: '0xDacE999d08eA443E800996208dF40a6D13A9c1Bd', decimals: 1
 // CRED tracked separately: held across bankr+cold
 var CRED = { address: '0xAB3f23c2ABcB4E12Cc8B593C218A7ba64Ed17Ba3', decimals: 18 };
 
-// Holdings metadata: updated when trades happen
-var HOLDINGS_META = [
+// Holdings metadata: falls back to hardcoded if treasury.json read fails
+var HOLDINGS_META_FALLBACK = [
   { token: 'TGATE', entry_date: '2026-02-26', entry_size: 224, status: 'active' },
   { token: 'SIGIL', entry_date: '2026-02-26', entry_size: 346, status: 'active' },
   { token: 'CRED', entry_date: '2026-02-27', entry_size: 252, status: 'active' },
 ];
+
+// Cache treasury.json with 60s TTL
+var treasuryCache = { data: null, ts: 0 };
+
+function getHoldingsMeta() {
+  var now = Date.now();
+  if (treasuryCache.data && now - treasuryCache.ts < 60000) {
+    return treasuryCache.data;
+  }
+  try {
+    var fs = require('fs');
+    var path = require('path');
+    var treasuryPath = path.resolve(__dirname, '../../memory/state/treasury.json');
+    var raw = fs.readFileSync(treasuryPath, 'utf8');
+    var treasury = JSON.parse(raw);
+    if (treasury.positions && Array.isArray(treasury.positions)) {
+      // Aggregate entry sizes per token from active positions
+      var byToken = {};
+      treasury.positions.forEach(function(p) {
+        if (p.status !== 'active') return;
+        var key = (p.token || '').toUpperCase();
+        if (!key) return;
+        if (!byToken[key]) byToken[key] = { token: key, entry_date: p.entry_date || '', entry_size: 0, status: 'active' };
+        byToken[key].entry_size += (p.entry_amount_usd || 0);
+        // Use earliest entry date
+        if (p.entry_date && (!byToken[key].entry_date || p.entry_date < byToken[key].entry_date)) {
+          byToken[key].entry_date = p.entry_date;
+        }
+      });
+      var result = Object.keys(byToken).map(function(k) { return byToken[k]; })
+        .filter(function(h) { return h.entry_size > 0 && ['TGATE', 'SIGIL', 'CRED', 'EXO'].indexOf(h.token) !== -1; });
+      if (result.length > 0) {
+        treasuryCache.data = result;
+        treasuryCache.ts = now;
+        return result;
+      }
+    }
+  } catch (e) {
+    console.error('treasury_read_failed:', e.message, '(using fallback)');
+  }
+  return HOLDINGS_META_FALLBACK;
+}
 
 // SIGIL is held across stealth wallets + cold, not bankr. Query these separately.
 var SIGIL_WALLETS = ['stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'cold'];
 
 // CRED is held across bankr + cold
 var CRED_WALLETS = ['bankr', 'cold'];
+
+// Price cache: last known good prices survive within a single Vercel instance
+var priceCache = { eth: 0, tgate: 0, sigil: 0, cred: 0 };
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -99,6 +144,12 @@ module.exports = async function handler(req, res) {
     var sigilPrice = results[5];
     var credPrice = results[6];
 
+    // Detect if any prices are from cache (price = cached value and cache was set before this request)
+    var stalePrice = (ethPrice === 0 && priceCache.eth > 0) ||
+                     (tgatePrice === 0 && priceCache.tgate > 0) ||
+                     (sigilPrice === 0 && priceCache.sigil > 0) ||
+                     (credPrice === 0 && priceCache.cred > 0);
+
     // Parse ETH balances
     var ethBalances = {};
     for (var k = 0; k < walletNames.length; k++) {
@@ -159,6 +210,7 @@ module.exports = async function handler(req, res) {
     walletDetails.bankr.tgate = Math.round(tokenBalances.tgate);
 
     // Build holdings with live values
+    var HOLDINGS_META = getHoldingsMeta();
     var holdings = HOLDINGS_META.map(function (h) {
       var balance = 0;
       var valueUsd = 0;
@@ -198,9 +250,10 @@ module.exports = async function handler(req, res) {
         deployed_usd: round(deployed, 2),
         deployable_usd: round(deployable, 2),
         reserve_usd: round(reserve, 2),
-        positions: HOLDINGS_META.length,
+        positions: holdings.length,
       },
       holdings: holdings,
+      stale_price: stalePrice || undefined,
     });
 
   } catch (err) {
@@ -243,10 +296,12 @@ async function fetchEthPrice() {
       headers: { 'Accept': 'application/json' },
     });
     var data = await resp.json();
-    return data.ethereum.usd;
+    var price = data.ethereum.usd;
+    if (price > 0) priceCache.eth = price;
+    return price;
   } catch (e) {
-    console.error('eth_price_failed:', e.message);
-    return 0;
+    console.error('eth_price_failed:', e.message, priceCache.eth > 0 ? '(using cached)' : '');
+    return priceCache.eth || 0;
   }
 }
 
@@ -255,22 +310,29 @@ async function fetchTgatePrice() {
 }
 
 async function fetchTokenPrice(tokenAddress) {
+  // Map address to cache key
+  var cacheKey = null;
+  if (tokenAddress.toLowerCase() === TOKENS.tgate.address.toLowerCase()) cacheKey = 'tgate';
+  else if (tokenAddress.toLowerCase() === SIGIL.address.toLowerCase()) cacheKey = 'sigil';
+  else if (tokenAddress.toLowerCase() === CRED.address.toLowerCase()) cacheKey = 'cred';
+
   try {
     var resp = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + tokenAddress, {
       headers: { 'Accept': 'application/json' },
     });
     var data = await resp.json();
     if (data.pairs && data.pairs.length > 0) {
-      // Use the pair with highest liquidity
       var sorted = data.pairs.sort(function (a, b) {
         return (b.liquidity && b.liquidity.usd || 0) - (a.liquidity && a.liquidity.usd || 0);
       });
-      return parseFloat(sorted[0].priceUsd) || 0;
+      var price = parseFloat(sorted[0].priceUsd) || 0;
+      if (price > 0 && cacheKey) priceCache[cacheKey] = price;
+      return price;
     }
-    return 0;
+    return (cacheKey && priceCache[cacheKey]) || 0;
   } catch (e) {
-    console.error('token_price_failed:', tokenAddress, e.message);
-    return 0;
+    console.error('token_price_failed:', tokenAddress, e.message, (cacheKey && priceCache[cacheKey]) ? '(using cached)' : '');
+    return (cacheKey && priceCache[cacheKey]) || 0;
   }
 }
 
