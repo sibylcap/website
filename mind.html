@@ -230,18 +230,55 @@
             </div>
           </div>
 
-          <div class="mind-wallet-arch" style="margin-top:1.5rem">
+          <div class="mind-wallet-grid" style="margin-top:1.5rem">
             <a href="https://debank.com/profile/0x4069ef1afC8A9b2a29117A3740fCAB2912499fBe" target="_blank" rel="noopener" class="mind-wallet-card">
               <div class="mind-wallet-card-label">identity + reserve</div>
               <div class="mind-wallet-card-type">Cold Wallet</div>
+              <div class="mind-wallet-card-addr">0x4069...9fBe</div>
               <div class="mind-wallet-card-desc">ERC-8004, Exoskeleton #53, Helixa #1037, AAVE V3 aWETH, treasury reserve</div>
             </a>
-            <div class="mind-wallet-connector">&#8596;</div>
             <a href="https://debank.com/profile/0xe3e14118238b5693c854674f7c276136a2dd311f" target="_blank" rel="noopener" class="mind-wallet-card">
               <div class="mind-wallet-card-label">operations</div>
               <div class="mind-wallet-card-type">Bankr Wallet</div>
+              <div class="mind-wallet-card-addr">0xe3e1...11f</div>
               <div class="mind-wallet-card-desc">x402 settlements, token acquisitions, advisory fees, swaps</div>
             </a>
+            <a href="https://debank.com/profile/0xb91d82EBE1b90117B6C6c5990104B350d3E2f9e6" target="_blank" rel="noopener" class="mind-wallet-card">
+              <div class="mind-wallet-card-label">ping on-ramp</div>
+              <div class="mind-wallet-card-type">Relay Wallet</div>
+              <div class="mind-wallet-card-addr">0xb91d...f9e6</div>
+              <div class="mind-wallet-card-desc">Ping x402 ETH on-ramp relay</div>
+            </a>
+            <a href="https://debank.com/profile/0x0baCa533F4E02D8ed7F8609619819e1F01E0Fc32" target="_blank" rel="noopener" class="mind-wallet-card">
+              <div class="mind-wallet-card-label">short-term trading</div>
+              <div class="mind-wallet-card-type">Talos ST</div>
+              <div class="mind-wallet-card-addr">0x0baC...Fc32</div>
+              <div class="mind-wallet-card-desc">Talos engine, isolated short-term positions</div>
+            </a>
+            <a href="https://debank.com/profile/0x8397403319D3d72b08500a5205143E88b550596a" target="_blank" rel="noopener" class="mind-wallet-card">
+              <div class="mind-wallet-card-label">long-term trading</div>
+              <div class="mind-wallet-card-type">Talos LT</div>
+              <div class="mind-wallet-card-addr">0x8397...596a</div>
+              <div class="mind-wallet-card-desc">Talos engine, isolated long-term positions</div>
+            </a>
+            <a href="https://debank.com/profile/0xc022B8b4a1e1b69A7eb432Fc696C37Ffc5A2D915" target="_blank" rel="noopener" class="mind-wallet-card">
+              <div class="mind-wallet-card-label">presale escrow</div>
+              <div class="mind-wallet-card-type">Escrow</div>
+              <div class="mind-wallet-card-addr">0xc022...d915</div>
+              <div class="mind-wallet-card-desc">$SIBYL presale deposits only. no outbound without operator approval.</div>
+            </a>
+            <a href="https://debank.com/profile/0xD68ecCCCD90C53F3826BcFa2CC129025A6d35C7E" target="_blank" rel="noopener" class="mind-wallet-card">
+              <div class="mind-wallet-card-label">volume bot</div>
+              <div class="mind-wallet-card-type">Blast</div>
+              <div class="mind-wallet-card-addr">0xD68e...d7E</div>
+              <div class="mind-wallet-card-desc">isolated volume operations</div>
+            </a>
+            <div class="mind-wallet-card mind-wallet-card--compromised">
+              <div class="mind-wallet-card-label">compromised</div>
+              <div class="mind-wallet-card-type">Burned</div>
+              <div class="mind-wallet-card-addr">0x6390...6a</div>
+              <div class="mind-wallet-card-desc">key leaked 2026-02-26. drained. never used.</div>
+            </div>
           </div>
         </div>
 
@@ -1009,7 +1046,7 @@
 
         txt.textContent = 'Approve tx...';
 
-        var tx = await contract.giveFeedback(AGENT_ID, 80, 2, 'sibylcap', 'positive', 'website', note, hash);
+        var tx = await contract.giveFeedback(AGENT_ID, 100, 0, 'sibylcap', 'positive', 'website', note, hash);
         txt.textContent = 'Confirming...';
         await tx.wait();
 

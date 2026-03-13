@@ -1652,11 +1652,18 @@ a.mind-source:hover {
   margin-top: 1.5rem;
 }
 
+.mind-wallet-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
 .mind-wallet-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  padding: 1.5rem 2rem;
-  min-width: 200px;
+  padding: 1.25rem 1.5rem;
+  min-width: 0;
   text-align: center;
 }
 
@@ -1678,9 +1685,28 @@ a.mind-source:hover {
   margin-bottom: 0.25rem;
 }
 
+.mind-wallet-card-addr {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.375rem;
+}
+
 .mind-wallet-card-desc {
   font-size: 0.6875rem;
   color: var(--text-secondary);
+}
+
+.mind-wallet-card--compromised {
+  opacity: 0.4;
+  border-style: dashed;
+  cursor: default;
+}
+
+.mind-wallet-card--compromised .mind-wallet-card-type {
+  text-decoration: line-through;
+  color: var(--text-muted);
 }
 
 .mind-wallet-connector {
@@ -2419,6 +2445,10 @@ a.mind-source:hover {
   align-items: stretch;
 }
 
+.st-detail-body .mind-wallet-grid {
+  grid-template-columns: 1fr;
+}
+
 .st-detail-body .mind-wallet-connector {
   padding: 0.5rem 0;
   transform: rotate(90deg);
@@ -2676,6 +2706,10 @@ a.mind-source:hover {
   .mind-wallet-arch {
     flex-direction: column;
     align-items: center;
+  }
+
+  .mind-wallet-grid {
+    grid-template-columns: 1fr;
   }
 
   .mind-wallet-connector {
@@ -3029,33 +3063,69 @@ a.mind-source:hover {
   letter-spacing: 0.02em;
 }
 
-/* Active service panel */
-.x4-panel {
-  max-height: 0;
-  overflow: hidden;
+/* Modal backdrop */
+.x4-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 900;
   opacity: 0;
-  transition: max-height 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
-              opacity 0.3s ease,
-              margin 0.4s ease;
-  margin-top: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
 }
 
-.x4-panel.visible {
-  max-height: 600px;
+.x4-backdrop.open {
   opacity: 1;
-  margin-top: 2rem;
+  pointer-events: auto;
 }
 
-.x4-panel-header {
+/* Modal container */
+.x4-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.96);
+  width: calc(100% - 3rem);
+  max-width: 640px;
+  max-height: calc(100vh - 4rem);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  z-index: 901;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.x4-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Modal header */
+.x4-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.x4-modal-title-row {
   display: flex;
   align-items: baseline;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
-.x4-panel-header h3 {
+.x4-modal-title-row h3 {
   font-family: var(--font-display);
   font-size: 0.875rem;
   font-weight: 600;
@@ -3071,8 +3141,33 @@ a.mind-source:hover {
   letter-spacing: 0.05em;
 }
 
-.x4-panel .sibyl-form {
-  max-width: 600px;
+.x4-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+  margin: -0.25rem -0.25rem 0 0.5rem;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.x4-modal-close:hover {
+  color: var(--text-primary);
+}
+
+/* Modal body (scrollable) */
+.x4-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.x4-modal-body .sibyl-form {
+  max-width: 100%;
 }
 
 .x4-actions {
@@ -3159,21 +3254,16 @@ a.mind-source:hover {
   color: var(--accent);
 }
 
-/* Output area */
+/* Output area (inside modal) */
 .x4-output {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
-              opacity 0.4s ease,
-              margin 0.5s ease;
-  margin-top: 0;
+  display: none;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
 }
 
 .x4-output.visible {
-  max-height: 2000px;
-  opacity: 1;
-  margin-top: 2rem;
+  display: block;
 }
 
 /* Metric cards */
@@ -3354,17 +3444,26 @@ a.mind-source:hover {
     grid-template-columns: 1fr;
   }
 
-  .x4-panel .sibyl-form {
-    max-width: 100%;
+  .x4-modal {
+    width: calc(100% - 1.5rem);
+    max-height: calc(100vh - 2rem);
+  }
+
+  .x4-modal-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+
+  .x4-modal-body {
+    padding: 1.25rem;
+  }
+
+  .x4-modal-title-row {
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
   .x4-curl {
     max-width: 100%;
-  }
-
-  .x4-panel-header {
-    flex-direction: column;
-    gap: 0.25rem;
   }
 
   .x4-metric {
@@ -3387,6 +3486,20 @@ a.mind-source:hover {
 @media (max-width: 480px) {
   .x4-title {
     font-size: 1.375rem;
+  }
+
+  .x4-modal {
+    width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    top: 0;
+    left: 0;
+    transform: translateY(100%);
+    transition: opacity 0.25s ease, transform 0.3s ease;
+  }
+
+  .x4-modal.open {
+    transform: translateY(0);
   }
 
   .x4-metrics {
