@@ -822,13 +822,24 @@
     }
 
     async function loadPresaleData() {
-      try {
-        const [virtualBal, virtualPrice] = await Promise.all([
-          getERC20Balance(VIRTUAL_CA, ESCROW),
-          getVirtualPrice(),
-        ]);
+      // Fetch balance and price independently so one failing doesn't block the other
+      let virtual_ = 0;
+      let virtualPrice = lastVirtualPrice;
 
-        const virtual_ = Number(virtualBal) / 1e18;
+      try {
+        const virtualBal = await getERC20Balance(VIRTUAL_CA, ESCROW);
+        virtual_ = Number(virtualBal) / 1e18;
+      } catch (e) {
+        console.error('Balance fetch failed:', e);
+      }
+
+      try {
+        virtualPrice = await getVirtualPrice();
+      } catch (e) {
+        console.error('Price fetch failed, using last known:', lastVirtualPrice);
+      }
+
+      try {
         const remaining = Math.max(TARGET_VIRTUAL - virtual_, 0);
 
         // Progress tracks VIRTUAL balance only (curve requires VIRTUAL)
