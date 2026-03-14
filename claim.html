@@ -685,10 +685,10 @@
       // Simple keccak256 for function signatures - we'll use the pre-computed ones
       const sigs = {
         'allocations(address)': '0x52a9039c',
-        'vested(address)':      '0x44b1231f',
-        'claimable(address)':   '0xa4063dbc',
+        'vested(address)':      '0x7102b728',
+        'claimable(address)':   '0x402914f5',
         'claim()':              '0x4e71d92d',
-        'tgeTimestamp()':       '0xe50b813c',
+        'tgeTimestamp()':       '0xa4317ef4',
       };
       return sigs[sig];
     }
@@ -933,8 +933,18 @@
 
         status.textContent = 'transaction submitted. waiting for confirmation...';
 
-        // Poll for receipt
+        // Poll for receipt (timeout after 2 minutes)
+        let pollCount = 0;
         const poll = setInterval(async () => {
+          pollCount++;
+          if (pollCount > 40) { // 40 * 3s = 2 min
+            clearInterval(poll);
+            status.className = 'tx-status pending';
+            status.innerHTML = 'transaction pending. <a href="https://basescan.org/tx/' + txHash + '" target="_blank" style="color:inherit;text-decoration:underline">check on BaseScan</a>';
+            btn.disabled = false;
+            btn.textContent = 'CLAIM TOKENS';
+            return;
+          }
           const receipt = await rpcCall('eth_getTransactionReceipt', [txHash]);
           if (receipt) {
             clearInterval(poll);
