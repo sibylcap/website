@@ -612,16 +612,12 @@
       </div>
       <div style="margin-top:16px">
         <div class="balance-row">
-          <span class="balance-asset">VIRTUAL</span>
+          <span class="balance-asset">VIRTUAL deposited</span>
           <span class="balance-value" id="balVirtual">...</span>
         </div>
         <div class="balance-row">
-          <span class="balance-asset">USDC</span>
-          <span class="balance-value" id="balUsdc">...</span>
-        </div>
-        <div class="balance-row">
-          <span class="balance-asset">ETH</span>
-          <span class="balance-value" id="balEth">...</span>
+          <span class="balance-asset">VIRTUAL remaining</span>
+          <span class="balance-value" id="balRemaining">...</span>
         </div>
       </div>
     </div>
@@ -698,7 +694,7 @@
     <div class="card">
       <div class="card-title">Deposit to Escrow</div>
       <p style="color:var(--text-secondary);margin-bottom:16px;font-size:0.75rem">
-        Send VIRTUAL, USDC, or ETH on Base to the escrow address below. All deposits are tracked on-chain and reflected in real time.
+        Send <strong style="color:var(--text-primary)">VIRTUAL only</strong> on Base to the escrow address below. The bonding curve requires VIRTUAL to launch. All deposits are tracked on-chain and reflected in real time.
       </p>
       <div class="deposit-address-wrap" onclick="copyAddress()">
         <div class="deposit-address" id="escrowAddr">0xc022B8b4a1e1b69A7eb432Fc696C37Ffc5A2D915</div>
@@ -706,11 +702,9 @@
       </div>
       <div class="token-pills">
         <div class="token-pill"><div class="token-dot virtual"></div> VIRTUAL</div>
-        <div class="token-pill"><div class="token-dot usdc"></div> USDC</div>
-        <div class="token-pill"><div class="token-dot eth"></div> ETH</div>
       </div>
       <p style="color:var(--text-muted);margin-top:12px;font-size:0.6875rem">
-        Base network only. Do not send from other chains.
+        Base network only. Do not send from other chains. VIRTUAL token only.
       </p>
     </div>
 
@@ -829,17 +823,13 @@
 
     async function loadPresaleData() {
       try {
-        const [ethHex, virtualBal, usdcBal, virtualPrice, ethPrice] = await Promise.all([
-          rpc('eth_getBalance', [ESCROW, 'latest']),
+        const [virtualBal, virtualPrice] = await Promise.all([
           getERC20Balance(VIRTUAL_CA, ESCROW),
-          getERC20Balance(USDC_CA, ESCROW),
           getVirtualPrice(),
-          getEthPrice(),
         ]);
 
-        const eth = Number(BigInt(ethHex)) / 1e18;
         const virtual_ = Number(virtualBal) / 1e18;
-        const usdc = Number(usdcBal) / 1e6;
+        const remaining = Math.max(TARGET_VIRTUAL - virtual_, 0);
 
         // Progress tracks VIRTUAL balance only (curve requires VIRTUAL)
         const progress = Math.min((virtual_ / TARGET_VIRTUAL) * 100, 100);
@@ -855,11 +845,9 @@
 
         // Balances
         document.getElementById('balVirtual').textContent =
-          virtual_.toLocaleString(undefined, { maximumFractionDigits: 2 });
-        document.getElementById('balUsdc').textContent =
-          '$' + usdc.toLocaleString(undefined, { maximumFractionDigits: 2 });
-        document.getElementById('balEth').textContent =
-          eth.toFixed(6) + ' ETH';
+          virtual_.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' VIRTUAL';
+        document.getElementById('balRemaining').textContent =
+          remaining.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' VIRTUAL';
 
         // Update live FDV values based on current VIRTUAL price
         lastVirtualPrice = virtualPrice;
