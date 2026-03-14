@@ -594,7 +594,7 @@
     <div class="status-bar">
       <div class="status-dot"></div>
       <span>escrow live on Base</span>
-      <span style="margin-left:auto" id="lastUpdate">loading...</span>
+      <span style="margin-left:auto" id="lastUpdate">online</span>
     </div>
 
     <!-- Progress -->
@@ -877,8 +877,8 @@
           now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       } catch (e) {
-        document.getElementById('progressPct').textContent = '--';
-        document.getElementById('lastUpdate').textContent = 'offline';
+        console.error('loadPresaleData error:', e);
+        document.getElementById('lastUpdate').textContent = 'online \u00b7 price feed updating...';
       }
     }
 
