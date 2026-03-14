@@ -841,18 +841,15 @@
         const virtual_ = Number(virtualBal) / 1e18;
         const usdc = Number(usdcBal) / 1e6;
 
-        // Convert to VIRTUAL equivalent
-        const ethInVirtual = (eth * ethPrice) / virtualPrice;
-        const usdcInVirtual = usdc / virtualPrice;
-        const totalVE = virtual_ + ethInVirtual + usdcInVirtual;
-        const totalUsd = totalVE * virtualPrice;
-        const progress = Math.min((totalVE / TARGET_VIRTUAL) * 100, 100);
+        // Progress tracks VIRTUAL balance only (curve requires VIRTUAL)
+        const progress = Math.min((virtual_ / TARGET_VIRTUAL) * 100, 100);
+        const raisedUsd = virtual_ * virtualPrice;
 
         // Progress
         document.getElementById('progressPct').textContent = progress.toFixed(1) + '%';
         document.getElementById('progressBar').style.width = progress + '%';
         document.getElementById('raisedAmt').textContent =
-          '$' + totalUsd.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' raised';
+          '$' + raisedUsd.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' raised';
         document.getElementById('targetAmt').textContent =
           '$' + (TARGET_VIRTUAL * virtualPrice).toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' target';
 
