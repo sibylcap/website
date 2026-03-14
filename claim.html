@@ -459,7 +459,7 @@
       <div class="auth-label">PRESALE HOLDERS</div>
       <h2 class="auth-title">$<span style="color:var(--gold)">SIBYL</span> Claim</h2>
       <p class="auth-sub">enter access code to continue</p>
-      <form onsubmit="return checkAuth()" style="margin-top:24px">
+      <form onsubmit="event.preventDefault(); checkAuth();" style="margin-top:24px">
         <input type="password" id="authInput" class="auth-input" placeholder="access code" autocomplete="off" autofocus>
         <button type="submit" class="auth-btn">ENTER</button>
         <p class="auth-error" id="authError"></p>
