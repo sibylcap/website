@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIBYL : Claim</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:            #08090a;
+      --surface:       #0e1118;
+      --elevated:      #131620;
+      --highest:       #1a1e28;
+      --border:        #1a1e28;
+      --border-strong: #252a36;
+      --text-primary:  #c8ccd4;
+      --text-secondary:#8a919c;
+      --text-muted:    #555d6b;
+      --accent:        #6b8ba5;
+      --accent-hover:  #7d9ab2;
+      --gold:          #b5a070;
+      --gold-hover:    #c4af80;
+      --gold-dim:      #8a7a55;
+      --violet:        #8878a8;
+      --positive:      #5a8a6a;
+      --negative:      #b06868;
+      --warning:       #b5944a;
+      --font-display:  'Syne', 'Helvetica Neue', sans-serif;
+      --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--gold); color: var(--bg); }
+
+    .ambient {
+      position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 600px;
+      background: radial-gradient(ellipse, rgba(181,160,112,0.04) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .header-label {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--gold-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .header h1 {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .header h1 span { color: var(--gold); }
+    .header-sub {
+      color: var(--text-secondary);
+      font-size: 0.8125rem;
+      max-width: 460px;
+      margin: 0 auto;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 20px;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: var(--border-strong); }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    /* Stat rows */
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--text-secondary); font-size: 0.75rem; }
+    .stat-value { color: var(--text-primary); font-weight: 500; }
+    .stat-value.gold { color: var(--gold); }
+    .stat-value.positive { color: var(--positive); }
+
+    /* Big claimable display */
+    .claimable-wrap {
+      text-align: center;
+      padding: 32px 0;
+    }
+    .claimable-label {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+    .claimable-amount {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--gold);
+      line-height: 1.1;
+    }
+    .claimable-usd {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--border-strong);
+    }
+    .timeline-item {
+      position: relative;
+      padding: 12px 0;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -24px;
+      top: 16px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--border-strong);
+      background: var(--bg);
+    }
+    .timeline-dot.completed {
+      background: var(--positive);
+      border-color: var(--positive);
+    }
+    .timeline-dot.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      box-shadow: 0 0 8px rgba(181,160,112,0.4);
+    }
+    .timeline-dot.locked {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .timeline-title {
+      font-size: 0.8125rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .timeline-amount {
+      font-size: 0.8125rem;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .timeline-sub {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Progress bar (within timeline) */
+    .vesting-progress-bg {
+      height: 4px;
+      background: var(--highest);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .vesting-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    /* Buttons */
+    .btn-claim {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      color: var(--bg);
+      border: none;
+      border-radius: 8px;
+      padding: 16px 28px;
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      text-transform: uppercase;
+    }
+    .btn-claim:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(181,160,112,0.2);
+    }
+    .btn-claim:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-connect {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 14px 24px;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .btn-connect:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+    }
+
+    /* Wallet badge */
+    .wallet-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    .wallet-badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--positive);
+    }
+
+    /* Not eligible state */
+    .not-eligible {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+    .not-eligible-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    /* Tx status */
+    .tx-status {
+      margin-top: 12px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      display: none;
+    }
+    .tx-status.pending {
+      display: block;
+      background: rgba(181,160,112,0.1);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+    }
+    .tx-status.success {
+      display: block;
+      background: rgba(90,138,106,0.1);
+      border: 1px solid var(--positive);
+      color: var(--positive);
+    }
+    .tx-status.error {
+      display: block;
+      background: rgba(176,104,104,0.1);
+      border: 1px solid var(--negative);
+      color: var(--negative);
+    }
+
+    /* Auth gate */
+    .auth-gate {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .auth-gate.hidden { display: none; }
+    .auth-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 48px 40px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+    }
+    .auth-label {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      color: var(--gold-dim);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .auth-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .auth-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .auth-input {
+      width: 100%;
+      background: var(--elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      text-align: center;
+      letter-spacing: 0.1em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .auth-input:focus { border-color: var(--gold-dim); }
+    .auth-input::placeholder { color: var(--text-muted); letter-spacing: 0.05em; }
+    .auth-btn {
+      width: 100%;
+      margin-top: 12px;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      color: var(--bg);
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .auth-btn:hover {
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
+      transform: translateY(-1px);
+    }
+    .auth-error {
+      margin-top: 12px;
+      font-size: 0.6875rem;
+      color: var(--negative);
+      min-height: 1em;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-text {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .footer-link {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .footer-link:hover { color: var(--accent-hover); }
+
+    /* Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--elevated), var(--highest), var(--elevated));
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 40px 16px 60px; }
+      .header h1 { font-size: 1.6rem; }
+      .claimable-amount { font-size: 1.8rem; }
+      .timeline-header { flex-direction: column; align-items: flex-start; gap: 2px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Auth Gate -->
+  <div class="auth-gate" id="authGate">
+    <div class="auth-box">
+      <div class="auth-label">PRESALE HOLDERS</div>
+      <h2 class="auth-title">$<span style="color:var(--gold)">SIBYL</span> Claim</h2>
+      <p class="auth-sub">enter access code to continue</p>
+      <form onsubmit="return checkAuth()" style="margin-top:24px">
+        <input type="password" id="authInput" class="auth-input" placeholder="access code" autocomplete="off" autofocus>
+        <button type="submit" class="auth-btn">ENTER</button>
+        <p class="auth-error" id="authError"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="ambient"></div>
+
+  <div class="container" id="mainContent" style="display:none">
+    <div class="header">
+      <div class="header-label">presale vesting</div>
+      <h1>$<span>SIBYL</span> Claim</h1>
+      <p class="header-sub">connect your wallet to view your allocation and claim vested tokens.</p>
+    </div>
+
+    <!-- Connect state -->
+    <div id="connectState">
+      <div class="card" style="text-align:center;padding:48px 28px">
+        <p style="color:var(--text-secondary);margin-bottom:20px;font-size:0.8125rem">
+          connect the wallet you used for the presale deposit
+        </p>
+        <button class="btn-connect" onclick="connectWallet()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="14" r="1.5"/></svg>
+          Connect Wallet
+        </button>
+      </div>
+    </div>
+
+    <!-- Connected: not eligible -->
+    <div id="notEligibleState" style="display:none">
+      <div class="card">
+        <div class="wallet-badge">
+          <div class="wallet-badge-dot"></div>
+          <span id="notEligibleAddr"></span>
+        </div>
+        <div class="not-eligible">
+          <div class="not-eligible-icon">&#8709;</div>
+          <p style="color:var(--text-primary);font-weight:500;margin-bottom:6px">No allocation found</p>
+          <p>this wallet has no presale allocation. make sure you are connected with the wallet that deposited to the escrow.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connected: has allocation -->
+    <div id="claimState" style="display:none">
+      <div class="wallet-badge">
+        <div class="wallet-badge-dot"></div>
+        <span id="walletAddr"></span>
+      </div>
+
+      <!-- Claimable now -->
+      <div class="card">
+        <div class="claimable-wrap">
+          <div class="claimable-label">claimable now</div>
+          <div class="claimable-amount" id="claimableAmount">0</div>
+          <div class="claimable-usd" id="claimableUsd">$0.00</div>
+        </div>
+        <button class="btn-claim" id="claimBtn" onclick="claimTokens()" disabled>
+          CLAIM TOKENS
+        </button>
+        <div class="tx-status" id="txStatus"></div>
+      </div>
+
+      <!-- Balance overview -->
+      <div class="card">
+        <div class="card-title">Your Allocation</div>
+        <div class="stat-row">
+          <span class="stat-label">Total allocation</span>
+          <span class="stat-value" id="statTotal">...</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Total vested</span>
+          <span class="stat-value positive" id="statVested">...</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Already claimed</span>
+          <span class="stat-value" id="statClaimed">...</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Remaining (locked)</span>
+          <span class="stat-value" id="statLocked">...</span>
+        </div>
+      </div>
+
+      <!-- Unlock schedule -->
+      <div class="card">
+        <div class="card-title">Unlock Schedule</div>
+        <div class="timeline">
+          <!-- TGE -->
+          <div class="timeline-item">
+            <div class="timeline-dot" id="dotTge"></div>
+            <div class="timeline-header">
+              <span class="timeline-title">TGE Unlock (50%)</span>
+              <span class="timeline-amount" id="amtTge">...</span>
+            </div>
+            <div class="timeline-sub" id="dateTge">...</div>
+          </div>
+
+          <!-- Cliff -->
+          <div class="timeline-item">
+            <div class="timeline-dot" id="dotCliff"></div>
+            <div class="timeline-header">
+              <span class="timeline-title">30-Day Cliff</span>
+              <span class="timeline-amount" style="color:var(--text-muted)">locked</span>
+            </div>
+            <div class="timeline-sub" id="dateCliff">...</div>
+          </div>
+
+          <!-- Linear vesting -->
+          <div class="timeline-item">
+            <div class="timeline-dot" id="dotLinear"></div>
+            <div class="timeline-header">
+              <span class="timeline-title">6-Month Linear (50%)</span>
+              <span class="timeline-amount" id="amtLinear">...</span>
+            </div>
+            <div class="timeline-sub" id="dateLinear">...</div>
+            <div class="vesting-progress-bg" style="margin-top:10px">
+              <div class="vesting-progress-fill" id="linearProgress" style="width:0%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px">
+              <span style="font-size:0.625rem;color:var(--text-muted)" id="linearPctLabel">0% vested</span>
+              <span style="font-size:0.625rem;color:var(--text-muted)" id="linearVestedAmt">0 SIBYL</span>
+            </div>
+          </div>
+
+          <!-- Fully vested -->
+          <div class="timeline-item">
+            <div class="timeline-dot" id="dotFull"></div>
+            <div class="timeline-header">
+              <span class="timeline-title">Fully Vested</span>
+              <span class="timeline-amount" id="amtFull">...</span>
+            </div>
+            <div class="timeline-sub" id="dateFull">...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p class="footer-text">
+        <a href="https://sibylcap.com" class="footer-link">sibylcap.com</a>
+        &nbsp;&middot;&nbsp;
+        <a href="https://x.com/sibylcap" class="footer-link">@sibylcap</a>
+        &nbsp;&middot;&nbsp;
+        <span id="contractLink"></span>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // ── Auth ──
+    const PASS_HASH = '9cfeca2355a8ee17f7c34760c857e19a4f95d0a94b2ae56a99f27d0ae67105ec';
+
+    async function sha256(msg) {
+      const data = new TextEncoder().encode(msg);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function checkAuth() {
+      const input = document.getElementById('authInput').value;
+      const hash = await sha256(input);
+      if (hash === PASS_HASH) {
+        sessionStorage.setItem('sibyl_claim_auth', '1');
+        unlockPage();
+      } else {
+        document.getElementById('authError').textContent = 'invalid access code';
+        document.getElementById('authInput').value = '';
+        document.getElementById('authInput').focus();
+      }
+      return false;
+    }
+
+    function unlockPage() {
+      document.getElementById('authGate').classList.add('hidden');
+      document.getElementById('mainContent').style.display = '';
+    }
+
+    if (sessionStorage.getItem('sibyl_claim_auth') === '1') {
+      unlockPage();
+    }
+
+    // ── Contract config ──
+    // TODO: set after Virtuals launch
+    const VESTING_CA = '';  // vesting contract address
+    const TOKEN_CA = '';    // $SIBYL token address
+    const RPC = 'https://mainnet.base.org';
+
+    const VESTING_ABI = {
+      allocations: 'function allocations(address) view returns (uint256 total, uint256 claimed)',
+      vested:      'function vested(address) view returns (uint256)',
+      claimable:   'function claimable(address) view returns (uint256)',
+      claim:       'function claim()',
+      tgeTimestamp:'function tgeTimestamp() view returns (uint256)',
+    };
+
+    // ── State ──
+    let userAddress = null;
+    let provider = null;
+
+    // ── Helpers ──
+    function shortAddr(addr) {
+      return addr.slice(0, 6) + '...' + addr.slice(-4);
+    }
+
+    function fmtTokens(wei) {
+      const n = Number(wei) / 1e18;
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
+      if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+      return n.toFixed(2);
+    }
+
+    function fmtDate(ts) {
+      if (!ts) return '...';
+      const d = new Date(ts * 1000);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    // Encode function selector
+    function selector(sig) {
+      // Simple keccak256 for function signatures - we'll use the pre-computed ones
+      const sigs = {
+        'allocations(address)': '0x52a9039c',
+        'vested(address)':      '0x44b1231f',
+        'claimable(address)':   '0xa4063dbc',
+        'claim()':              '0x4e71d92d',
+        'tgeTimestamp()':       '0xe50b813c',
+      };
+      return sigs[sig];
+    }
+
+    async function rpcCall(method, params) {
+      const r = await fetch(RPC, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 })
+      });
+      const d = await r.json();
+      return d.result;
+    }
+
+    async function callContract(fnSig, addr) {
+      const sel = selector(fnSig);
+      const data = addr
+        ? sel + '000000000000000000000000' + addr.slice(2).toLowerCase()
+        : sel;
+      return rpcCall('eth_call', [{ to: VESTING_CA, data }, 'latest']);
+    }
+
+    function decodeTwoUint256(hex) {
+      if (!hex || hex === '0x') return [0n, 0n];
+      const clean = hex.slice(2);
+      return [
+        BigInt('0x' + clean.slice(0, 64)),
+        BigInt('0x' + clean.slice(64, 128))
+      ];
+    }
+
+    function decodeUint256(hex) {
+      if (!hex || hex === '0x') return 0n;
+      return BigInt(hex);
+    }
+
+    // ── Wallet ──
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert('No wallet detected. Please install MetaMask or another Web3 wallet.');
+        return;
+      }
+
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        userAddress = accounts[0];
+
+        // Switch to Base if needed
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x2105' }],
+          });
+        } catch (switchErr) {
+          if (switchErr.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: '0x2105',
+                chainName: 'Base',
+                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                rpcUrls: ['https://mainnet.base.org'],
+                blockExplorerUrls: ['https://basescan.org'],
+              }],
+            });
+          }
+        }
+
+        await loadUserData();
+      } catch (err) {
+        console.error('Wallet connection failed:', err);
+      }
+    }
+
+    // ── Load Data ──
+    async function loadUserData() {
+      if (!userAddress) return;
+
+      // Check if contract is configured
+      if (!VESTING_CA) {
+        // Pre-launch: show placeholder state
+        document.getElementById('connectState').style.display = 'none';
+        document.getElementById('claimState').style.display = '';
+        document.getElementById('walletAddr').textContent = shortAddr(userAddress);
+        document.getElementById('claimableAmount').textContent = '...';
+        document.getElementById('claimableUsd').textContent = 'vesting contract not yet deployed';
+        document.getElementById('claimBtn').disabled = true;
+        document.getElementById('claimBtn').textContent = 'VESTING NOT YET ACTIVE';
+
+        document.getElementById('statTotal').textContent = 'pending';
+        document.getElementById('statVested').textContent = 'pending';
+        document.getElementById('statClaimed').textContent = 'pending';
+        document.getElementById('statLocked').textContent = 'pending';
+
+        document.getElementById('dotTge').className = 'timeline-dot locked';
+        document.getElementById('dotCliff').className = 'timeline-dot locked';
+        document.getElementById('dotLinear').className = 'timeline-dot locked';
+        document.getElementById('dotFull').className = 'timeline-dot locked';
+
+        document.getElementById('amtTge').textContent = 'pending';
+        document.getElementById('dateTge').textContent = 'after token launch';
+        document.getElementById('dateCliff').textContent = '30 days after TGE';
+        document.getElementById('amtLinear').textContent = 'pending';
+        document.getElementById('dateLinear').textContent = '30 days to 7 months after TGE';
+        document.getElementById('amtFull').textContent = 'pending';
+        document.getElementById('dateFull').textContent = '7 months after TGE';
+        return;
+      }
+
+      try {
+        const [allocRaw, vestedRaw, claimableRaw, tgeRaw] = await Promise.all([
+          callContract('allocations(address)', userAddress),
+          callContract('vested(address)', userAddress),
+          callContract('claimable(address)', userAddress),
+          callContract('tgeTimestamp()'),
+        ]);
+
+        const [total, claimed] = decodeTwoUint256(allocRaw);
+        const vested = decodeUint256(vestedRaw);
+        const claimableAmt = decodeUint256(claimableRaw);
+        const tgeTs = Number(decodeUint256(tgeRaw));
+
+        // No allocation
+        if (total === 0n) {
+          document.getElementById('connectState').style.display = 'none';
+          document.getElementById('notEligibleState').style.display = '';
+          document.getElementById('notEligibleAddr').textContent = shortAddr(userAddress);
+          return;
+        }
+
+        // Has allocation
+        document.getElementById('connectState').style.display = 'none';
+        document.getElementById('claimState').style.display = '';
+        document.getElementById('walletAddr').textContent = shortAddr(userAddress);
+
+        // Claimable
+        const claimableNum = Number(claimableAmt) / 1e18;
+        document.getElementById('claimableAmount').textContent = fmtTokens(claimableAmt) + ' SIBYL';
+        document.getElementById('claimBtn').disabled = claimableAmt === 0n;
+
+        // Stats
+        const locked = total - vested;
+        document.getElementById('statTotal').textContent = fmtTokens(total) + ' SIBYL';
+        document.getElementById('statVested').textContent = fmtTokens(vested) + ' SIBYL';
+        document.getElementById('statClaimed').textContent = fmtTokens(claimed) + ' SIBYL';
+        document.getElementById('statLocked').textContent = fmtTokens(locked) + ' SIBYL';
+
+        // Timeline
+        const now = Math.floor(Date.now() / 1000);
+        const cliffEnd = tgeTs + 30 * 86400;
+        const vestEnd = cliffEnd + 180 * 86400;
+        const tgeAmount = total / 2n;
+        const linearAmount = total - tgeAmount;
+
+        // TGE
+        document.getElementById('amtTge').textContent = fmtTokens(tgeAmount) + ' SIBYL';
+        document.getElementById('dateTge').textContent = tgeTs > 0 ? fmtDate(tgeTs) : 'pending';
+
+        // Cliff
+        document.getElementById('dateCliff').textContent = tgeTs > 0
+          ? fmtDate(tgeTs) + ' \u2192 ' + fmtDate(cliffEnd)
+          : '30 days after TGE';
+
+        // Linear
+        document.getElementById('amtLinear').textContent = fmtTokens(linearAmount) + ' SIBYL';
+        document.getElementById('dateLinear').textContent = tgeTs > 0
+          ? fmtDate(cliffEnd) + ' \u2192 ' + fmtDate(vestEnd)
+          : '30 days to 7 months after TGE';
+
+        // Full
+        document.getElementById('amtFull').textContent = fmtTokens(total) + ' SIBYL';
+        document.getElementById('dateFull').textContent = tgeTs > 0
+          ? fmtDate(vestEnd)
+          : '7 months after TGE';
+
+        // Dot states + linear progress
+        if (tgeTs === 0) {
+          // Not started
+          ['dotTge','dotCliff','dotLinear','dotFull'].forEach(id => {
+            document.getElementById(id).className = 'timeline-dot locked';
+          });
+        } else if (now < cliffEnd) {
+          // TGE done, in cliff
+          document.getElementById('dotTge').className = 'timeline-dot completed';
+          document.getElementById('dotCliff').className = 'timeline-dot active';
+          document.getElementById('dotLinear').className = 'timeline-dot locked';
+          document.getElementById('dotFull').className = 'timeline-dot locked';
+        } else if (now < vestEnd) {
+          // In linear vesting
+          document.getElementById('dotTge').className = 'timeline-dot completed';
+          document.getElementById('dotCliff').className = 'timeline-dot completed';
+          document.getElementById('dotLinear').className = 'timeline-dot active';
+          document.getElementById('dotFull').className = 'timeline-dot locked';
+
+          const elapsed = now - cliffEnd;
+          const pct = Math.min((elapsed / (180 * 86400)) * 100, 100);
+          document.getElementById('linearProgress').style.width = pct.toFixed(1) + '%';
+          document.getElementById('linearPctLabel').textContent = pct.toFixed(1) + '% vested';
+          const linearVested = (linearAmount * BigInt(elapsed)) / BigInt(180 * 86400);
+          document.getElementById('linearVestedAmt').textContent = fmtTokens(linearVested) + ' SIBYL';
+        } else {
+          // Fully vested
+          ['dotTge','dotCliff','dotLinear','dotFull'].forEach(id => {
+            document.getElementById(id).className = 'timeline-dot completed';
+          });
+          document.getElementById('linearProgress').style.width = '100%';
+          document.getElementById('linearPctLabel').textContent = '100% vested';
+          document.getElementById('linearVestedAmt').textContent = fmtTokens(linearAmount) + ' SIBYL';
+        }
+
+        // Contract link
+        document.getElementById('contractLink').innerHTML =
+          '<a href="https://basescan.org/address/' + VESTING_CA + '" class="footer-link" target="_blank">vesting contract</a>';
+
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      }
+    }
+
+    // ── Claim ──
+    async function claimTokens() {
+      if (!userAddress || !VESTING_CA) return;
+
+      const btn = document.getElementById('claimBtn');
+      const status = document.getElementById('txStatus');
+
+      btn.disabled = true;
+      btn.textContent = 'CONFIRMING...';
+      status.className = 'tx-status pending';
+      status.textContent = 'waiting for wallet confirmation...';
+
+      try {
+        const txHash = await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: userAddress,
+            to: VESTING_CA,
+            data: '0x4e71d92d', // claim()
+            gas: '0x30D40', // 200000
+          }],
+        });
+
+        status.textContent = 'transaction submitted. waiting for confirmation...';
+
+        // Poll for receipt
+        const poll = setInterval(async () => {
+          const receipt = await rpcCall('eth_getTransactionReceipt', [txHash]);
+          if (receipt) {
+            clearInterval(poll);
+            if (receipt.status === '0x1') {
+              status.className = 'tx-status success';
+              status.innerHTML = 'claimed successfully. <a href="https://basescan.org/tx/' + txHash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+              btn.textContent = 'CLAIMED';
+              // Refresh data
+              setTimeout(() => loadUserData(), 2000);
+            } else {
+              status.className = 'tx-status error';
+              status.textContent = 'transaction failed.';
+              btn.disabled = false;
+              btn.textContent = 'CLAIM TOKENS';
+            }
+          }
+        }, 3000);
+
+      } catch (err) {
+        status.className = 'tx-status error';
+        status.textContent = err.code === 4001 ? 'transaction rejected.' : 'transaction failed: ' + (err.message || 'unknown error');
+        btn.disabled = false;
+        btn.textContent = 'CLAIM TOKENS';
+      }
+    }
+
+    // ── Account change listener ──
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length > 0) {
+          userAddress = accounts[0];
+          // Reset states
+          document.getElementById('connectState').style.display = 'none';
+          document.getElementById('notEligibleState').style.display = 'none';
+          document.getElementById('claimState').style.display = 'none';
+          document.getElementById('connectState').style.display = '';
+          loadUserData();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
