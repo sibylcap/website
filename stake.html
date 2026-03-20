@@ -266,6 +266,62 @@
     }
     .tier-btn.active .tier-mult { color: var(--gold-dim); }
 
+    /* Percentage slider */
+    .pct-slider-wrap {
+      margin-bottom: 20px;
+    }
+    .pct-labels {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .pct-label {
+      font-size: 0.625rem; color: var(--text-muted);
+      letter-spacing: 0.12em; text-transform: uppercase;
+      font-family: var(--font-display); font-weight: 600;
+    }
+    .pct-value {
+      font-size: 0.75rem; color: var(--gold); font-weight: 500;
+      font-family: var(--font-mono);
+    }
+    .pct-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px;
+      background: var(--highest); border-radius: 3px;
+      outline: none; cursor: pointer;
+    }
+    .pct-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--gold); cursor: pointer;
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 8px rgba(196,175,122,0.3);
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .pct-slider::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 16px rgba(196,175,122,0.5);
+      transform: scale(1.15);
+    }
+    .pct-slider::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--gold); cursor: pointer;
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 8px rgba(196,175,122,0.3);
+    }
+    .pct-slider::-moz-range-track {
+      height: 6px; background: var(--highest); border-radius: 3px;
+    }
+    .pct-ticks {
+      display: flex; justify-content: space-between;
+      margin-top: 6px; padding: 0 2px;
+    }
+    .pct-tick {
+      font-size: 0.5rem; color: var(--text-muted);
+      cursor: pointer; padding: 2px 4px; border-radius: 2px;
+      transition: color 0.15s;
+      font-family: var(--font-mono);
+    }
+    .pct-tick:hover { color: var(--gold); }
+
     /* Stake summary */
     .stake-summary {
       padding: 16px; background: var(--elevated);
@@ -291,14 +347,29 @@
       color: var(--bg); border: none; border-radius: 8px;
       font-family: var(--font-display); font-size: 0.875rem;
       font-weight: 700; letter-spacing: 0.08em;
-      cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+      cursor: pointer; transition: all 0.4s cubic-bezier(0.25,0.1,0.25,1);
+      text-transform: uppercase;
+      box-shadow: 0 0 0 rgba(196,175,122,0);
+    }
+    .btn-stake.ready {
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
+      box-shadow: 0 0 24px rgba(196,175,122,0.25), 0 0 60px rgba(196,175,122,0.08);
+      animation: stake-pulse 2.5s ease-in-out infinite;
     }
     .btn-stake:hover:not(:disabled) {
-      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
-      transform: translateY(-1px);
-      box-shadow: 0 4px 24px rgba(181,160,112,0.2);
+      background: linear-gradient(135deg, var(--gold-hover), #e0cf98);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 32px rgba(196,175,122,0.35), 0 0 80px rgba(196,175,122,0.12);
     }
-    .btn-stake:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+    .btn-stake:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 12px rgba(196,175,122,0.2);
+    }
+    .btn-stake:disabled { opacity: 0.25; cursor: not-allowed; transform: none; animation: none; }
+    @keyframes stake-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(196,175,122,0.2), 0 0 50px rgba(196,175,122,0.06); }
+      50% { box-shadow: 0 0 30px rgba(196,175,122,0.35), 0 0 70px rgba(196,175,122,0.12); }
+    }
     .btn-unstake {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; padding: 12px 24px; margin-top: 10px;
@@ -686,6 +757,21 @@
             <button class="stake-max" onclick="setMax()">MAX</button>
           </div>
           <div class="stake-balance">Balance: <span id="user-balance">0.00</span> SIBYL</div>
+
+          <div class="pct-slider-wrap">
+            <div class="pct-labels">
+              <span class="pct-label">Amount</span>
+              <span class="pct-value" id="pct-display">0%</span>
+            </div>
+            <input type="range" class="pct-slider" id="pct-slider" min="0" max="100" value="0" oninput="onSlider(this.value)">
+            <div class="pct-ticks">
+              <span class="pct-tick" onclick="snapSlider(0)">0%</span>
+              <span class="pct-tick" onclick="snapSlider(25)">25%</span>
+              <span class="pct-tick" onclick="snapSlider(50)">50%</span>
+              <span class="pct-tick" onclick="snapSlider(75)">75%</span>
+              <span class="pct-tick" onclick="snapSlider(100)">100%</span>
+            </div>
+          </div>
 
           <div class="tier-selector">
             <div class="tier-label">Lock Duration</div>
@@ -1096,7 +1182,17 @@
     //  Stake summary calculation
     // ═══════════════════════════════════════
     const stakeInput = document.getElementById('stake-amount');
-    stakeInput.addEventListener('input', updateSummary);
+    stakeInput.addEventListener('input', () => {
+      updateSummary();
+      // Sync slider with typed amount
+      const bal = parseFloat(document.getElementById('user-balance').textContent) || 0;
+      const raw = parseFloat(stakeInput.value) || 0;
+      const pct = bal > 0 ? Math.min(100, Math.round((raw / bal) * 100)) : 0;
+      document.getElementById('pct-slider').value = pct;
+      document.getElementById('pct-display').textContent = pct + '%';
+      const slider = document.getElementById('pct-slider');
+      slider.style.background = 'linear-gradient(to right, var(--gold) 0%, var(--gold) ' + pct + '%, var(--highest) ' + pct + '%, var(--highest) 100%)';
+    });
 
     function updateSummary() {
       const raw = parseFloat(stakeInput.value) || 0;
@@ -1109,13 +1205,37 @@
       document.getElementById('sum-net').textContent = formatNum(net) + ' SIBYL';
       document.getElementById('sum-weight').textContent = formatNum(weight);
 
-      document.getElementById('btn-stake').disabled = !(raw > 0 && connected);
+      const stakeBtn = document.getElementById('btn-stake');
+      const hasAmount = raw > 0;
+      stakeBtn.disabled = !(hasAmount && connected);
+      // Activate glow + pulse when user enters an amount
+      if (hasAmount) {
+        stakeBtn.classList.add('ready');
+      } else {
+        stakeBtn.classList.remove('ready');
+      }
     }
 
     function setMax() {
-      const bal = document.getElementById('user-balance').textContent;
-      stakeInput.value = bal;
+      document.getElementById('pct-slider').value = 100;
+      onSlider(100);
+    }
+
+    function onSlider(pct) {
+      pct = parseInt(pct);
+      document.getElementById('pct-display').textContent = pct + '%';
+      const bal = parseFloat(document.getElementById('user-balance').textContent) || 0;
+      const amount = bal * pct / 100;
+      stakeInput.value = amount > 0 ? amount.toFixed(2) : '';
       updateSummary();
+      // Update slider track fill via CSS gradient
+      const slider = document.getElementById('pct-slider');
+      slider.style.background = 'linear-gradient(to right, var(--gold) 0%, var(--gold) ' + pct + '%, var(--highest) ' + pct + '%, var(--highest) 100%)';
+    }
+
+    function snapSlider(pct) {
+      document.getElementById('pct-slider').value = pct;
+      onSlider(pct);
     }
 
     // ═══════════════════════════════════════
