@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIBYL : Files</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08090a;
+      --surface: #0e1118;
+      --elevated: #131620;
+      --border: #1a1e28;
+      --border-strong: #252a36;
+      --text-primary: #c8ccd4;
+      --text-secondary: #8a919c;
+      --text-muted: #555d6b;
+      --accent: #6b8ba5;
+      --accent-hover: #7d9ab2;
+      --gold: #b5a070;
+      --font-display: 'Syne', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* Gate */
+    .gate {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    .gate-box { max-width: 360px; padding: 2rem; }
+    .gate-box h1 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+    .gate-box p { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1.5rem; }
+    .gate-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 0.6rem 1rem;
+      width: 100%;
+      border-radius: 2px;
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+    .gate-input:focus { border-color: var(--accent); }
+    .gate-error {
+      color: #b06868;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    /* Files view */
+    .files-view { display: none; max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .files-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .files-header h1 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .files-header a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+    }
+    .files-header a:hover { color: var(--text-secondary); }
+
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .file-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .file-card:hover { border-color: var(--border-strong); }
+    .file-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+      background: var(--bg);
+    }
+    .file-info {
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .file-name {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 65%;
+    }
+    .file-dl {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .file-dl:hover { color: var(--accent-hover); }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 600px) {
+      .file-grid { grid-template-columns: 1fr; }
+      .files-view { padding: 1.5rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Password gate -->
+  <div class="gate" id="gate">
+    <div class="gate-box">
+      <h1>SIBYL FILES</h1>
+      <p>operator access only</p>
+      <input type="password" class="gate-input" id="pw" placeholder="password" autofocus>
+      <div class="gate-error" id="err">incorrect</div>
+    </div>
+  </div>
+
+  <!-- Files listing -->
+  <div class="files-view" id="filesView">
+    <div class="files-header">
+      <h1>FILES</h1>
+      <a href="/">sibylcap.com</a>
+    </div>
+    <div id="fileGrid" class="file-grid"></div>
+  </div>
+
+  <script>
+    // Simple hash check (not crypto-grade, just keeps casual visitors out)
+    // Password: "sibyl3999"
+    const HASH = 'e081ad2a';
+    function simpleHash(s) {
+      let h = 0x811c9dc5;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 0x01000193);
+      }
+      return (h >>> 0).toString(16).slice(0, 8);
+    }
+
+    // File manifest (updated when files are added)
+    const FILES = [
+      { name: '3am-thoughts.mp4', path: '/files/3am-thoughts.mp4' },
+      { name: 'clip.mp4', path: '/files/clip.mp4' },
+      { name: 'verdict.mp4', path: '/files/verdict.mp4' },
+      { name: 'sibyl-token-logo.png', path: '/files/sibyl-token-logo.png' },
+      { name: 'dexscreener-banner.png', path: '/files/dexscreener-banner.png' },
+      { name: 'sibyl-command-center-clean.png', path: '/files/sibyl-command-center-clean.png' },
+      { name: 'coingecko-listing.png', path: '/files/coingecko-listing.png' },
+      { name: 'sibyl-coingecko-post.png', path: '/files/sibyl-coingecko-post.png' }
+    ];
+
+    const gate = document.getElementById('gate');
+    const filesView = document.getElementById('filesView');
+    const pw = document.getElementById('pw');
+    const err = document.getElementById('err');
+    const grid = document.getElementById('fileGrid');
+
+    // Check URL param or stored session
+    const urlPw = new URLSearchParams(window.location.search).get('pw');
+    if (urlPw && simpleHash(urlPw) === HASH) {
+      sessionStorage.setItem('sibyl_files_auth', '1');
+      showFiles();
+    } else if (sessionStorage.getItem('sibyl_files_auth') === '1') {
+      showFiles();
+    }
+
+    pw.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (simpleHash(pw.value) === HASH) {
+          sessionStorage.setItem('sibyl_files_auth', '1');
+          showFiles();
+        } else {
+          err.style.opacity = '1';
+          pw.value = '';
+          setTimeout(() => err.style.opacity = '0', 1500);
+        }
+      }
+    });
+
+    function showFiles() {
+      gate.style.display = 'none';
+      filesView.style.display = 'block';
+
+      if (FILES.length === 0) {
+        grid.innerHTML = '<div class="empty-state">no files</div>';
+        return;
+      }
+
+      grid.innerHTML = FILES.map(f => {
+        const isImage = /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(f.name);
+        const isVideo = /\.(mp4|mov|webm)$/i.test(f.name);
+        let thumb;
+        if (isImage) {
+          thumb = `<img class="file-thumb" src="${f.path}" alt="${f.name}" loading="lazy">`;
+        } else if (isVideo) {
+          thumb = `<video class="file-thumb" src="${f.path}" muted playsinline preload="metadata" onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>`;
+        } else {
+          thumb = `<div class="file-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.75rem;">${f.name.split('.').pop().toUpperCase()}</div>`;
+        }
+        return `<div class="file-card">
+          ${thumb}
+          <div class="file-info">
+            <span class="file-name" title="${f.name}">${f.name}</span>
+            <a class="file-dl" href="${f.path}" download="${f.name}">download</a>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  </script>
+</body>
+</html>
