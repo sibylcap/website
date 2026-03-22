@@ -100,6 +100,17 @@
     }
     .files-header a:hover { color: var(--text-secondary); }
 
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      margin-top: 2rem;
+    }
+    .section-label:first-child { margin-top: 0; }
+
     .file-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -119,6 +130,14 @@
       object-fit: cover;
       display: block;
       background: var(--bg);
+    }
+    .file-thumb-video {
+      width: 100%;
+      aspect-ratio: 9/16;
+      object-fit: contain;
+      display: block;
+      background: #000;
+      cursor: pointer;
     }
     .file-info {
       padding: 0.75rem 1rem;
@@ -175,12 +194,10 @@
       <h1>FILES</h1>
       <a href="/">sibylcap.com</a>
     </div>
-    <div id="fileGrid" class="file-grid"></div>
+    <div id="content"></div>
   </div>
 
   <script>
-    // Simple hash check (not crypto-grade, just keeps casual visitors out)
-    // Password: "sibyl3999"
     const HASH = 'e081ad2a';
     function simpleHash(s) {
       let h = 0x811c9dc5;
@@ -191,24 +208,29 @@
       return (h >>> 0).toString(16).slice(0, 8);
     }
 
-    // File manifest (updated when files are added)
-    const FILES = [
-      { name: '3am-thoughts.mp4', path: '/3am-thoughts.mp4' },
-      { name: 'clip.mp4', path: '/clip.mp4' },
-      { name: 'verdict.mp4', path: '/verdict.mp4' },
+    // Images — served from /images/ (already deployed, no conflicts)
+    const IMAGES = [
       { name: 'sibyl-token-logo.png', path: '/images/sibyl-token-logo.png' },
       { name: 'dexscreener-banner.png', path: '/images/dexscreener-banner.png' },
       { name: 'sibyl-logo-primary.png', path: '/images/sibyl-logo-primary.png' },
-      { name: 'vesting-tease.png', path: '/images/vesting-tease.png' }
+      { name: 'vesting-tease.png', path: '/images/vesting-tease.png' },
+      { name: 'sibyl-about.png', path: '/images/sibyl-about.png' },
+      { name: 'sibyl-banner.png', path: '/images/sibyl-banner.png' },
+    ];
+
+    // Videos — served from root (same level as ping-ad.mp4)
+    const VIDEOS = [
+      { name: '3am-thoughts.mp4', path: '/3am-thoughts.mp4', desc: '28s TikTok — terminal journal' },
+      { name: 'clip.mp4', path: '/clip.mp4', desc: '7s clip — Seedance compositing' },
+      { name: 'verdict.mp4', path: '/verdict.mp4', desc: '22s TikTok — project evaluation' },
     ];
 
     const gate = document.getElementById('gate');
     const filesView = document.getElementById('filesView');
     const pw = document.getElementById('pw');
     const err = document.getElementById('err');
-    const grid = document.getElementById('fileGrid');
+    const content = document.getElementById('content');
 
-    // Check URL param or stored session
     const urlPw = new URLSearchParams(window.location.search).get('pw');
     if (urlPw && simpleHash(urlPw) === HASH) {
       sessionStorage.setItem('sibyl_files_auth', '1');
@@ -234,30 +256,35 @@
       gate.style.display = 'none';
       filesView.style.display = 'block';
 
-      if (FILES.length === 0) {
-        grid.innerHTML = '<div class="empty-state">no files</div>';
-        return;
-      }
+      let html = '';
 
-      grid.innerHTML = FILES.map(f => {
-        const isImage = /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(f.name);
-        const isVideo = /\.(mp4|mov|webm)$/i.test(f.name);
-        let thumb;
-        if (isImage) {
-          thumb = `<img class="file-thumb" src="${f.path}" alt="${f.name}" loading="lazy">`;
-        } else if (isVideo) {
-          thumb = `<video class="file-thumb" src="${f.path}" muted playsinline preload="metadata" onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>`;
-        } else {
-          thumb = `<div class="file-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.75rem;">${f.name.split('.').pop().toUpperCase()}</div>`;
-        }
-        return `<div class="file-card">
-          ${thumb}
-          <div class="file-info">
-            <span class="file-name" title="${f.name}">${f.name}</span>
-            <a class="file-dl" href="${f.path}" download="${f.name}">download</a>
-          </div>
-        </div>`;
-      }).join('');
+      // --- IMAGES SECTION ---
+      html += '<div class="section-label">Images</div>';
+      html += '<div class="file-grid">';
+      html += IMAGES.map(f => `<div class="file-card">
+        <img class="file-thumb" src="${f.path}" alt="${f.name}" loading="lazy">
+        <div class="file-info">
+          <span class="file-name" title="${f.name}">${f.name}</span>
+          <a class="file-dl" href="${f.path}" download="${f.name}">download</a>
+        </div>
+      </div>`).join('');
+      html += '</div>';
+
+      // --- VIDEOS SECTION ---
+      html += '<div class="section-label">Videos</div>';
+      html += '<div class="file-grid">';
+      html += VIDEOS.map(f => `<div class="file-card">
+        <video class="file-thumb-video" src="${f.path}" muted playsinline preload="metadata"
+          onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"
+          onclick="this.paused?this.play():this.pause()"></video>
+        <div class="file-info">
+          <span class="file-name" title="${f.desc || f.name}">${f.desc || f.name}</span>
+          <a class="file-dl" href="${f.path}" download="${f.name}">download</a>
+        </div>
+      </div>`).join('');
+      html += '</div>';
+
+      content.innerHTML = html;
     }
   </script>
 </body>
