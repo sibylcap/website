@@ -892,6 +892,9 @@
           <button class="btn-stake" id="btn-stake" disabled onclick="doStake()">
             Stake SIBYL
           </button>
+          <button class="btn-unstake" id="btn-unstake-main" style="display:none" onclick="doUnstakeAll()">
+            Unstake All Flex Positions
+          </button>
           <div class="tx-status" id="tx-status"></div>
         </div>
 
@@ -1596,8 +1599,26 @@
 
         // Render active positions
         const active = positions.filter(p => p.active);
+        const unstakeBtn = document.getElementById('btn-unstake-main');
         if (active.length === 0) {
-          table.style.display = 'none'; noPos.style.display = ''; return;
+          table.style.display = 'none'; noPos.style.display = '';
+          if (unstakeBtn) unstakeBtn.style.display = 'none';
+          return;
+        }
+
+        // Show main unstake button if any positions can be unstaked
+        const unstakeable = active.filter(p => p.lockTier === 0 || now >= p.unlockTime);
+        if (unstakeBtn) {
+          if (unstakeable.length > 0) {
+            unstakeBtn.style.display = '';
+            unstakeBtn.textContent = unstakeable.length === 1
+              ? 'Unstake Position'
+              : 'Unstake All (' + unstakeable.length + ' positions)';
+          } else {
+            unstakeBtn.style.display = '';
+            unstakeBtn.textContent = 'All positions locked';
+            unstakeBtn.disabled = true;
+          }
         }
 
         table.style.display = ''; noPos.style.display = 'none';
@@ -1737,6 +1758,60 @@
         } else {
           throw new Error('Unstake failed');
         }
+      } catch (e) {
+        status.className = 'tx-status error';
+        status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
+      }
+    }
+
+    // ═══════════════════════════════════════
+    //  Actions: Unstake All
+    // ═══════════════════════════════════════
+    async function doUnstakeAll() {
+      if (!connected) return;
+      const status = document.getElementById('tx-status');
+
+      // Get all positions, find unstakeable ones
+      try {
+        const raw = await call(STAKE_CA, SEL.getPositions, padAddr(userAddress));
+        const data = raw.slice(2);
+        const offset = parseInt(data.slice(0, 64), 16) * 2;
+        const length = parseInt(data.slice(offset, offset + 64), 16);
+        const now = Math.floor(Date.now() / 1000);
+
+        const unstakeable = [];
+        for (let i = 0; i < length; i++) {
+          const base = offset + 64 + (i * 256);
+          const lockTier = parseInt(data.slice(base + 64, base + 128), 16);
+          const unlockTime = parseInt(data.slice(base + 128, base + 192), 16);
+          const active = parseInt(data.slice(base + 192, base + 256), 16) !== 0;
+          if (active && (lockTier === 0 || now >= unlockTime)) unstakeable.push(i);
+        }
+
+        if (unstakeable.length === 0) {
+          status.className = 'tx-status error'; status.style.display = 'block';
+          status.textContent = 'no unstakeable positions found.';
+          return;
+        }
+
+        // Unstake each sequentially
+        for (let idx = 0; idx < unstakeable.length; idx++) {
+          status.className = 'tx-status pending'; status.style.display = 'block';
+          status.textContent = 'unstaking position ' + (idx + 1) + ' of ' + unstakeable.length + '...';
+
+          const calldata = SEL.unstake + padUint(unstakeable[idx]);
+          const hash = await sendTx(STAKE_CA, calldata, '0x493E0');
+          const receipt = await waitTx(hash);
+
+          if (!receipt || receipt.status !== '0x1') {
+            throw new Error('Unstake failed for position ' + unstakeable[idx]);
+          }
+        }
+
+        status.className = 'tx-status success';
+        status.textContent = 'all ' + unstakeable.length + ' position(s) unstaked.';
+        setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+
       } catch (e) {
         status.className = 'tx-status error';
         status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
