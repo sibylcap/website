@@ -472,7 +472,7 @@
       font-size: 0.75rem; color: var(--text-muted); margin-bottom: 24px;
     }
     .unstake-amount-display {
-      text-align: center; margin-bottom: 20px;
+      text-align: center; margin-bottom: 24px;
     }
     .unstake-amount-value {
       font-family: var(--font-display); font-size: 2rem;
@@ -480,63 +480,6 @@
     }
     .unstake-amount-usd {
       font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;
-    }
-    .unstake-slider-wrap { margin-bottom: 20px; }
-    .unstake-slider {
-      -webkit-appearance: none; appearance: none;
-      width: 100%; height: 6px;
-      background: var(--highest); border-radius: 3px;
-      outline: none; cursor: pointer;
-    }
-    .unstake-slider::-webkit-slider-thumb {
-      -webkit-appearance: none; appearance: none;
-      width: 20px; height: 20px; border-radius: 50%;
-      background: var(--negative); cursor: pointer;
-      border: 2px solid var(--bg);
-      box-shadow: 0 0 8px rgba(196,120,120,0.4);
-      transition: box-shadow 0.2s, transform 0.15s;
-    }
-    .unstake-slider::-webkit-slider-thumb:hover {
-      box-shadow: 0 0 16px rgba(196,120,120,0.6);
-      transform: scale(1.15);
-    }
-    .unstake-slider::-moz-range-thumb {
-      width: 20px; height: 20px; border-radius: 50%;
-      background: var(--negative); cursor: pointer;
-      border: 2px solid var(--bg);
-    }
-    .unstake-slider::-moz-range-track {
-      height: 6px; background: var(--highest); border-radius: 3px;
-    }
-    .unstake-slider-labels {
-      display: flex; justify-content: space-between;
-      margin-top: 8px; font-size: 0.625rem; color: var(--text-muted);
-    }
-    .unstake-positions-preview {
-      margin-bottom: 20px; max-height: 140px; overflow-y: auto;
-    }
-    .unstake-pos-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 12px; border-radius: 6px; margin-bottom: 4px;
-      font-size: 0.75rem; transition: all 0.15s;
-    }
-    .unstake-pos-row.selected {
-      background: rgba(196,120,120,0.08); border: 1px solid rgba(196,120,120,0.2);
-    }
-    .unstake-pos-row.unselected {
-      background: var(--elevated); border: 1px solid transparent;
-      opacity: 0.4;
-    }
-    .unstake-pos-tier {
-      font-size: 0.625rem; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.08em;
-    }
-    .unstake-pos-check {
-      width: 16px; height: 16px; border-radius: 50%;
-      border: 2px solid var(--border-strong); transition: all 0.15s;
-    }
-    .unstake-pos-row.selected .unstake-pos-check {
-      background: var(--negative); border-color: var(--negative);
     }
     .btn-unstake-confirm {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -1206,28 +1149,18 @@
     <div class="unstake-drawer">
       <div class="unstake-handle"></div>
       <div class="unstake-title">Unstake $SIBYL</div>
-      <div class="unstake-sub">drag to select how much to withdraw. positions are unstaked largest-first.</div>
+      <div class="unstake-sub" id="unstake-sub"></div>
 
       <div class="unstake-amount-display">
         <div class="unstake-amount-value" id="unstake-amount-val">0</div>
         <div class="unstake-amount-usd" id="unstake-amount-usd">$0.00</div>
-        <div style="display:flex;justify-content:center;gap:24px;margin-top:10px;font-size:0.6875rem;">
-          <div><span style="color:var(--text-muted)">Balance after: </span><span style="color:var(--text-primary)" id="unstake-bal-after">0</span></div>
-          <div><span style="color:var(--text-muted)">Positions: </span><span style="color:var(--negative)" id="unstake-pos-count">0</span></div>
+        <div style="margin-top:10px;font-size:0.6875rem;">
+          <span style="color:var(--text-muted)">Fee (0.1%): </span><span style="color:var(--text-secondary)" id="unstake-fee">0</span>
+          <span style="color:var(--text-muted);margin-left:16px">You receive: </span><span style="color:var(--text-primary);font-weight:500" id="unstake-net">0</span>
         </div>
       </div>
 
-      <div class="unstake-slider-wrap">
-        <input type="range" class="unstake-slider" id="unstake-slider" min="0" max="100" value="0" oninput="onUnstakeSlider(this.value)">
-        <div class="unstake-slider-labels">
-          <span>0</span>
-          <span id="unstake-slider-max">0 SIBYL</span>
-        </div>
-      </div>
-
-      <div class="unstake-positions-preview" id="unstake-positions-preview"></div>
-
-      <button class="btn-unstake-confirm" id="btn-unstake-confirm" disabled onclick="executeUnstake()">
+      <button class="btn-unstake-confirm" id="btn-unstake-confirm" onclick="executeUnstake()">
         Confirm Unstake
       </button>
       <button class="btn-unstake-cancel" onclick="closeUnstakeDrawer()">cancel</button>
@@ -1754,17 +1687,16 @@
           return;
         }
 
-        // Show main unstake button if any positions can be unstaked
+        // Show main unstake button if position can be unstaked
         const unstakeable = active.filter(p => p.lockTier === 0 || now >= p.unlockTime);
         if (unstakeBtn) {
           if (unstakeable.length > 0) {
             unstakeBtn.style.display = '';
-            unstakeBtn.textContent = unstakeable.length === 1
-              ? 'Unstake Position'
-              : 'Unstake All (' + unstakeable.length + ' positions)';
+            unstakeBtn.textContent = 'Unstake';
+            unstakeBtn.disabled = false;
           } else {
             unstakeBtn.style.display = '';
-            unstakeBtn.textContent = 'All positions locked';
+            unstakeBtn.textContent = 'Locked';
             unstakeBtn.disabled = true;
           }
         }
@@ -1915,15 +1847,12 @@
     // ═══════════════════════════════════════
     //  Unstake Drawer
     // ═══════════════════════════════════════
-    let unstakeablePositions = []; // sorted largest-first
-    let selectedUnstakeIndices = [];
-    let totalUnstakeableAmount = 0;
-    let currentStakedBalance = 0;
+    let unstakePositionIndex = null;
+    let unstakeAmount = 0;
 
     async function openUnstakeDrawer() {
       if (!connected) return;
 
-      // Fetch positions
       try {
         const raw = await call(STAKE_CA, SEL.getPositions, padAddr(userAddress));
         const data = raw.slice(2);
@@ -1931,40 +1860,36 @@
         const length = parseInt(data.slice(off, off + 64), 16);
         const now = Math.floor(Date.now() / 1000);
 
-        unstakeablePositions = [];
-        currentStakedBalance = 0;
+        // Find the first active unstakeable position
         for (let i = 0; i < length; i++) {
           const b = off + 64 + (i * 256);
           const amount = BigInt('0x' + data.slice(b, b + 64));
           const lockTier = parseInt(data.slice(b + 64, b + 128), 16);
           const unlockTime = parseInt(data.slice(b + 128, b + 192), 16);
           const active = parseInt(data.slice(b + 192, b + 256), 16) !== 0;
-          if (active) {
-            currentStakedBalance += fromWei(amount);
-            if (lockTier === 0 || now >= unlockTime) {
-              unstakeablePositions.push({ index: i, amount, amtNum: fromWei(amount), lockTier });
-            }
+
+          if (active && (lockTier === 0 || now >= unlockTime)) {
+            unstakePositionIndex = i;
+            unstakeAmount = fromWei(amount);
+
+            const fee = unstakeAmount * feeBps / 10000;
+            const net = unstakeAmount - fee;
+            const tier = tierDurations[lockTier];
+
+            setText('unstake-amount-val', formatNum(unstakeAmount) + ' SIBYL');
+            setText('unstake-amount-usd', '$' + (unstakeAmount * tokenPrice).toFixed(2));
+            setText('unstake-fee', formatNum(fee) + ' SIBYL');
+            setText('unstake-net', formatNum(net) + ' SIBYL');
+            document.getElementById('unstake-sub').textContent =
+              tier + ' tier. withdrawal fee: 0.1%. tokens return to your wallet.';
+
+            document.getElementById('unstake-overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+            return;
           }
         }
-
-        // Sort largest first
-        unstakeablePositions.sort((a, b) => b.amtNum - a.amtNum);
-        totalUnstakeableAmount = unstakeablePositions.reduce((s, p) => s + p.amtNum, 0);
-
-        if (unstakeablePositions.length === 0) return;
-
-        // Reset slider
-        document.getElementById('unstake-slider').value = 0;
-        document.getElementById('unstake-slider-max').textContent = formatNum(totalUnstakeableAmount) + ' SIBYL';
-        selectedUnstakeIndices = [];
-        onUnstakeSlider(0);
-
-        // Open
-        const overlay = document.getElementById('unstake-overlay');
-        overlay.classList.add('open');
-        document.body.style.overflow = 'hidden';
       } catch (e) {
-        console.warn('Failed to load positions for unstake:', e.message);
+        console.warn('Failed to load position for unstake:', e.message);
       }
     }
 
@@ -1973,86 +1898,30 @@
       document.body.style.overflow = '';
     }
 
-    function onUnstakeSlider(pct) {
-      pct = parseInt(pct);
-      const targetAmount = totalUnstakeableAmount * pct / 100;
-
-      // Select positions largest-first until we reach the target
-      selectedUnstakeIndices = [];
-      let runningTotal = 0;
-      for (const pos of unstakeablePositions) {
-        if (runningTotal + pos.amtNum <= targetAmount + 0.01 || (pct === 100)) {
-          selectedUnstakeIndices.push(pos.index);
-          runningTotal += pos.amtNum;
-        }
-        if (pct < 100 && runningTotal >= targetAmount) break;
-      }
-
-      // If slider > 0 but nothing selected yet (small amount), select smallest eligible
-      if (pct > 0 && selectedUnstakeIndices.length === 0 && unstakeablePositions.length > 0) {
-        const smallest = unstakeablePositions[unstakeablePositions.length - 1];
-        selectedUnstakeIndices.push(smallest.index);
-        runningTotal = smallest.amtNum;
-      }
-
-      // Update display
-      const withdrawAmount = runningTotal;
-      const balAfter = currentStakedBalance - withdrawAmount;
-
-      document.getElementById('unstake-amount-val').textContent = formatNum(withdrawAmount) + ' SIBYL';
-      document.getElementById('unstake-amount-usd').textContent = '$' + (withdrawAmount * tokenPrice).toFixed(2);
-      document.getElementById('unstake-bal-after').textContent = formatNum(balAfter) + ' SIBYL';
-      document.getElementById('unstake-pos-count').textContent = selectedUnstakeIndices.length;
-
-      // Slider track fill
-      const slider = document.getElementById('unstake-slider');
-      slider.style.background = 'linear-gradient(to right, var(--negative) 0%, var(--negative) ' + pct + '%, var(--highest) ' + pct + '%, var(--highest) 100%)';
-
-      // Render position preview
-      const preview = document.getElementById('unstake-positions-preview');
-      preview.innerHTML = unstakeablePositions.map(pos => {
-        const sel = selectedUnstakeIndices.includes(pos.index);
-        const cls = sel ? 'selected' : 'unselected';
-        const tier = tierDurations[pos.lockTier];
-        return '<div class="unstake-pos-row ' + cls + '">' +
-          '<div><span style="color:var(--text-primary)">' + formatNum(pos.amtNum) + ' SIBYL</span> ' +
-          '<span class="unstake-pos-tier">' + tier + ' ' + tierMultipliers[pos.lockTier] + 'x</span></div>' +
-          '<div class="unstake-pos-check"></div>' +
-        '</div>';
-      }).join('');
-
-      // Enable/disable confirm
-      document.getElementById('btn-unstake-confirm').disabled = selectedUnstakeIndices.length === 0;
-    }
-
     async function executeUnstake() {
-      if (selectedUnstakeIndices.length === 0) return;
+      if (unstakePositionIndex === null) return;
       const status = document.getElementById('tx-status');
       const btn = document.getElementById('btn-unstake-confirm');
       btn.disabled = true;
       btn.textContent = 'UNSTAKING...';
 
       try {
-        for (let i = 0; i < selectedUnstakeIndices.length; i++) {
-          btn.textContent = 'UNSTAKING ' + (i + 1) + '/' + selectedUnstakeIndices.length + '...';
+        const calldata = SEL.unstake + padUint(unstakePositionIndex);
+        const hash = await sendTx(STAKE_CA, calldata, '0x493E0');
 
-          const calldata = SEL.unstake + padUint(selectedUnstakeIndices[i]);
-          const hash = await sendTx(STAKE_CA, calldata, '0x493E0');
-          const receipt = await waitTx(hash);
+        btn.textContent = 'WAITING...';
+        const receipt = await waitTx(hash);
 
-          if (!receipt || receipt.status !== '0x1') {
-            throw new Error('Unstake failed for position ' + selectedUnstakeIndices[i]);
-          }
+        if (receipt && receipt.status === '0x1') {
+          closeUnstakeDrawer();
+          status.className = 'tx-status success'; status.style.display = 'block';
+          status.innerHTML = 'unstaked ' + formatNum(unstakeAmount) + ' SIBYL. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+        } else {
+          throw new Error('Unstake transaction failed');
         }
-
-        closeUnstakeDrawer();
-        status.className = 'tx-status success'; status.style.display = 'block';
-        status.textContent = selectedUnstakeIndices.length + ' position(s) unstaked successfully.';
-        setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
-
       } catch (e) {
-        btn.textContent = 'CONFIRM UNSTAKE';
-        btn.disabled = false;
+        btn.textContent = 'CONFIRM UNSTAKE'; btn.disabled = false;
         status.className = 'tx-status error'; status.style.display = 'block';
         status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
       }
