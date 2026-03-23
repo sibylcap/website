@@ -4,13 +4,21 @@
    USDC goes to relay wallet. Daily cron converts 50% of new USDC to ETH. */
 
 var { gate } = require('./_x402');
-var { createWalletClient, createPublicClient, http, parseEther, formatEther } = require('viem');
+var { createWalletClient, createPublicClient, http, fallback, parseEther, formatEther } = require('viem');
 var { base } = require('viem/chains');
 var { privateKeyToAccount } = require('viem/accounts');
 
 var RELAY_ADDRESS = '0xb91d82EBE1b90117B6C6c5990104B350d3E2f9e6';
 var SEND_AMOUNT = parseEther('0.001');
-var RPC = process.env.BASE_RPC_URL || 'https://base-mainnet.public.blastapi.io';
+var RPC_URLS = [
+  'https://base-mainnet.g.alchemy.com/v2/RgNU6uKPEDG6b7LI14nKs',
+  'https://base-mainnet.gateway.tatum.io/v4/t-69adc61b8b7c2d93b6192185-48fba70dc11e4944b605e028',
+  'https://base.gateway.tenderly.co',
+  'https://mainnet.base.org',
+  'https://base.drpc.org',
+  'https://base-rpc.publicnode.com',
+];
+var rpcTransport = fallback(RPC_URLS.map(function(u) { return http(u, { timeout: 10000 }); }), { rank: true, retryCount: 2 });
 var MIN_RELAY_BALANCE = parseEther('0.002'); // don't drain below this
 
 var ERC8004_FEEDBACK = {
@@ -62,8 +70,8 @@ module.exports = async function handler(req, res) {
     }
 
     var account = privateKeyToAccount(relayKey);
-    var publicClient = createPublicClient({ chain: base, transport: http(RPC) });
-    var walletClient = createWalletClient({ account: account, chain: base, transport: http(RPC) });
+    var publicClient = createPublicClient({ chain: base, transport: rpcTransport });
+    var walletClient = createWalletClient({ account: account, chain: base, transport: rpcTransport });
 
     var balance = await publicClient.getBalance({ address: RELAY_ADDRESS });
 

@@ -19,18 +19,18 @@
       --highest:       #1a1e28;
       --border:        #1a1e28;
       --border-strong: #252a36;
-      --text-primary:  #dce0e8;
-      --text-secondary:#a3aab5;
-      --text-muted:    #6e7787;
-      --accent:        #6b8ba5;
-      --accent-hover:  #7d9ab2;
-      --gold:          #c4af7a;
-      --gold-hover:    #d4bf8a;
-      --gold-dim:      #9a8a60;
-      --violet:        #8878a8;
-      --positive:      #5a8a6a;
-      --negative:      #b06868;
-      --warning:       #b5944a;
+      --text-primary:  #e4e8f0;
+      --text-secondary:#b8bfc9;
+      --text-muted:    #8e98aa;
+      --accent:        #7e9cb5;
+      --accent-hover:  #92afc4;
+      --gold:          #d4bf8a;
+      --gold-hover:    #e0cf9a;
+      --gold-dim:      #b5a478;
+      --violet:        #9a8cba;
+      --positive:      #72ab87;
+      --negative:      #c47878;
+      --warning:       #c9a85a;
       --font-display:  'Syne', 'Helvetica Neue', sans-serif;
       --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
     }
@@ -92,19 +92,25 @@
     }
     .nav-back:hover { color: var(--text-secondary); }
     .nav-page-tag {
-      font-size: 0.5625rem; color: var(--gold-dim);
+      font-size: 0.625rem; color: var(--gold-dim);
       letter-spacing: 0.2em; text-transform: uppercase;
       font-family: var(--font-display); font-weight: 600;
     }
     .btn-wallet {
       display: flex; align-items: center; gap: 8px;
-      background: transparent; border: 1px solid var(--border-strong);
-      border-radius: 6px; padding: 8px 16px;
-      font-family: var(--font-mono); font-size: 0.75rem;
-      color: var(--text-primary); cursor: pointer;
-      transition: all 0.2s;
+      background: rgba(181,160,112,0.06); border: 1px solid rgba(181,160,112,0.25);
+      border-radius: 8px; padding: 10px 20px;
+      font-family: var(--font-mono); font-size: 0.8125rem;
+      color: var(--gold); cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 0 12px rgba(181,160,112,0.06);
     }
-    .btn-wallet:hover { border-color: var(--gold-dim); color: var(--gold); }
+    .btn-wallet:hover {
+      border-color: var(--gold); color: var(--gold-hover);
+      background: rgba(181,160,112,0.1);
+      box-shadow: 0 0 20px rgba(181,160,112,0.12);
+      transform: translateY(-1px);
+    }
     .btn-wallet .dot {
       width: 6px; height: 6px; border-radius: 50%;
       background: var(--positive);
@@ -148,7 +154,7 @@
     .market-cell:last-child { border-right: none; }
     .market-cell:hover { background: var(--elevated); }
     .market-label {
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.15em;
       margin-bottom: 6px; font-family: var(--font-display); font-weight: 600;
     }
@@ -192,9 +198,9 @@
       letter-spacing: 0.2em; text-transform: uppercase;
     }
     .card-badge {
-      font-size: 0.5625rem; padding: 3px 8px;
-      border-radius: 3px; letter-spacing: 0.1em;
-      text-transform: uppercase; font-weight: 500;
+      font-size: 0.625rem; padding: 4px 10px;
+      border-radius: 4px; letter-spacing: 0.1em;
+      text-transform: uppercase; font-weight: 600;
     }
     .card-badge.live {
       background: rgba(90,138,106,0.12); color: var(--positive);
@@ -222,13 +228,16 @@
     .stake-input::placeholder { color: var(--text-muted); }
     .stake-max {
       position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-      background: rgba(181,160,112,0.1); border: 1px solid rgba(181,160,112,0.2);
-      border-radius: 4px; padding: 4px 10px;
-      font-family: var(--font-mono); font-size: 0.625rem;
+      background: rgba(212,191,138,0.12); border: 1px solid rgba(212,191,138,0.3);
+      border-radius: 5px; padding: 5px 12px;
+      font-family: var(--font-mono); font-size: 0.6875rem;
       color: var(--gold); cursor: pointer; text-transform: uppercase;
-      letter-spacing: 0.1em; transition: all 0.2s;
+      letter-spacing: 0.1em; transition: all 0.2s; font-weight: 500;
     }
-    .stake-max:hover { background: rgba(181,160,112,0.2); border-color: var(--gold); }
+    .stake-max:hover {
+      background: rgba(212,191,138,0.22); border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(212,191,138,0.1);
+    }
     .stake-balance {
       font-size: 0.6875rem; color: var(--text-muted);
       margin-bottom: 20px; text-align: right;
@@ -261,7 +270,7 @@
     }
     .tier-btn.active .tier-duration { color: var(--gold); }
     .tier-mult {
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
       letter-spacing: 0.05em;
     }
     .tier-btn.active .tier-mult { color: var(--gold-dim); }
@@ -315,12 +324,12 @@
       margin-top: 6px; padding: 0 2px;
     }
     .pct-tick {
-      font-size: 0.5rem; color: var(--text-muted);
-      cursor: pointer; padding: 2px 4px; border-radius: 2px;
-      transition: color 0.15s;
+      font-size: 0.625rem; color: var(--text-secondary);
+      cursor: pointer; padding: 3px 6px; border-radius: 3px;
+      transition: all 0.15s;
       font-family: var(--font-mono);
     }
-    .pct-tick:hover { color: var(--gold); }
+    .pct-tick:hover { color: var(--gold); background: rgba(212,191,138,0.06); }
 
     /* Stake summary */
     .stake-summary {
@@ -341,17 +350,35 @@
 
     /* Action buttons */
     .btn-stake {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 18px 24px;
-      background: var(--elevated);
-      color: var(--text-muted); border: 1px solid var(--border-strong); border-radius: 8px;
-      font-family: var(--font-display); font-size: 0.9375rem;
-      font-weight: 700; letter-spacing: 0.1em;
-      cursor: pointer; transition: all 0.5s cubic-bezier(0.25,0.1,0.25,1);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(181,160,112,0.08), rgba(181,160,112,0.15));
+      color: var(--gold); border: 1px solid rgba(181,160,112,0.3); border-radius: 10px;
+      font-family: var(--font-display); font-size: 1rem;
+      font-weight: 700; letter-spacing: 0.12em;
+      cursor: pointer; transition: all 0.4s cubic-bezier(0.25,0.1,0.25,1);
       text-transform: uppercase;
-      box-shadow: none;
+      box-shadow: 0 0 20px rgba(181,160,112,0.06), inset 0 1px 0 rgba(255,255,255,0.03);
       position: relative;
       overflow: hidden;
+    }
+    .btn-stake::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 30%, rgba(181,160,112,0.06) 50%, transparent 70%);
+      background-size: 200% 200%;
+      animation: btn-idle-shimmer 4s ease-in-out infinite;
+    }
+    @keyframes btn-idle-shimmer {
+      0% { background-position: 200% 200%; }
+      100% { background-position: -200% -200%; }
+    }
+    .btn-stake:hover:not(:disabled):not(.ready) {
+      border-color: rgba(181,160,112,0.5);
+      color: var(--gold-hover);
+      background: linear-gradient(135deg, rgba(181,160,112,0.12), rgba(181,160,112,0.22));
+      box-shadow: 0 0 30px rgba(181,160,112,0.12), 0 4px 16px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
     }
     .btn-stake.ready {
       background: linear-gradient(135deg, #d4bf60, #f0d878, #d4bf60);
@@ -360,28 +387,30 @@
       color: #0a0b0d;
       border-color: transparent;
       box-shadow:
-        0 0 30px rgba(240,216,120,0.4),
-        0 0 60px rgba(240,216,120,0.15),
-        0 4px 20px rgba(0,0,0,0.3);
-      text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        0 0 40px rgba(240,216,120,0.5),
+        0 0 80px rgba(240,216,120,0.2),
+        0 6px 24px rgba(0,0,0,0.35);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
+    .btn-stake.ready::before { display: none; }
     .btn-stake.ready:hover {
-      background: linear-gradient(135deg, #e0cf70, #fff0a0, #e0cf70);
+      background: linear-gradient(135deg, #e8d870, #fff8b8, #e8d870);
       background-size: 200% 200%;
-      transform: translateY(-3px);
+      transform: translateY(-3px) scale(1.01);
       box-shadow:
-        0 0 45px rgba(240,216,120,0.55),
-        0 0 90px rgba(240,216,120,0.2),
-        0 8px 32px rgba(0,0,0,0.4);
-    }
-    .btn-stake:hover:not(:disabled):not(.ready) {
-      border-color: var(--gold-dim);
-      color: var(--text-secondary);
+        0 0 60px rgba(240,216,120,0.65),
+        0 0 120px rgba(240,216,120,0.25),
+        0 10px 40px rgba(0,0,0,0.4);
     }
     .btn-stake:active:not(:disabled) {
       transform: translateY(0) scale(0.98);
     }
-    .btn-stake:disabled { opacity: 0.2; cursor: not-allowed; transform: none; animation: none; }
+    .btn-stake:disabled {
+      opacity: 0.35; cursor: not-allowed; transform: none; animation: none;
+      background: var(--elevated); color: var(--text-muted);
+      border-color: var(--border-strong); box-shadow: none;
+    }
+    .btn-stake:disabled::before { display: none; }
     @keyframes stake-shimmer {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
@@ -390,26 +419,30 @@
     @keyframes stake-glow {
       0%, 100% {
         box-shadow:
-          0 0 25px rgba(240,216,120,0.35),
-          0 0 50px rgba(240,216,120,0.12),
-          0 4px 20px rgba(0,0,0,0.3);
+          0 0 35px rgba(240,216,120,0.45),
+          0 0 70px rgba(240,216,120,0.15),
+          0 6px 24px rgba(0,0,0,0.35);
       }
       50% {
         box-shadow:
-          0 0 40px rgba(240,216,120,0.55),
-          0 0 80px rgba(240,216,120,0.22),
-          0 4px 20px rgba(0,0,0,0.3);
+          0 0 55px rgba(240,216,120,0.65),
+          0 0 110px rgba(240,216,120,0.28),
+          0 6px 24px rgba(0,0,0,0.35);
       }
     }
     .btn-unstake {
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 12px 24px; margin-top: 10px;
-      background: transparent; color: var(--text-secondary);
-      border: 1px solid var(--border-strong); border-radius: 8px;
-      font-family: var(--font-mono); font-size: 0.75rem;
-      cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em;
+      width: 100%; padding: 14px 24px; margin-top: 12px;
+      background: rgba(196,120,120,0.04); color: var(--text-secondary);
+      border: 1px solid rgba(196,120,120,0.2); border-radius: 8px;
+      font-family: var(--font-mono); font-size: 0.8125rem;
+      cursor: pointer; transition: all 0.25s; letter-spacing: 0.05em;
     }
-    .btn-unstake:hover { border-color: var(--negative); color: var(--negative); }
+    .btn-unstake:hover {
+      border-color: var(--negative); color: var(--negative);
+      background: rgba(196,120,120,0.08);
+      box-shadow: 0 0 16px rgba(196,120,120,0.08);
+    }
 
     /* Tx status */
     .tx-status {
@@ -439,7 +472,7 @@
     }
     .position-stat { padding: 16px; background: var(--elevated); border-radius: 8px; }
     .position-stat .stat-label {
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.15em;
       margin-bottom: 6px; font-family: var(--font-display); font-weight: 600;
     }
@@ -461,7 +494,7 @@
     }
     .claim-info { flex: 1; }
     .claim-label {
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.15em;
       font-family: var(--font-display); font-weight: 600;
     }
@@ -471,20 +504,22 @@
     }
     .claim-usd { font-size: 0.6875rem; color: var(--text-muted); }
     .btn-claim {
-      padding: 12px 28px;
-      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      padding: 14px 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
       color: var(--bg); border: none; border-radius: 8px;
-      font-family: var(--font-display); font-size: 0.8125rem;
-      font-weight: 700; letter-spacing: 0.08em;
-      cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+      font-family: var(--font-display); font-size: 0.875rem;
+      font-weight: 700; letter-spacing: 0.1em;
+      cursor: pointer; transition: all 0.25s; text-transform: uppercase;
       white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(212,191,138,0.2), 0 0 24px rgba(212,191,138,0.1);
     }
     .btn-claim:hover:not(:disabled) {
-      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
-      transform: translateY(-1px);
-      box-shadow: 0 4px 20px rgba(181,160,112,0.2);
+      background: linear-gradient(135deg, var(--gold-hover), #ecd9a0);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 28px rgba(212,191,138,0.35), 0 0 40px rgba(212,191,138,0.15);
     }
-    .btn-claim:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-claim:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+    .btn-claim:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
 
     /* Value chart */
     .chart-wrap {
@@ -497,7 +532,7 @@
       position: absolute; top: 16px; left: 16px;
     }
     .chart-value-label {
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.15em;
       font-family: var(--font-display); font-weight: 600;
     }
@@ -515,8 +550,8 @@
     .chart-tf {
       padding: 4px 10px; background: transparent;
       border: 1px solid var(--border-strong); border-radius: 4px;
-      font-family: var(--font-mono); font-size: 0.5625rem;
-      color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+      font-family: var(--font-mono); font-size: 0.625rem;
+      color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
     }
     .chart-tf.active {
       background: rgba(181,160,112,0.1); border-color: var(--gold-dim);
@@ -536,7 +571,7 @@
     }
     .apr-cell:last-child { border-right: none; }
     .apr-tier {
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.1em;
       margin-bottom: 4px; font-family: var(--font-display); font-weight: 600;
     }
@@ -545,7 +580,7 @@
       font-family: var(--font-mono);
     }
     .apr-weight {
-      font-size: 0.5625rem; color: var(--text-muted); margin-top: 2px;
+      font-size: 0.625rem; color: var(--text-muted); margin-top: 2px;
     }
     .apr-cell.active {
       background: rgba(90,138,106,0.04);
@@ -558,7 +593,7 @@
     }
     .supply-item { padding: 16px; background: var(--elevated); border-radius: 8px; }
     .supply-label {
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.12em;
       margin-bottom: 6px; font-family: var(--font-display); font-weight: 600;
     }
@@ -582,14 +617,14 @@
     }
     .legend-item {
       display: flex; align-items: center; gap: 6px;
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
     }
     .legend-dot { width: 6px; height: 6px; border-radius: 50%; }
 
     /* Liquidity Pools Table */
     .lp-table { width: 100%; border-collapse: collapse; }
     .lp-table th {
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.12em;
       font-family: var(--font-display); font-weight: 600;
       padding: 10px 12px; text-align: left;
@@ -614,7 +649,7 @@
     /* Positions Table */
     .positions-table { width: 100%; border-collapse: collapse; }
     .positions-table th {
-      font-size: 0.5625rem; color: var(--text-muted);
+      font-size: 0.625rem; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.12em;
       font-family: var(--font-display); font-weight: 600;
       padding: 10px 12px; text-align: left;
@@ -635,13 +670,16 @@
     .lock-progress { width: 100%; height: 3px; background: var(--highest); border-radius: 2px; margin-top: 4px; }
     .lock-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.5s; }
     .btn-unstake-sm {
-      padding: 4px 12px; background: transparent;
-      border: 1px solid var(--border-strong); border-radius: 4px;
-      font-family: var(--font-mono); font-size: 0.5625rem;
-      color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+      padding: 5px 14px; background: rgba(196,120,120,0.04);
+      border: 1px solid rgba(196,120,120,0.2); border-radius: 4px;
+      font-family: var(--font-mono); font-size: 0.625rem;
+      color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
     }
-    .btn-unstake-sm:hover { border-color: var(--negative); color: var(--negative); }
-    .btn-unstake-sm:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-unstake-sm:hover {
+      border-color: var(--negative); color: var(--negative);
+      background: rgba(196,120,120,0.08);
+    }
+    .btn-unstake-sm:disabled { opacity: 0.35; cursor: not-allowed; }
 
     /* ═══════════════════════════════════════
        Connect State
@@ -652,7 +690,7 @@
       text-align: center;
     }
     .connect-prompt .icon {
-      width: 64px; height: 64px; margin-bottom: 20px; opacity: 0.15;
+      width: 64px; height: 64px; margin-bottom: 20px; opacity: 0.25;
     }
     .connect-prompt p {
       color: var(--text-muted); font-size: 0.8125rem;
@@ -873,7 +911,8 @@
               </thead>
               <tbody id="positions-body"></tbody>
             </table>
-            <div id="no-positions" style="text-align:center;padding:24px;color:var(--text-muted);font-size:0.75rem;">
+            <div id="no-positions" style="text-align:center;padding:36px 24px;color:var(--text-secondary);font-size:0.8125rem;">
+              <div style="font-size:1.5rem;opacity:0.2;margin-bottom:8px;">&#9670;</div>
               no active positions
             </div>
           </div>
@@ -1035,10 +1074,10 @@
     </div><!-- /main-grid -->
 
     <!-- Footer -->
-    <div style="text-align:center; padding:48px 0 24px; color:var(--text-muted); font-size:0.5625rem; letter-spacing:0.15em; text-transform:uppercase;">
+    <div style="text-align:center; padding:48px 0 24px; color:var(--text-muted); font-size:0.6875rem; letter-spacing:0.15em; text-transform:uppercase;">
       SIBYL Staking Contract : Base
       <br>
-      <a href="#" id="contract-link" style="color:var(--accent);font-size:0.5625rem;" target="_blank">View on BaseScan</a>
+      <a href="#" id="contract-link" style="color:var(--accent);font-size:0.6875rem;" target="_blank">View on BaseScan</a>
     </div>
   </div>
 

@@ -1,10 +1,10 @@
 /* SIBYL Full Project Evaluation API.
    Scores projects on the three SIBYL criteria: Builder Conviction, Community Seed,
    On-Chain Proof of Work. Returns a conviction score out of 30 with tier classification.
-   Payment: x402 ($0.50 USDC per call). Free with ?demo=true.
+   Payment: x402 ($0.25 USDC per call). Free with ?demo=true.
 
    Usage:
-     GET /api/evaluate?token=0x...                                    (paid, $0.50 USDC)
+     GET /api/evaluate?token=0x...                                    (paid, $0.25 USDC)
      GET /api/evaluate?token=0x...&twitter=handle&github=user         (paid, full analysis)
      GET /api/evaluate?token=0x...&demo=true                          (free, same output)
 
@@ -37,6 +37,17 @@ module.exports = async function handler(req, res) {
 
   var token = (req.query.token || '').toLowerCase();
   if (!token || !/^0x[a-f0-9]{40}$/.test(token)) {
+    if (!req.query.demo && !req.headers['x-payment'] && !req.headers['x-payment-tx']) {
+      return x402.discovery(req, res, {
+        priceUsd: PRICE_USD,
+        description: 'SIBYL full project evaluation. scores on builder conviction, community seed, and on-chain proof of work. 0-30 conviction score with tier classification.',
+        discovery: {
+          input: { token: '0x...', twitter: 'handle', github: 'user' },
+          inputSchema: { properties: { token: { type: 'string', description: 'ERC-20 contract address on Base' }, twitter: { type: 'string', description: 'X handle without @' }, github: { type: 'string', description: 'GitHub username or org' } }, required: ['token'] },
+          output: { example: { conviction_score: 24, tier: 'high_conviction', builder_conviction: {}, community_seed: {}, onchain_proof: {} } }
+        }
+      });
+    }
     return res.status(400).json({ error: 'invalid token address. use ?token=0x...' });
   }
 
@@ -368,17 +379,29 @@ async function fetchTotalSupply(token) {
   for (var i = 0; i < rpcs.length; i++) {
     try {
       var controller = new AbortController();
-      var timeout = setTimeout(function() { controller.abort(); }, 3000);
+      var timeout = setTimeout(function() { controller.abort(); }, 5000);
+      var batch = [
+        { jsonrpc: '2.0', method: 'eth_call', params: [{ to: token, data: '0x18160ddd' }, 'latest'], id: 1 },
+        { jsonrpc: '2.0', method: 'eth_call', params: [{ to: token, data: '0x313ce567' }, 'latest'], id: 2 }
+      ];
       var resp = await fetch(rpcs[i], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_call', params: [{ to: token, data: '0x18160ddd' }, 'latest'], id: 1 }),
+        body: JSON.stringify(batch),
         signal: controller.signal
       });
       clearTimeout(timeout);
-      var data = await resp.json();
-      if (data.result && data.result !== '0x') {
-        return parseInt(data.result, 16) / 1e18;
+      var results = await resp.json();
+      if (!Array.isArray(results)) results = [results];
+      var supplyResult = results.find(function(r) { return r.id === 1; });
+      var decimalsResult = results.find(function(r) { return r.id === 2; });
+      if (supplyResult && supplyResult.result && supplyResult.result !== '0x') {
+        var decimals = 18;
+        if (decimalsResult && decimalsResult.result && decimalsResult.result !== '0x') {
+          decimals = parseInt(decimalsResult.result, 16);
+          if (decimals < 0 || decimals > 77) decimals = 18;
+        }
+        return parseInt(supplyResult.result, 16) / Math.pow(10, decimals);
       }
     } catch (e) {
       continue;
@@ -443,7 +466,7 @@ async function fetchXActivityV1(handle, bearer) {
     var cutoff = Date.now() - 7 * 86400000;
     var recent = tweets.filter(function(t) { return new Date(t.created_at).getTime() > cutoff; });
 
-    var SHIP_RE = /deploy|ship|launch|release|update|commit|push|build|fix|refactor|merge|v\d|beta|alpha|testnet|mainnet|live|audit|contract|integrat/i;
+    var SHIP_RE = /deploy|shipped|shipping|ship\s|push.*prod|commit\s*[a-f0-9]|merge.*PR|merged.*pull|v\d+\.\d|testnet|mainnet|smart.?contract|audit|refactor|integrat.*api|open.?source|changelog|patch|hotfix|bug.?fix|migrat/i;
     var shipCount = recent.filter(function(t) { return SHIP_RE.test(t.text || t.full_text || ''); }).length;
 
     var engagement = 0;
@@ -466,7 +489,7 @@ async function fetchXActivityV1(handle, bearer) {
 }
 
 function classifyTweets(tweets, handle, source) {
-  var SHIP_RE = /deploy|ship|launch|release|update|commit|push|build|fix|refactor|merge|v\d|beta|alpha|testnet|mainnet|live|audit|contract|integrat/i;
+  var SHIP_RE = /deploy|shipped|shipping|ship\s|push.*prod|commit\s*[a-f0-9]|merge.*PR|merged.*pull|v\d+\.\d|testnet|mainnet|smart.?contract|audit|refactor|integrat.*api|open.?source|changelog|patch|hotfix|bug.?fix|migrat/i;
 
   var shipCount = tweets.filter(function(t) { return SHIP_RE.test(t.text || ''); }).length;
   var engagement = 0;
@@ -500,7 +523,7 @@ async function fetchGitHubActivity(username) {
       var controller = new AbortController();
       var timeout = setTimeout(function() { controller.abort(); }, 5000);
       var resp = await fetch(url, {
-        headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' },
+        headers: Object.assign({ 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' }, process.env.GITHUB_TOKEN ? { 'Authorization': 'token ' + process.env.GITHUB_TOKEN } : {}),
         signal: controller.signal
       });
       clearTimeout(timeout);
@@ -528,7 +551,7 @@ async function fetchGitHubOrgActivity(orgName) {
     var resp = await fetch(
       'https://api.github.com/orgs/' + encodeURIComponent(orgName) + '/events?per_page=100',
       {
-        headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' },
+        headers: Object.assign({ 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' }, process.env.GITHUB_TOKEN ? { 'Authorization': 'token ' + process.env.GITHUB_TOKEN } : {}),
         signal: controller.signal
       }
     );

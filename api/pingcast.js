@@ -12,7 +12,7 @@
    grows and tiers increase. Never loses money on a broadcast. */
 
 var { gate } = require('./_x402');
-var { createWalletClient, createPublicClient, http, formatEther } = require('viem');
+var { createWalletClient, createPublicClient, http, fallback, formatEther } = require('viem');
 var { base } = require('viem/chains');
 var { privateKeyToAccount } = require('viem/accounts');
 
@@ -29,7 +29,15 @@ var DIAMOND_ADDRESS = '0x59235da2dd29bd0ebce0399ba16a1c5213e605da';
 var PING_V1_ADDRESS = '0xcd4af194dd8e79d26f9e7ccff8948e010a53d70a';
 var CHAINLINK_ETH_USD = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70';
 var ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-var RPC = process.env.BASE_RPC_URL || 'https://base-mainnet.public.blastapi.io';
+var RPC_URLS = [
+  'https://base-mainnet.g.alchemy.com/v2/RgNU6uKPEDG6b7LI14nKs',
+  'https://base-mainnet.gateway.tatum.io/v4/t-69adc61b8b7c2d93b6192185-48fba70dc11e4944b605e028',
+  'https://base.gateway.tenderly.co',
+  'https://mainnet.base.org',
+  'https://base.drpc.org',
+  'https://base-rpc.publicnode.com',
+];
+var rpcTransport = fallback(RPC_URLS.map(function(u) { return http(u, { timeout: 10000 }); }), { rank: true, retryCount: 2 });
 
 var BROADCAST_ABI = [
   {
@@ -73,6 +81,84 @@ var CHAINLINK_ABI = [
     ]
   }
 ];
+
+// Referral credits: 1st referral = 1 free Pingcast, then +1 per 10 additional
+var REFERRALS_ADDRESS = '0x0f1a7dcb6409149721f0c187e01d0107b2dd94e0';
+var REFERRALS_DEPLOY_BLOCK = 43068000n;
+var V2_ADDRESS = '0x0571b06a221683f8afddfedd90e8568b95086df6';
+
+var REFERRALS_ABI = [
+  { name: 'referralCount', type: 'function', stateMutability: 'view',
+    inputs: [{ name: '', type: 'address' }], outputs: [{ name: '', type: 'uint256' }] }
+];
+var V2_USERNAME_ABI = [
+  { name: 'getUsername', type: 'function', stateMutability: 'view',
+    inputs: [{ name: '', type: 'address' }], outputs: [{ name: '', type: 'string' }] }
+];
+var BROADCAST_EVENT = {
+  type: 'event', name: 'Broadcast',
+  inputs: [
+    { name: 'sender', type: 'address', indexed: true },
+    { name: 'content', type: 'string', indexed: false },
+    { name: 'broadcastId', type: 'uint256', indexed: true }
+  ]
+};
+
+// Free Pingcast credits from referral count
+// 1st referral = 1 free, then +1 per 10 additional (at 11, 21, 31...)
+function calcFreeCredits(referralCount) {
+  if (referralCount < 1) return 0;
+  return 1 + Math.floor((referralCount - 1) / 10);
+}
+
+// Count free Pingcasts already redeemed by scanning broadcast logs for [ref|Username] tag
+async function countUsedFreeCredits(publicClient, username) {
+  var tag = '[ref|' + username + '] ';
+  try {
+    var logs = await publicClient.getLogs({
+      address: DIAMOND_ADDRESS,
+      event: BROADCAST_EVENT,
+      fromBlock: REFERRALS_DEPLOY_BLOCK,
+      toBlock: 'latest',
+    });
+    var used = 0;
+    for (var i = 0; i < logs.length; i++) {
+      var content = logs[i].args.content || '';
+      if (content.indexOf(tag) === 0) used++;
+    }
+    return used;
+  } catch (e) {
+    console.error('pingcast_count_free_error:', e.message);
+    return 0;
+  }
+}
+
+// Execute a broadcast via relay wallet (shared by free and paid flows)
+async function executeBroadcast(publicClient, content) {
+  var relayKey = process.env.RELAY_PRIVATE_KEY;
+  if (!relayKey) throw new Error('RELAY_PRIVATE_KEY not set');
+  var account = privateKeyToAccount(relayKey);
+  var walletClient = createWalletClient({ account: account, chain: base, transport: rpcTransport });
+
+  var fee = await publicClient.readContract({
+    address: DIAMOND_ADDRESS,
+    abi: BROADCAST_ABI,
+    functionName: 'getBroadcastFee'
+  });
+
+  var hash = await walletClient.writeContract({
+    address: DIAMOND_ADDRESS,
+    abi: BROADCAST_ABI,
+    functionName: 'broadcast',
+    args: [content],
+    value: fee
+  });
+
+  var receipt = await publicClient.waitForTransactionReceipt({ hash: hash, timeout: 30000 });
+  if (receipt.status !== 'success') throw new Error('broadcast tx failed: ' + hash);
+
+  return { hash: hash, fee: fee };
+}
 
 // Calculate dynamic USDC price from on-chain data
 async function getDynamicPrice(publicClient) {
@@ -127,8 +213,92 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'name too long (max 32 characters)' });
   }
 
+  var publicClient = createPublicClient({ chain: base, transport: rpcTransport });
+
+  // ── Free Pingcast via referral credits ──
+  var callerAddress = (req.query.address || '').trim();
+  if (callerAddress && /^0x[a-fA-F0-9]{40}$/.test(callerAddress)) {
+    try {
+      // Verify caller's registered username matches the name param
+      var regUsername = await publicClient.readContract({
+        address: V2_ADDRESS, abi: V2_USERNAME_ABI,
+        functionName: 'getUsername', args: [callerAddress]
+      });
+
+      if (!regUsername || regUsername.toLowerCase() !== name.toLowerCase()) {
+        return res.status(403).json({
+          error: 'name does not match registered username for this address',
+          registered: regUsername || '(not registered)',
+          provided: name
+        });
+      }
+
+      // Check referral count
+      var refCount = await publicClient.readContract({
+        address: REFERRALS_ADDRESS, abi: REFERRALS_ABI,
+        functionName: 'referralCount', args: [callerAddress]
+      });
+      var count = Number(refCount);
+      var earned = calcFreeCredits(count);
+
+      if (earned === 0) {
+        return res.status(402).json({
+          error: 'no free Pingcasts available. refer at least 1 user to earn your first.',
+          referrals: count,
+          credits_earned: 0,
+          credits_used: 0,
+          next_credit_at: '1 referral',
+          tip: 'your referral link: https://ping.sibylcap.com?ref=' + name
+        });
+      }
+
+      var used = await countUsedFreeCredits(publicClient, name);
+
+      if (used >= earned) {
+        var nextAt = earned * 10 + 1;
+        return res.status(402).json({
+          error: 'all free Pingcast credits used. refer more users or pay via x402.',
+          referrals: count,
+          credits_earned: earned,
+          credits_used: used,
+          next_credit_at: nextAt + ' referrals',
+          tip: 'remove the address parameter to use paid x402 Pingcast'
+        });
+      }
+
+      // Execute free broadcast
+      var freeContent = '[ref|' + name + '] ' + message;
+      if (freeContent.length > 1024) {
+        return res.status(400).json({ error: 'message too long (max 1024 chars)', current_length: freeContent.length });
+      }
+
+      var result = await executeBroadcast(publicClient, freeContent);
+
+      console.log('pingcast_free:', name, 'referrals:', count, 'credit', (used + 1) + '/' + earned, 'tx:', result.hash);
+
+      return res.status(200).json({
+        success: true,
+        txHash: result.hash,
+        content: freeContent,
+        charged: 'FREE (referral credit ' + (used + 1) + '/' + earned + ')',
+        broadcastFee: formatEther(result.fee) + ' ETH (covered by Ping)',
+        referrals: count,
+        credits_remaining: earned - used - 1,
+        next_credit_at: (earned * 10 + 1) + ' referrals',
+        basescan: 'https://basescan.org/tx/' + result.hash,
+        note: 'free Pingcast delivered to all Ping inboxes. earned by referring ' + count + ' user' + (count !== 1 ? 's' : '') + '.',
+        feedback: ERC8004_FEEDBACK
+      });
+
+    } catch (err) {
+      console.error('pingcast_referral_error:', err.message);
+      return res.status(500).json({ error: 'referral credit check failed: ' + err.message });
+    }
+  }
+
+  // ── Paid Pingcast via x402 ──
+
   // Anti-impersonation: check if name matches any registered Ping username
-  var publicClient = createPublicClient({ chain: base, transport: http(RPC) });
   try {
     var registeredAddr = await publicClient.readContract({
       address: PING_V1_ADDRESS,
@@ -143,7 +313,6 @@ module.exports = async function handler(req, res) {
       });
     }
   } catch (err) {
-    // If registry check fails, allow the request but log it
     console.error('pingcast_registry_check_failed:', err.message);
   }
 
@@ -193,7 +362,7 @@ module.exports = async function handler(req, res) {
     }
 
     var account = privateKeyToAccount(relayKey);
-    var walletClient = createWalletClient({ account: account, chain: base, transport: http(RPC) });
+    var walletClient = createWalletClient({ account: account, chain: base, transport: rpcTransport });
 
     // Re-read fee at execution time (may have changed since price quote)
     var fee = await publicClient.readContract({
@@ -202,15 +371,17 @@ module.exports = async function handler(req, res) {
       functionName: 'getBroadcastFee'
     });
 
-    // Verify the fee we're about to pay is still covered by what we charged
+    // Verify the fee we're about to pay is still covered by what we charged (with 10% buffer)
     var feeCheckData = await getDynamicPrice(publicClient);
-    if (feeCheckData.costUsd > pricing.priceUsd) {
-      // Fee jumped between quote and execution. We'd lose money. Abort.
-      console.error('pingcast_error: fee jumped. quoted:', pricing.priceUsd, 'current cost:', feeCheckData.costUsd);
+    var feeBuffer = pricing.costUsd * 0.10; // 10% tolerance for fee fluctuation
+    if (feeCheckData.costUsd > pricing.costUsd + feeBuffer) {
+      // Fee jumped beyond our buffer. We'd lose money. Abort and queue refund flag.
+      console.error('pingcast_error: fee jumped beyond buffer. quoted cost:', pricing.costUsd, 'current cost:', feeCheckData.costUsd, 'buffer:', feeBuffer);
       return res.status(503).json({
-        error: 'broadcast fee increased since price was quoted. try again for updated pricing.',
+        error: 'broadcast fee increased beyond tolerance since price was quoted. try again for updated pricing.',
         quoted_price: pricing.priceUsd,
-        current_cost: feeCheckData.costUsd
+        current_cost: feeCheckData.costUsd,
+        note: 'your x402 payment was settled. if you see this error, contact @sibylcap for a manual refund.'
       });
     }
 
