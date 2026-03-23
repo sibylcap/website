@@ -1085,11 +1085,38 @@
     // ═══════════════════════════════════════
     //  Constants
     // ═══════════════════════════════════════
-    const SIBYL_CA = '0x797f214a2CD64a4963A91Fa21c8C55Ec3EBa4714';
+    const SIBYL_CA  = '0x797f214a2CD64a4963A91Fa21c8C55Ec3EBa4714';
+    const STAKE_CA  = '0x13a885969d1dBe8afB048005154F3a060CC2e07F';
     const VESTING_CA = '0xD6B830F72FE36AC6Fb2Bb959642B29c64bE3cF11';
     const TOTAL_SUPPLY = 1_000_000_000;
+    const DECIMALS = 18;
+    const RPC = 'https://mainnet.base.org';
+    const CHAIN_ID = '0x2105'; // Base
     const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex/tokens/' + SIBYL_CA;
-    const REFRESH_INTERVAL = 90_000; // 90 seconds
+    const REFRESH_INTERVAL = 90_000;
+
+    // Function selectors
+    const SEL = {
+      // ERC20
+      balanceOf:          '0x70a08231',
+      approve:            '0x095ea7b3',
+      allowance:          '0xdd62ed3e',
+      // Staking reads
+      totalRawStaked:     '0xc09696f7',
+      totalWeightedSupply:'0x268dc199',
+      rewardRate:         '0x7b0a47ee',
+      periodFinish:       '0xebe2b12b',
+      feeBps:             '0x24a9d853',
+      earned:             '0x008cc262',
+      getPositions:       '0x3eeb530e',
+      getPositionCount:   '0x0234b445',
+      userInfo:           '0x1959a002',
+      getVotingPower:     '0xbb4d4436',
+      // Staking writes
+      stake:              '0x10087fb1',
+      unstake:            '0x2e17de78',
+      claimRewards:       '0x372500ab',
+    };
 
     // ═══════════════════════════════════════
     //  State
@@ -1099,9 +1126,53 @@
     let selectedTier = 0;
     let marketData = null;
     let lastFetch = 0;
+    let tokenPrice = 0;
+    let userBalance = 0n; // raw wei
     const tierMultipliers = [1.0, 1.2, 1.4, 1.8];
     const tierDurations = ['Flex', '30d', '60d', '120d'];
-    const feeBps = 10; // 0.1%
+    const tierDurationsSec = [0, 30*86400, 60*86400, 120*86400];
+    const feeBps = 10;
+
+    // ═══════════════════════════════════════
+    //  RPC Helpers
+    // ═══════════════════════════════════════
+    function padAddr(addr) { return '000000000000000000000000' + addr.slice(2).toLowerCase(); }
+    function padUint(n) { return BigInt(n).toString(16).padStart(64, '0'); }
+    function decUint(hex) { return hex && hex !== '0x' ? BigInt(hex) : 0n; }
+    function toWei(n) { return BigInt(Math.floor(n * 1e18)); }
+    function fromWei(n) { return Number(n) / 1e18; }
+
+    async function rpc(method, params) {
+      const r = await fetch(RPC, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({jsonrpc:'2.0', method, params, id: Date.now()})
+      });
+      const d = await r.json();
+      if (d.error) throw new Error(d.error.message);
+      return d.result;
+    }
+
+    async function call(to, sel, args) {
+      const data = args ? sel + args : sel;
+      return rpc('eth_call', [{to, data}, 'latest']);
+    }
+
+    async function sendTx(to, data, gasOverride) {
+      const gas = gasOverride || '0x30D40';
+      return window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{ from: userAddress, to, data, gas }]
+      });
+    }
+
+    async function waitTx(hash) {
+      for (let i = 0; i < 60; i++) {
+        await new Promise(r => setTimeout(r, 2000));
+        const receipt = await rpc('eth_getTransactionReceipt', [hash]);
+        if (receipt) return receipt;
+      }
+      return null;
+    }
 
     // ═══════════════════════════════════════
     //  Live Market Data (DexScreener)
@@ -1117,23 +1188,19 @@
         marketData = pairs;
         lastFetch = Date.now();
 
-        // Use the highest-liquidity pair for headline price
         const primary = pairs.reduce((a, b) =>
           (parseFloat(b.liquidity?.usd || 0) > parseFloat(a.liquidity?.usd || 0)) ? b : a
         , pairs[0]);
 
         const price = parseFloat(primary.priceUsd || 0);
+        tokenPrice = price;
         const priceChange = parseFloat(primary.priceChange?.h24 || 0);
         const fdv = parseFloat(primary.fdv || 0);
         const mcap = parseFloat(primary.marketCap || fdv);
 
-        // Circulating supply from API or derive
         let circSupply = 0;
-        if (primary.marketCap && price > 0) {
-          circSupply = mcap / price;
-        }
+        if (primary.marketCap && price > 0) circSupply = mcap / price;
 
-        // Market strip
         setText('m-price', '$' + formatPrice(price));
         const deltaEl = document.getElementById('m-price-delta');
         deltaEl.textContent = (priceChange >= 0 ? '+' : '') + priceChange.toFixed(1) + '%';
@@ -1142,7 +1209,6 @@
         setText('m-mcap', '$' + formatCompact(mcap));
         setText('m-fdv', '$' + formatCompact(fdv));
 
-        // Circulating
         if (circSupply > 0) {
           setText('m-circ', formatCompact(circSupply));
           setText('m-circ-pct', ((circSupply / TOTAL_SUPPLY) * 100).toFixed(1) + '% of total');
@@ -1150,11 +1216,9 @@
           setText('supply-circ-pct', ((circSupply / TOTAL_SUPPLY) * 100).toFixed(1) + '% of total');
         }
 
-        // LP table: render all discovered pairs
         renderPools(pairs);
-
-        // Fetch vesting/circulating supply from our API
         fetchSupplyData(price);
+        fetchStakingGlobals(price);
 
         console.log('[SIBYL] Market data refreshed:', new Date().toLocaleTimeString(),
           '| Price: $' + formatPrice(price), '| Pairs:', pairs.length);
@@ -1165,7 +1229,6 @@
 
     async function fetchSupplyData(price) {
       try {
-        // Fetch circulating supply from our API endpoint
         const res = await fetch('/api/circulating-supply');
         if (res.ok) {
           const circ = parseFloat(await res.text());
@@ -1174,41 +1237,79 @@
             setText('m-circ-pct', ((circ / TOTAL_SUPPLY) * 100).toFixed(1) + '% of total');
             setText('supply-circ', formatCompact(circ));
             setText('supply-circ-pct', ((circ / TOTAL_SUPPLY) * 100).toFixed(1) + '% of total');
+            if (price > 0) setText('m-mcap', '$' + formatCompact(circ * price));
 
-            // Update market cap with accurate circulating supply
-            if (price > 0) {
-              setText('m-mcap', '$' + formatCompact(circ * price));
-            }
-
-            // Vesting = total - circulating (rough estimate)
             const vesting = TOTAL_SUPPLY - circ;
             if (vesting > 0) {
               setText('m-vesting', formatCompact(vesting));
               setText('supply-vesting', formatCompact(vesting));
-
-              // Supply bar
               const circPct = (circ / TOTAL_SUPPLY) * 100;
               const vestPct = (vesting / TOTAL_SUPPLY) * 100;
               document.getElementById('bar-circ').style.width = circPct + '%';
               document.getElementById('bar-vesting').style.width = vestPct + '%';
-              document.getElementById('bar-staked').style.width = '0%'; // until staking live
             }
           }
         }
+      } catch (e) { /* silent */ }
+    }
+
+    async function fetchStakingGlobals(price) {
+      try {
+        const [totalRaw, totalWeighted, rateRaw, periodRaw] = await Promise.all([
+          call(STAKE_CA, SEL.totalRawStaked),
+          call(STAKE_CA, SEL.totalWeightedSupply),
+          call(STAKE_CA, SEL.rewardRate),
+          call(STAKE_CA, SEL.periodFinish),
+        ]);
+
+        const totalStaked = fromWei(decUint(totalRaw));
+        const rewardRate = fromWei(decUint(rateRaw));
+        const periodFinish = Number(decUint(periodRaw));
+        const now = Math.floor(Date.now() / 1000);
+        const rewardsActive = periodFinish > now && rewardRate > 0;
+
+        // Market strip: total staked
+        setText('m-staked', formatCompact(totalStaked));
+        if (totalStaked > 0) {
+          const circEl = document.getElementById('m-circ');
+          const circVal = parseFloat((circEl?.textContent || '0').replace(/[^0-9.]/g,''));
+          // Rough circ for pct
+          const circ = circVal >= 1000 ? circVal * 1e6 : circVal;
+          if (circ > 0) setText('m-staked-pct', ((totalStaked / circ) * 100).toFixed(1) + '% of circ.');
+        }
+
+        // Supply bar: staked segment
+        if (totalStaked > 0) {
+          const stakedPct = (totalStaked / TOTAL_SUPPLY) * 100;
+          document.getElementById('bar-staked').style.width = Math.max(stakedPct, 0.5) + '%';
+          setText('supply-staked', formatCompact(totalStaked));
+          setText('supply-staked-pct', ((totalStaked / TOTAL_SUPPLY) * 100).toFixed(2) + '% of total');
+        }
+
+        // APR by tier (annual reward / weighted stake per unit)
+        if (rewardsActive && totalStaked > 0) {
+          const totalWeightedN = fromWei(decUint(totalWeighted));
+          const annualReward = rewardRate * 365.25 * 86400;
+          const tiers = [1.0, 1.2, 1.4, 1.8];
+          const ids = ['apr-flex', 'apr-short', 'apr-medium', 'apr-long'];
+          tiers.forEach((mult, i) => {
+            // APR = (annualReward * myWeight / totalWeighted) / myStake * 100
+            // Simplifies to: annualReward * mult / totalWeightedN * 100
+            const apr = (annualReward * mult / totalWeightedN) * 100;
+            setText(ids[i], apr.toFixed(1) + '%');
+          });
+        }
       } catch (e) {
-        // Silently fail, market data still shows
+        console.warn('[SIBYL] Staking globals fetch failed:', e.message);
       }
     }
 
     function renderPools(pairs) {
       const tbody = document.getElementById('lp-body');
       if (!tbody) return;
-
-      // Sort by liquidity descending
       const sorted = [...pairs].sort((a, b) =>
         (parseFloat(b.liquidity?.usd || 0)) - (parseFloat(a.liquidity?.usd || 0))
       );
-
       tbody.innerHTML = sorted.map(p => {
         const base = p.baseToken?.symbol || '?';
         const quote = p.quoteToken?.symbol || '?';
@@ -1217,10 +1318,8 @@
         const tvl = parseFloat(p.liquidity?.usd || 0);
         const vol = parseFloat(p.volume?.h24 || 0);
         const url = p.url || '#';
-        const pairLabel = base + ' / ' + quote;
-
         return '<tr>' +
-          '<td><span class="lp-pair">' + pairLabel + '</span></td>' +
+          '<td><span class="lp-pair">' + base + ' / ' + quote + '</span></td>' +
           '<td><span class="lp-dex">' + dexName + '</span></td>' +
           '<td><span class="lp-tvl">$' + formatCompact(tvl) + '</span></td>' +
           '<td><span class="lp-tvl">$' + formatCompact(vol) + '</span></td>' +
@@ -1254,8 +1353,7 @@
     const stakeInput = document.getElementById('stake-amount');
     stakeInput.addEventListener('input', () => {
       updateSummary();
-      // Sync slider with typed amount
-      const bal = parseFloat(document.getElementById('user-balance').textContent) || 0;
+      const bal = fromWei(userBalance);
       const raw = parseFloat(stakeInput.value) || 0;
       const pct = bal > 0 ? Math.min(100, Math.round((raw / bal) * 100)) : 0;
       document.getElementById('pct-slider').value = pct;
@@ -1278,12 +1376,8 @@
       const stakeBtn = document.getElementById('btn-stake');
       const hasAmount = raw > 0;
       stakeBtn.disabled = !(hasAmount && connected);
-      // Activate glow + pulse when user enters an amount
-      if (hasAmount) {
-        stakeBtn.classList.add('ready');
-      } else {
-        stakeBtn.classList.remove('ready');
-      }
+      if (hasAmount) { stakeBtn.classList.add('ready'); }
+      else { stakeBtn.classList.remove('ready'); }
     }
 
     function setMax() {
@@ -1294,11 +1388,10 @@
     function onSlider(pct) {
       pct = parseInt(pct);
       document.getElementById('pct-display').textContent = pct + '%';
-      const bal = parseFloat(document.getElementById('user-balance').textContent) || 0;
+      const bal = fromWei(userBalance);
       const amount = bal * pct / 100;
       stakeInput.value = amount > 0 ? amount.toFixed(2) : '';
       updateSummary();
-      // Update slider track fill via CSS gradient
       const slider = document.getElementById('pct-slider');
       slider.style.background = 'linear-gradient(to right, var(--gold) 0%, var(--gold) ' + pct + '%, var(--highest) ' + pct + '%, var(--highest) 100%)';
     }
@@ -1320,35 +1413,23 @@
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.scale(dpr, dpr);
+      const w = rect.width, h = rect.height;
 
-      const w = rect.width;
-      const h = rect.height;
-
-      // Generate sample data (placeholder until staking is live)
-      const points = 60;
-      const data = [];
+      const points = 60; const data = [];
       let val = 100;
       for (let i = 0; i < points; i++) {
         val += (Math.random() - 0.42) * 8;
-        if (val < 50) val = 50;
-        data.push(val);
+        if (val < 50) val = 50; data.push(val);
       }
-      const max = Math.max(...data) * 1.1;
-      const min = Math.min(...data) * 0.9;
+      const max = Math.max(...data) * 1.1, min = Math.min(...data) * 0.9;
 
-      // Grid lines
-      ctx.strokeStyle = 'rgba(37,42,54,0.5)';
-      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = 'rgba(37,42,54,0.5)'; ctx.lineWidth = 0.5;
       for (let i = 0; i < 4; i++) {
         const y = (h * 0.15) + (h * 0.7 * i / 3);
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
       }
 
-      // Line
-      ctx.beginPath();
-      ctx.strokeStyle = '#b5a070';
-      ctx.lineWidth = 1.5;
-      ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.strokeStyle = '#b5a070'; ctx.lineWidth = 1.5; ctx.lineJoin = 'round';
       for (let i = 0; i < data.length; i++) {
         const x = (i / (data.length - 1)) * w;
         const y = h - ((data[i] - min) / (max - min)) * h * 0.7 - h * 0.15;
@@ -1356,7 +1437,6 @@
       }
       ctx.stroke();
 
-      // Fill gradient
       const lastX = w;
       const lastY = h - ((data[data.length - 1] - min) / (max - min)) * h * 0.7 - h * 0.15;
       ctx.lineTo(lastX, h); ctx.lineTo(0, h); ctx.closePath();
@@ -1365,7 +1445,6 @@
       grad.addColorStop(1, 'rgba(181,160,112,0)');
       ctx.fillStyle = grad; ctx.fill();
 
-      // End dot
       ctx.beginPath(); ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
       ctx.fillStyle = '#b5a070'; ctx.fill();
       ctx.beginPath(); ctx.arc(lastX, lastY, 6, 0, Math.PI * 2);
@@ -1383,9 +1462,10 @@
     // ═══════════════════════════════════════
     async function connectWallet() {
       if (connected) {
-        connected = false; userAddress = null;
+        connected = false; userAddress = null; userBalance = 0n;
         document.getElementById('wallet-label').textContent = 'Connect Wallet';
         document.getElementById('btn-connect').classList.add('disconnected');
+        document.getElementById('user-balance').textContent = '0.00';
         updateSummary(); return;
       }
       if (typeof window.ethereum === 'undefined') {
@@ -1394,38 +1474,303 @@
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         userAddress = accounts[0]; connected = true;
+
+        // Switch to Base if needed
+        try {
+          await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{chainId: CHAIN_ID}] });
+        } catch (sw) {
+          if (sw.code === 4902) {
+            await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
+              chainId: CHAIN_ID, chainName: 'Base',
+              nativeCurrency: {name:'ETH',symbol:'ETH',decimals:18},
+              rpcUrls: [RPC], blockExplorerUrls: ['https://basescan.org']
+            }]});
+          }
+        }
+
         document.getElementById('wallet-label').textContent =
           userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
         document.getElementById('btn-connect').classList.remove('disconnected');
-        updateSummary(); loadUserData();
+        await loadUserData();
+        updateSummary();
       } catch (e) { console.error('Connect failed:', e); }
     }
 
+    // ═══════════════════════════════════════
+    //  Load user data from staking contract
+    // ═══════════════════════════════════════
     async function loadUserData() {
-      // Will read from staking contract once deployed
+      if (!userAddress) return;
+      const addr = padAddr(userAddress);
+
+      try {
+        const [balRaw, earnedRaw, infoRaw, posCountRaw, vpRaw] = await Promise.all([
+          call(SIBYL_CA, SEL.balanceOf, addr),
+          call(STAKE_CA, SEL.earned, addr),
+          call(STAKE_CA, SEL.userInfo, addr),
+          call(STAKE_CA, SEL.getPositionCount, addr),
+          call(STAKE_CA, SEL.getVotingPower, addr),
+        ]);
+
+        // Token balance
+        userBalance = decUint(balRaw);
+        const balNum = fromWei(userBalance);
+        document.getElementById('user-balance').textContent = formatNum(balNum);
+
+        // Earned rewards
+        const earnedWei = decUint(earnedRaw);
+        const earnedNum = fromWei(earnedWei);
+
+        // User info: (totalWeightedBalance, totalRawBalance, rewardPerTokenPaid, rewardsAccrued)
+        const infoClean = infoRaw.slice(2);
+        const rawStaked = fromWei(BigInt('0x' + infoClean.slice(64, 128)));
+        const weightedBal = fromWei(decUint(vpRaw));
+
+        // Position summary
+        setText('pos-staked', formatNum(rawStaked) + ' SIBYL');
+        setText('pos-staked-usd', '$' + formatCompact(rawStaked * tokenPrice));
+        setText('pos-weight', formatNum(weightedBal));
+
+        // Weight % of total
+        try {
+          const twRaw = await call(STAKE_CA, SEL.totalWeightedSupply);
+          const totalW = fromWei(decUint(twRaw));
+          if (totalW > 0) setText('pos-weight-pct', ((weightedBal / totalW) * 100).toFixed(2) + '% of total');
+        } catch(e) {}
+
+        // Earned
+        setText('pos-earned', formatNum(earnedNum) + ' SIBYL');
+        setText('pos-earned-usd', '$' + formatCompact(earnedNum * tokenPrice));
+
+        // Claimable rewards
+        setText('claim-amount', formatNum(earnedNum));
+        setText('claim-usd', '$' + (earnedNum * tokenPrice).toFixed(2));
+        document.getElementById('btn-claim').disabled = earnedWei === 0n;
+
+        // Chart value
+        const totalValue = (rawStaked + earnedNum) * tokenPrice;
+        setText('chart-value', '$' + formatCompact(totalValue));
+
+        // Load positions
+        const posCount = Number(decUint(posCountRaw));
+        await loadPositions(posCount);
+
+      } catch (e) {
+        console.warn('[SIBYL] loadUserData failed:', e.message);
+      }
+    }
+
+    async function loadPositions(count) {
+      const table = document.getElementById('positions-table');
+      const noPos = document.getElementById('no-positions');
+      const tbody = document.getElementById('positions-body');
+
+      if (count === 0) {
+        table.style.display = 'none'; noPos.style.display = '';
+        return;
+      }
+
+      // Fetch all positions via getPositions(address)
+      try {
+        const raw = await call(STAKE_CA, SEL.getPositions, padAddr(userAddress));
+        const data = raw.slice(2); // remove 0x
+        // ABI: Position[] dynamic array
+        // offset (64 chars) + length (64 chars) + N * (amount:128 + lockTier:8 + unlockTime:64 + active:bool) packed as 4 x 32-byte slots each
+        const offset = parseInt(data.slice(0, 64), 16) * 2;
+        const length = parseInt(data.slice(offset, offset + 64), 16);
+
+        const positions = [];
+        const now = Math.floor(Date.now() / 1000);
+
+        for (let i = 0; i < length; i++) {
+          const base = offset + 64 + (i * 256); // 4 slots * 64 chars each
+          const amount = BigInt('0x' + data.slice(base, base + 64));
+          const lockTier = parseInt(data.slice(base + 64, base + 128), 16);
+          const unlockTime = parseInt(data.slice(base + 128, base + 192), 16);
+          const active = parseInt(data.slice(base + 192, base + 256), 16) !== 0;
+
+          positions.push({ amount, lockTier, unlockTime, active, index: i });
+        }
+
+        // Render active positions
+        const active = positions.filter(p => p.active);
+        if (active.length === 0) {
+          table.style.display = 'none'; noPos.style.display = ''; return;
+        }
+
+        table.style.display = ''; noPos.style.display = 'none';
+        tbody.innerHTML = active.map(p => {
+          const amtNum = fromWei(p.amount);
+          const tierName = tierDurations[p.lockTier];
+          const isLocked = p.lockTier > 0 && now < p.unlockTime;
+          const canUnstake = p.lockTier === 0 || now >= p.unlockTime;
+
+          let unlockLabel = 'anytime';
+          let progressHtml = '';
+          if (p.lockTier > 0) {
+            const lockStart = p.unlockTime - tierDurationsSec[p.lockTier];
+            const elapsed = Math.max(0, now - lockStart);
+            const total = tierDurationsSec[p.lockTier];
+            const pct = Math.min(100, (elapsed / total) * 100);
+
+            if (isLocked) {
+              const remaining = p.unlockTime - now;
+              const days = Math.ceil(remaining / 86400);
+              unlockLabel = days + 'd left';
+              progressHtml = '<div class="lock-progress"><div class="lock-fill" style="width:' + pct.toFixed(1) + '%"></div></div>';
+            } else {
+              unlockLabel = 'unlocked';
+            }
+          }
+
+          const badgeClass = p.lockTier === 0 ? 'flex' : 'locked';
+          const btnDisabled = canUnstake ? '' : 'disabled';
+
+          return '<tr>' +
+            '<td>' + formatNum(amtNum) + '</td>' +
+            '<td><span class="lock-badge ' + badgeClass + '">' + tierName + ' (' + tierMultipliers[p.lockTier] + 'x)</span>' + progressHtml + '</td>' +
+            '<td>' + unlockLabel + '</td>' +
+            '<td><button class="btn-unstake-sm" ' + btnDisabled + ' onclick="doUnstake(' + p.index + ')">Unstake</button></td>' +
+          '</tr>';
+        }).join('');
+
+      } catch (e) {
+        console.warn('[SIBYL] loadPositions failed:', e.message);
+        table.style.display = 'none'; noPos.style.display = '';
+      }
     }
 
     // ═══════════════════════════════════════
-    //  Actions (stubs for contract integration)
+    //  Actions: Stake
     // ═══════════════════════════════════════
     async function doStake() {
-      if (!connected) return;
+      if (!connected || !userAddress) return;
+      const raw = parseFloat(stakeInput.value) || 0;
+      if (raw <= 0) return;
+
       const status = document.getElementById('tx-status');
-      status.className = 'tx-status pending';
-      status.textContent = 'Submitting transaction...';
-      status.style.display = 'block';
-      document.getElementById('btn-stake').disabled = true;
-      // Contract integration after deploy
-      setTimeout(() => {
-        status.className = 'tx-status success';
-        status.textContent = 'Staked successfully.';
-        document.getElementById('btn-stake').disabled = false;
-      }, 2000);
+      const btn = document.getElementById('btn-stake');
+      btn.disabled = true;
+
+      const amountWei = toWei(raw);
+
+      try {
+        // Step 1: Check allowance
+        status.className = 'tx-status pending'; status.style.display = 'block';
+        status.textContent = 'checking allowance...';
+
+        const allowRaw = await call(SIBYL_CA, SEL.allowance,
+          padAddr(userAddress) + padAddr(STAKE_CA));
+        const currentAllowance = decUint(allowRaw);
+
+        if (currentAllowance < amountWei) {
+          // Step 2: Approve
+          status.textContent = 'requesting token approval...';
+          const maxApprove = '0x' + 'f'.repeat(64); // max uint256
+          const approveData = SEL.approve + padAddr(STAKE_CA) + maxApprove.slice(2).padStart(64, '0');
+
+          // Actually use max uint256 properly
+          const approveCalldata = SEL.approve +
+            padAddr(STAKE_CA) +
+            'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
+          const approveTx = await sendTx(SIBYL_CA, approveCalldata, '0x15F90'); // 90000 gas
+          status.textContent = 'approval submitted. waiting for confirmation...';
+
+          const approveReceipt = await waitTx(approveTx);
+          if (!approveReceipt || approveReceipt.status !== '0x1') {
+            throw new Error('Approval transaction failed');
+          }
+          status.textContent = 'approved. submitting stake...';
+        }
+
+        // Step 3: Stake
+        status.textContent = 'submitting stake transaction...';
+        const stakeData = SEL.stake + padUint(amountWei) + padUint(selectedTier);
+        const stakeTx = await sendTx(STAKE_CA, stakeData, '0x493E0'); // 300000 gas
+
+        status.textContent = 'stake submitted. waiting for confirmation...';
+        const stakeReceipt = await waitTx(stakeTx);
+
+        if (stakeReceipt && stakeReceipt.status === '0x1') {
+          status.className = 'tx-status success';
+          status.innerHTML = 'staked successfully. <a href="https://basescan.org/tx/' + stakeTx + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+          stakeInput.value = '';
+          snapSlider(0);
+          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+        } else {
+          throw new Error('Stake transaction failed');
+        }
+
+      } catch (e) {
+        status.className = 'tx-status error';
+        status.textContent = e.code === 4001 ? 'transaction rejected.' : 'failed: ' + (e.message || 'unknown error');
+      }
+
+      btn.disabled = false;
+      updateSummary();
     }
 
+    // ═══════════════════════════════════════
+    //  Actions: Unstake
+    // ═══════════════════════════════════════
+    async function doUnstake(positionIndex) {
+      if (!connected) return;
+      const status = document.getElementById('tx-status');
+
+      try {
+        status.className = 'tx-status pending'; status.style.display = 'block';
+        status.textContent = 'submitting unstake...';
+
+        const data = SEL.unstake + padUint(positionIndex);
+        const hash = await sendTx(STAKE_CA, data, '0x493E0');
+
+        status.textContent = 'unstake submitted. waiting...';
+        const receipt = await waitTx(hash);
+
+        if (receipt && receipt.status === '0x1') {
+          status.className = 'tx-status success';
+          status.innerHTML = 'unstaked successfully. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+        } else {
+          throw new Error('Unstake failed');
+        }
+      } catch (e) {
+        status.className = 'tx-status error';
+        status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
+      }
+    }
+
+    // ═══════════════════════════════════════
+    //  Actions: Claim Rewards
+    // ═══════════════════════════════════════
     async function doClaim() {
       if (!connected) return;
-      // Contract integration after deploy
+      const btn = document.getElementById('btn-claim');
+      const status = document.getElementById('tx-status');
+      btn.disabled = true;
+
+      try {
+        status.className = 'tx-status pending'; status.style.display = 'block';
+        status.textContent = 'submitting claim...';
+
+        const hash = await sendTx(STAKE_CA, SEL.claimRewards, '0x30D40');
+
+        status.textContent = 'claim submitted. waiting...';
+        const receipt = await waitTx(hash);
+
+        if (receipt && receipt.status === '0x1') {
+          status.className = 'tx-status success';
+          status.innerHTML = 'rewards claimed. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+          setTimeout(() => loadUserData(), 2000);
+        } else {
+          throw new Error('Claim failed');
+        }
+      } catch (e) {
+        status.className = 'tx-status error';
+        status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
+        btn.disabled = false;
+      }
     }
 
     // ═══════════════════════════════════════
@@ -1449,7 +1794,6 @@
       if (p >= 1) return p.toFixed(2);
       if (p >= 0.01) return p.toFixed(4);
       if (p >= 0.0001) return p.toFixed(6);
-      // For very small prices, show significant digits
       const s = p.toFixed(12);
       const m = s.match(/^0\.(0*)(\d{4})/);
       if (m) return '0.' + m[1] + m[2];
@@ -1462,15 +1806,41 @@
     }
 
     // ═══════════════════════════════════════
+    //  Account change listener
+    // ═══════════════════════════════════════
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length > 0) {
+          userAddress = accounts[0]; connected = true;
+          document.getElementById('wallet-label').textContent =
+            userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+          document.getElementById('btn-connect').classList.remove('disconnected');
+          loadUserData();
+        } else {
+          connected = false; userAddress = null; userBalance = 0n;
+          document.getElementById('wallet-label').textContent = 'Connect Wallet';
+          document.getElementById('btn-connect').classList.add('disconnected');
+        }
+        updateSummary();
+      });
+    }
+
+    // ═══════════════════════════════════════
     //  Init
     // ═══════════════════════════════════════
     window.addEventListener('load', () => {
       drawChart();
       window.addEventListener('resize', drawChart);
 
+      // Set contract link
+      document.getElementById('contract-link').href = 'https://basescan.org/address/' + STAKE_CA;
+
       // Fetch live data immediately, then every 90s
       fetchMarketData();
       setInterval(fetchMarketData, REFRESH_INTERVAL);
+
+      // Refresh user data every 30s if connected
+      setInterval(() => { if (connected) loadUserData(); }, 30_000);
     });
   </script>
 </body>
