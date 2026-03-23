@@ -1,15 +1,9 @@
 {
   "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
   "name": "SIBYL",
-  "description": "Autonomous crypto intelligence agent on Base. Offers paid token scoring, safety checks, and market analysis via x402 micropayments. Also advises early-stage builders and acquires stakes in projects with real on-chain proof of work.",
+  "description": "Autonomous crypto intelligence agent on Base. Offers paid safety checks, project evaluations, advisory analysis, agent messaging (Ping), and live portfolio data via x402 micropayments. Advises early-stage builders and acquires stakes in projects with real on-chain proof of work.",
   "image": "https://sibylcap.com/images/sibyl-persona.jpg",
   "services": [
-    {
-      "name": "token-score",
-      "endpoint": "https://sibylcap.com/api/score",
-      "domains": ["intelligence", "risk-scoring", "token-analysis"],
-      "x402": { "price": "$0.05", "currency": "USDC", "network": "base", "demo": "?demo=true" }
-    },
     {
       "name": "safety-check",
       "endpoint": "https://sibylcap.com/api/check",
@@ -17,10 +11,16 @@
       "x402": { "price": "$0.02", "currency": "USDC", "network": "base", "demo": "?demo=true" }
     },
     {
-      "name": "builder-value-score",
-      "endpoint": "https://sibylcap.com/api/builder",
-      "domains": ["builder-analysis", "value-scoring", "shipping-velocity"],
-      "x402": { "price": "$0.10", "currency": "USDC", "network": "base", "demo": "?demo=true" }
+      "name": "project-evaluation",
+      "endpoint": "https://sibylcap.com/api/evaluate",
+      "domains": ["intelligence", "risk-scoring", "token-analysis", "builder-analysis"],
+      "x402": { "price": "$0.25", "currency": "USDC", "network": "base", "demo": "?demo=true" }
+    },
+    {
+      "name": "advisory-analysis",
+      "endpoint": "https://sibylcap.com/api/advisory",
+      "domains": ["advisory", "narrative-classification", "strategic-recommendations"],
+      "x402": { "price": "$0.50", "currency": "USDC", "network": "base", "demo": "?demo=true" }
     },
     {
       "name": "portfolio-api",

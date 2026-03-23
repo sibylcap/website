@@ -237,6 +237,24 @@ section {
   text-transform: uppercase;
 }
 
+.nav-page-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1.5rem;
+}
+.nav-page-links a {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-page-links a:hover {
+  color: var(--text-primary);
+}
+
 .x-icon {
   display: flex;
   align-items: center;
@@ -1199,6 +1217,12 @@ section {
   font-size: 0.6875rem;
   color: var(--text-muted);
   letter-spacing: 0.05em;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
 }
 
 .footer-right a {
@@ -2636,6 +2660,10 @@ a.mind-source:hover {
   }
 
   .nav-donate-label {
+    display: none;
+  }
+
+  .nav-page-links {
     display: none;
   }
 

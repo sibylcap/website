@@ -2,7 +2,7 @@
    Queries all wallets via Base RPC batch call, fetches prices from DexScreener + CoinGecko.
    Cached at edge for 60 seconds. */
 
-var RPC = process.env.BASE_RPC_URL || 'https://1rpc.io/base';
+var RPC = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
 
 var WALLETS = {
   bankr:     '0xe3e14118238b5693c854674f7c276136a2dd311f',
