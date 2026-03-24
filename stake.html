@@ -1265,8 +1265,11 @@
 
     async function rpc(method, params) {
       // Use wallet RPC if connected (faster for recent blocks), fallback to public
-      if (connected && window.ethereum) {
-        try { return await window.ethereum.request({ method, params }); } catch(e) {}
+      if (connected && window.ethereum && method === 'eth_call') {
+        try {
+          const result = await window.ethereum.request({ method, params });
+          if (result) return result;
+        } catch(e) { /* fallback to public RPC */ }
       }
       const r = await fetch(RPC, {
         method: 'POST', headers: {'Content-Type':'application/json'},
