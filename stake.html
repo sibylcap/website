@@ -1269,6 +1269,10 @@
     function fromWei(n) { return Number(n) / 1e18; }
 
     async function rpc(method, params) {
+      // Use wallet RPC if connected (faster for recent blocks), fallback to public
+      if (connected && window.ethereum) {
+        try { return await window.ethereum.request({ method, params }); } catch(e) {}
+      }
       const r = await fetch(RPC, {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({jsonrpc:'2.0', method, params, id: Date.now()})
@@ -1281,6 +1285,18 @@
     async function call(to, sel, args) {
       const data = args ? sel + args : sel;
       return rpc('eth_call', [{to, data}, 'latest']);
+    }
+
+    // Poll loadUserData until staked amount changes (max 15s)
+    async function refreshAfterTx() {
+      const before = await call(STAKE_CA, SEL.totalRawStaked);
+      for (let i = 0; i < 8; i++) {
+        await new Promise(r => setTimeout(r, 2000));
+        await loadUserData();
+        await fetchStakingGlobals(tokenPrice);
+        const after = await call(STAKE_CA, SEL.totalRawStaked);
+        if (after !== before) return;
+      }
     }
 
     async function sendTx(to, data, gasOverride) {
@@ -1843,7 +1859,7 @@
           status.innerHTML = 'staked successfully. <a href="https://basescan.org/tx/' + stakeTx + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
           stakeInput.value = '';
           snapSlider(0);
-          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+          refreshAfterTx();
         } else {
           throw new Error('Stake transaction failed');
         }
@@ -1877,7 +1893,7 @@
         if (receipt && receipt.status === '0x1') {
           status.className = 'tx-status success';
           status.innerHTML = 'unstaked successfully. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
-          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+          refreshAfterTx();
         } else {
           throw new Error('Unstake failed');
         }
@@ -1959,7 +1975,7 @@
           closeUnstakeDrawer();
           status.className = 'tx-status success'; status.style.display = 'block';
           status.innerHTML = 'unstaked ' + formatNum(unstakeAmount) + ' SIBYL. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
-          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+          refreshAfterTx();
         } else {
           throw new Error('Unstake transaction failed');
         }
@@ -2060,7 +2076,7 @@
           closeEarlyUnstakeDrawer();
           status.className = 'tx-status success'; status.style.display = 'block';
           status.innerHTML = 'early unstake complete. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
-          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+          refreshAfterTx();
         } else {
           throw new Error('Early unstake transaction failed');
         }
@@ -2094,7 +2110,7 @@
         if (receipt && receipt.status === '0x1') {
           status.className = 'tx-status success';
           status.innerHTML = 'rewards claimed. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
-          setTimeout(() => loadUserData(), 2000);
+          refreshAfterTx();
         } else {
           throw new Error('Claim failed');
         }
@@ -2171,8 +2187,8 @@
       fetchMarketData();
       setInterval(fetchMarketData, REFRESH_INTERVAL);
 
-      // Refresh user data every 30s if connected
-      setInterval(() => { if (connected) loadUserData(); }, 30_000);
+      // Refresh user data every 10s if connected
+      setInterval(() => { if (connected) loadUserData(); }, 10_000);
     });
   </script>
 </body>
