@@ -1251,6 +1251,7 @@
     let selectedTier = 0;
     let marketData = null;
     let lastFetch = 0;
+    let circulatingSupply = 0;
     let tokenPrice = 0;
     let userBalance = 0n; // raw wei
     const tierMultipliers = [1.0, 1.2, 1.4, 1.8];
@@ -1358,6 +1359,7 @@
         if (res.ok) {
           const circ = parseFloat(await res.text());
           if (circ > 0) {
+            circulatingSupply = circ;
             setText('m-circ', formatCompact(circ));
             setText('m-circ-pct', ((circ / TOTAL_SUPPLY) * 100).toFixed(1) + '% of total');
             setText('supply-circ', formatCompact(circ));
@@ -1395,12 +1397,8 @@
 
         // Market strip: total staked
         setText('m-staked', formatCompact(totalStaked));
-        if (totalStaked > 0) {
-          const circEl = document.getElementById('m-circ');
-          const circVal = parseFloat((circEl?.textContent || '0').replace(/[^0-9.]/g,''));
-          // Rough circ for pct
-          const circ = circVal >= 1000 ? circVal * 1e6 : circVal;
-          if (circ > 0) setText('m-staked-pct', ((totalStaked / circ) * 100).toFixed(1) + '% of circ.');
+        if (totalStaked > 0 && circulatingSupply > 0) {
+          setText('m-staked-pct', ((totalStaked / circulatingSupply) * 100).toFixed(1) + '% of circ.');
         }
 
         // Supply bar: staked segment
