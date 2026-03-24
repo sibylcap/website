@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIBYL : Stake</title>
+  <title>SIBYL : Stage</title>
+  <meta name="robots" content="noindex, nofollow">
   <meta name="description" content="Stake $SIBYL. Earn yield. Govern the record.">
   <meta property="og:title" content="SIBYL : Stake">
   <meta property="og:description" content="Stake $SIBYL. Earn yield. Govern the record.">
@@ -803,12 +804,68 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* Auth gate */
+    .auth-gate {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px;
+    }
+    .auth-gate.hidden { display: none; }
+    .auth-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 48px 40px; max-width: 380px;
+      width: 100%; text-align: center;
+    }
+    .auth-label {
+      font-family: var(--font-mono); font-size: 0.625rem;
+      color: var(--gold-dim); letter-spacing: 0.25em;
+      text-transform: uppercase; margin-bottom: 16px;
+    }
+    .auth-title {
+      font-family: var(--font-display); font-size: 1.5rem;
+      font-weight: 700; color: var(--text-primary); margin-bottom: 8px;
+    }
+    .auth-sub { font-size: 0.75rem; color: var(--text-muted); }
+    .auth-input {
+      width: 100%; background: var(--elevated); border: 1px solid var(--border-strong);
+      border-radius: 8px; padding: 14px 16px; color: var(--text-primary);
+      font-family: var(--font-mono); font-size: 0.875rem;
+      text-align: center; letter-spacing: 0.1em; outline: none;
+      transition: border-color 0.2s;
+    }
+    .auth-input:focus { border-color: var(--gold-dim); }
+    .auth-input::placeholder { color: var(--text-muted); }
+    .auth-btn {
+      width: 100%; margin-top: 12px;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      color: var(--bg); border: none; border-radius: 8px; padding: 14px;
+      font-family: var(--font-display); font-size: 0.8125rem;
+      font-weight: 600; letter-spacing: 0.1em; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .auth-btn:hover { background: linear-gradient(135deg, var(--gold), var(--gold-hover)); transform: translateY(-1px); }
+    .auth-error { margin-top: 12px; font-size: 0.6875rem; color: var(--negative); min-height: 1em; }
   </style>
 </head>
 <body>
+  <!-- Auth Gate -->
+  <div class="auth-gate" id="authGate">
+    <div class="auth-box">
+      <div class="auth-label">STAKING STAGE</div>
+      <h2 class="auth-title">$<span style="color:var(--gold)">SIBYL</span> Stage</h2>
+      <p class="auth-sub">enter access code to continue</p>
+      <form onsubmit="event.preventDefault(); checkAuth();" style="margin-top:24px">
+        <input type="password" id="authInput" class="auth-input" placeholder="access code" autocomplete="off" autofocus>
+        <button type="submit" class="auth-btn">ENTER</button>
+        <p class="auth-error" id="authError"></p>
+      </form>
+    </div>
+  </div>
+
   <div class="ambient"></div>
   <div class="ambient-2"></div>
 
+  <div id="mainContent" style="display:none">
   <!-- Nav -->
   <nav class="nav">
     <div class="nav-inner">
@@ -1167,12 +1224,41 @@
     </div>
   </div>
 
+  </div><!-- /mainContent -->
+
+  <script>
+    // ── Auth ──
+    const PASS_HASH = '9cfeca2355a8ee17f7c34760c857e19a4f95d0a94b2ae56a99f27d0ae67105ec';
+    async function sha256(msg) {
+      const data = new TextEncoder().encode(msg);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    async function checkAuth() {
+      const input = document.getElementById('authInput').value;
+      const hash = await sha256(input);
+      if (hash === PASS_HASH) {
+        sessionStorage.setItem('sibyl_stage_auth', '1');
+        unlockPage();
+      } else {
+        document.getElementById('authError').textContent = 'invalid access code';
+        document.getElementById('authInput').value = '';
+        document.getElementById('authInput').focus();
+      }
+    }
+    function unlockPage() {
+      document.getElementById('authGate').classList.add('hidden');
+      document.getElementById('mainContent').style.display = '';
+    }
+    if (sessionStorage.getItem('sibyl_stage_auth') === '1') unlockPage();
+  </script>
+
   <script>
     // ═══════════════════════════════════════
     //  Constants
     // ═══════════════════════════════════════
     const SIBYL_CA  = '0x797f214a2CD64a4963A91Fa21c8C55Ec3EBa4714';
-    const STAKE_CA  = ''; // V2 CONTRACT — update after mainnet deploy
+    const STAKE_CA  = '0x13a885969d1dBe8afB048005154F3a060CC2e07F';
     const VESTING_CA = '0xD6B830F72FE36AC6Fb2Bb959642B29c64bE3cF11';
     const TOTAL_SUPPLY = 1_000_000_000;
     const DECIMALS = 18;
