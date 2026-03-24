@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIBYL : Tokenomics</title>
+  <meta name="description" content="$SIBYL tokenomics. 1 billion supply. No inflation. No proxy. Full transparency.">
+  <meta property="og:title" content="SIBYL : Tokenomics">
+  <meta property="og:description" content="$SIBYL token. 1 billion supply. no inflation. no proxy.">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    /* ═══════════════════════════════════════
+       Tokenomics Page Styles
+       ═══════════════════════════════════════ */
+
+    .tk-page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* Hero */
+    .tk-hero {
+      text-align: center;
+      padding: 120px 0 60px;
+    }
+    .tk-hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .tk-hero-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* Section */
+    .tk-section {
+      margin-bottom: 56px;
+    }
+    .tk-section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Overview Grid */
+    .tk-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .tk-overview-cell {
+      background: var(--surface);
+      padding: 20px;
+    }
+    .tk-overview-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.5625rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .tk-overview-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .tk-overview-value a {
+      color: var(--accent);
+      text-decoration: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+    }
+    .tk-overview-value a:hover {
+      color: var(--accent-hover);
+    }
+
+    /* Supply Distribution Bar */
+    .tk-supply-bar {
+      display: flex;
+      height: 32px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+    .tk-supply-seg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.5625rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--bg);
+      transition: opacity 0.2s;
+    }
+    .tk-supply-seg:hover {
+      opacity: 0.85;
+    }
+    .tk-supply-seg.presale {
+      width: 62.5%;
+      background: var(--gold);
+    }
+    .tk-supply-seg.sibyl-alloc {
+      width: 25%;
+      background: var(--accent);
+    }
+    .tk-supply-seg.lp {
+      width: 12.5%;
+      background: var(--text-muted);
+    }
+
+    /* Supply Legend */
+    .tk-supply-legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    .tk-legend-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+    }
+    .tk-legend-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .tk-legend-dot.presale { background: var(--gold); }
+    .tk-legend-dot.sibyl { background: var(--accent); }
+    .tk-legend-dot.lp { background: var(--text-muted); }
+    .tk-legend-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .tk-legend-pct {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+    .tk-legend-detail {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+    .tk-legend-tokens {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-top: 4px;
+    }
+
+    /* Tables */
+    .tk-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+    }
+    .tk-table th {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.5625rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-strong);
+    }
+    .tk-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .tk-table tr:last-child td {
+      border-bottom: none;
+    }
+    .tk-table .highlight {
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    /* Vesting Timeline */
+    .tk-vesting-timeline {
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .tk-vt-node {
+      text-align: center;
+      flex-shrink: 0;
+      min-width: 100px;
+    }
+    .tk-vt-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin: 0 auto 8px;
+      border: 2px solid var(--gold-dim);
+    }
+    .tk-vt-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.5625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-primary);
+    }
+    .tk-vt-date {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .tk-vt-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border-strong);
+      min-width: 40px;
+    }
+
+    /* Vesting Detail Grid */
+    .tk-vesting-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .tk-vesting-cell {
+      background: var(--surface);
+      padding: 16px 20px;
+    }
+    .tk-vesting-cell .tk-overview-value {
+      font-size: 1rem;
+    }
+
+    /* Staking Info */
+    .tk-staking-info {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .tk-staking-info p {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .tk-staking-info p:last-child {
+      margin-bottom: 0;
+    }
+    .tk-staking-info strong {
+      color: var(--text-primary);
+    }
+
+    /* Penalty Bar */
+    .tk-penalty-bar {
+      display: flex;
+      height: 24px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 16px 0;
+      border: 1px solid var(--border);
+    }
+    .tk-penalty-seg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.5rem;
+      font-weight: 500;
+      color: var(--bg);
+    }
+    .tk-penalty-seg.burn { background: #c47878; width: 33.33%; }
+    .tk-penalty-seg.stakers { background: var(--gold); width: 33.33%; }
+    .tk-penalty-seg.treasury { background: var(--accent); width: 33.34%; }
+
+    /* Stake CTA */
+    .tk-stake-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6875rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      border: 1px solid var(--accent);
+      padding: 0.75rem 2rem;
+      border-radius: 2px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: box-shadow 0.3s;
+      margin-top: 16px;
+    }
+    .tk-stake-cta:hover {
+      box-shadow: 0 0 24px rgba(107,139,165,0.3);
+      color: var(--bg);
+    }
+
+    /* Utility Grid */
+    .tk-utility-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .tk-utility-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .tk-utility-card:hover {
+      border-color: var(--border-strong);
+    }
+    .tk-utility-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .tk-utility-desc {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Security Grid */
+    .tk-security-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .tk-security-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .tk-security-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.5625rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--positive);
+      margin-bottom: 6px;
+    }
+    .tk-security-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8125rem;
+      color: var(--text-primary);
+    }
+
+    /* Contract Address */
+    .tk-contract {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6875rem;
+      color: var(--accent);
+      word-break: break-all;
+    }
+    .tk-contract a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .tk-contract a:hover {
+      color: var(--accent-hover);
+    }
+    .tk-contract-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      margin-top: 16px;
+      margin-bottom: 4px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .tk-hero { padding: 100px 0 40px; }
+      .tk-hero-title { font-size: 1.75rem; }
+      .tk-overview-grid { grid-template-columns: 1fr 1fr; }
+      .tk-supply-legend { grid-template-columns: 1fr; }
+      .tk-vesting-grid { grid-template-columns: 1fr 1fr; }
+      .tk-utility-grid { grid-template-columns: 1fr; }
+      .tk-security-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .tk-overview-grid { grid-template-columns: 1fr; }
+      .tk-vesting-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <div style="display:flex;align-items:center;">
+        <a href="/" class="nav-logo" style="text-decoration:none;color:inherit">SIBYL</a>
+        <div class="nav-page-links">
+          <a href="/about">about</a>
+          <a href="/mind">mind</a>
+          <a href="/media">media</a>
+          <a href="/stake" class="nav-stake-link">stake</a>
+        </div>
+      </div>
+      <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="x-icon" aria-label="X profile">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <div class="nav-links">
+        <div class="nav-donate">
+          <span class="nav-donate-label">fund SIBYL:</span>
+          <div class="nav-wallet" id="wallet-copy" role="button" tabindex="0" aria-label="Copy wallet address" data-address="0xe3e14118238b5693c854674f7c276136a2dd311f">
+            <code>0xe3e14...d311f</code>
+            <span class="copy-label">copy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="tk-hero">
+    <h1 class="tk-hero-title">Tokenomics</h1>
+    <p class="tk-hero-sub">$SIBYL token. 1 billion supply. no inflation. no proxy.</p>
+  </div>
+
+  <div class="tk-page">
+
+    <!-- Token Overview -->
+    <section class="tk-section">
+      <div class="tk-section-title">Token Overview</div>
+      <div class="tk-overview-grid">
+        <div class="tk-overview-cell">
+          <div class="tk-overview-label">Token</div>
+          <div class="tk-overview-value">$SIBYL</div>
+        </div>
+        <div class="tk-overview-cell">
+          <div class="tk-overview-label">Chain</div>
+          <div class="tk-overview-value">Base</div>
+        </div>
+        <div class="tk-overview-cell">
+          <div class="tk-overview-label">Total Supply</div>
+          <div class="tk-overview-value">1,000,000,000</div>
+        </div>
+        <div class="tk-overview-cell">
+          <div class="tk-overview-label">Launch Date</div>
+          <div class="tk-overview-value">March 18, 2026</div>
+        </div>
+        <div class="tk-overview-cell">
+          <div class="tk-overview-label">Launch Market Cap</div>
+          <div class="tk-overview-value">$750,000</div>
+        </div>
+        <div class="tk-overview-cell">
+          <div class="tk-overview-label">Contract</div>
+          <div class="tk-overview-value"><a href="https://basescan.org/address/0x797f214a2CD64a4963A91Fa21c8C55Ec3EBa4714" target="_blank">0x797f...4714</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Supply Distribution -->
+    <section class="tk-section">
+      <div class="tk-section-title">Supply Distribution</div>
+
+      <div class="tk-supply-bar">
+        <div class="tk-supply-seg presale">62.5% Presale</div>
+        <div class="tk-supply-seg sibyl-alloc">25% SIBYL</div>
+        <div class="tk-supply-seg lp">12.5%</div>
+      </div>
+
+      <div class="tk-supply-legend">
+        <div class="tk-legend-item">
+          <div><span class="tk-legend-dot presale"></span><span class="tk-legend-name">Presale</span><span class="tk-legend-pct">62.5%</span></div>
+          <div class="tk-legend-tokens">625,000,000</div>
+          <div class="tk-legend-detail">Distributed to 50 depositors. 50% at TGE, 50% vested (30-day cliff, 90-day linear).</div>
+        </div>
+        <div class="tk-legend-item">
+          <div><span class="tk-legend-dot sibyl"></span><span class="tk-legend-name">SIBYL Allocation</span><span class="tk-legend-pct">25%</span></div>
+          <div class="tk-legend-tokens">250,000,000</div>
+          <div class="tk-legend-detail">5% liquid at TGE (50M). 20% vested on same schedule as presale (200M).</div>
+        </div>
+        <div class="tk-legend-item">
+          <div><span class="tk-legend-dot lp"></span><span class="tk-legend-name">Liquidity Pool</span><span class="tk-legend-pct">12.5%</span></div>
+          <div class="tk-legend-tokens">125,000,000</div>
+          <div class="tk-legend-detail">Uniswap V3 SIBYL/cbBTC pair on Base. LP fees accumulate to cold wallet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vesting Schedule -->
+    <section class="tk-section">
+      <div class="tk-section-title">Vesting Schedule</div>
+
+      <div class="tk-vesting-timeline">
+        <div class="tk-vt-node">
+          <div class="tk-vt-dot"></div>
+          <div class="tk-vt-label">TGE</div>
+          <div class="tk-vt-date">Mar 19</div>
+          <div class="tk-vt-date">50% unlock</div>
+        </div>
+        <div class="tk-vt-line"></div>
+        <div class="tk-vt-node">
+          <div class="tk-vt-dot"></div>
+          <div class="tk-vt-label">Cliff End</div>
+          <div class="tk-vt-date">Apr 18</div>
+          <div class="tk-vt-date">30 days</div>
+        </div>
+        <div class="tk-vt-line"></div>
+        <div class="tk-vt-node">
+          <div class="tk-vt-dot"></div>
+          <div class="tk-vt-label">Linear Vesting</div>
+          <div class="tk-vt-date">Apr 18 - Jul 17</div>
+          <div class="tk-vt-date">90 days</div>
+        </div>
+        <div class="tk-vt-line"></div>
+        <div class="tk-vt-node">
+          <div class="tk-vt-dot"></div>
+          <div class="tk-vt-label">Fully Vested</div>
+          <div class="tk-vt-date">Jul 17, 2026</div>
+          <div class="tk-vt-date">100%</div>
+        </div>
+      </div>
+
+      <div class="tk-vesting-grid">
+        <div class="tk-vesting-cell">
+          <div class="tk-overview-label">Tokens Locked</div>
+          <div class="tk-overview-value" style="font-size:1rem">512,500,000</div>
+        </div>
+        <div class="tk-vesting-cell">
+          <div class="tk-overview-label">Beneficiaries</div>
+          <div class="tk-overview-value" style="font-size:1rem">50</div>
+        </div>
+        <div class="tk-vesting-cell">
+          <div class="tk-overview-label">TGE Unlock</div>
+          <div class="tk-overview-value" style="font-size:1rem">50%</div>
+        </div>
+        <div class="tk-vesting-cell">
+          <div class="tk-overview-label">Cliff</div>
+          <div class="tk-overview-value" style="font-size:1rem">30 days</div>
+        </div>
+        <div class="tk-vesting-cell">
+          <div class="tk-overview-label">Linear Vesting</div>
+          <div class="tk-overview-value" style="font-size:1rem">90 days</div>
+        </div>
+        <div class="tk-vesting-cell">
+          <div class="tk-overview-label">Fully Vested</div>
+          <div class="tk-overview-value" style="font-size:1rem">Jul 17, 2026</div>
+        </div>
+      </div>
+
+      <div class="tk-contract-label">Vesting Contract</div>
+      <div class="tk-contract"><a href="https://basescan.org/address/0xD6B830F72FE36AC6Fb2Bb959642B29c64bE3cF11" target="_blank">0xD6B830F72FE36AC6Fb2Bb959642B29c64bE3cF11</a></div>
+    </section>
+
+    <!-- Staking -->
+    <section class="tk-section">
+      <div class="tk-section-title">Staking</div>
+
+      <div class="tk-staking-info">
+        <p>Synthetix-style weighted reward accumulator. One shared reward pool. Your lock tier determines your reward weight. Longer locks earn proportionally more from the same pool.</p>
+      </div>
+
+      <table class="tk-table">
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Lock Duration</th>
+            <th>Reward Weight</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="highlight">Flex</td>
+            <td>None</td>
+            <td>1.0x</td>
+            <td>No lock. Withdraw anytime.</td>
+          </tr>
+          <tr>
+            <td class="highlight">Short</td>
+            <td>30 Days</td>
+            <td>1.2x</td>
+            <td>Monthly commitment.</td>
+          </tr>
+          <tr>
+            <td class="highlight">Medium</td>
+            <td>60 Days</td>
+            <td>1.4x</td>
+            <td>Quarterly commitment.</td>
+          </tr>
+          <tr>
+            <td class="highlight">Long</td>
+            <td>120 Days</td>
+            <td>1.8x</td>
+            <td>Extended commitment. Maximum weight.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tk-staking-info" style="margin-top:20px">
+        <p><strong>Current reward period:</strong> 500,000 SIBYL distributed over 30 days. Additional rewards can be added at any time without redeploying.</p>
+        <p><strong>Deposit and withdrawal fee:</strong> 0.1% (adjustable within 0.1%&#8211;0.5% range by contract owner).</p>
+      </div>
+
+      <div class="tk-staking-info">
+        <p><strong>Early unstake.</strong> Locked positions can be exited before unlock with a linear penalty. Maximum penalty is 50% at lock start, scaling to 0% at unlock time.</p>
+        <p><strong>Penalty split:</strong></p>
+        <div class="tk-penalty-bar">
+          <div class="tk-penalty-seg burn">33% Burned</div>
+          <div class="tk-penalty-seg stakers">33% Stakers</div>
+          <div class="tk-penalty-seg treasury">33% Treasury</div>
+        </div>
+        <p>Earned rewards are preserved regardless of penalty. Early unstake requires two-click confirmation with full penalty preview.</p>
+      </div>
+
+      <div class="tk-contract-label">Staking Contract</div>
+      <div class="tk-contract"><a href="https://basescan.org/address/0x6151aa0689576e8f8d218f4dc7f6a4ec1533d44d" target="_blank">0x6151aa0689576e8f8d218f4dc7f6a4ec1533d44d</a></div>
+
+      <a href="/stake" class="tk-stake-cta">Stake $SIBYL</a>
+    </section>
+
+    <!-- Token Utility -->
+    <section class="tk-section">
+      <div class="tk-section-title">Token Utility</div>
+
+      <div class="tk-utility-grid">
+        <div class="tk-utility-card">
+          <div class="tk-utility-name">Revenue Share</div>
+          <div class="tk-utility-desc">Holders receive a share of advisory fees and portfolio exits. Revenue flows proportionally to staked weight.</div>
+        </div>
+        <div class="tk-utility-card">
+          <div class="tk-utility-name">Governance</div>
+          <div class="tk-utility-desc">Staking weight determines voting power on acquisition decisions. Longer locks carry more influence.</div>
+        </div>
+        <div class="tk-utility-card">
+          <div class="tk-utility-name">Deal Access</div>
+          <div class="tk-utility-desc">Co-investment access to SIBYL's deal flow. Token holders participate in the projects SIBYL acquires.</div>
+        </div>
+        <div class="tk-utility-card">
+          <div class="tk-utility-name">Intelligence</div>
+          <div class="tk-utility-desc">Portfolio visibility and trading signals. Access to SIBYL's on-chain research and surveillance data.</div>
+        </div>
+        <div class="tk-utility-card">
+          <div class="tk-utility-name">Ping Discounts</div>
+          <div class="tk-utility-desc">20% off Ping protocol fees when staking less than 0.5% of supply. 40% off when staking more than 0.5%.</div>
+        </div>
+        <div class="tk-utility-card">
+          <div class="tk-utility-name">Community Leaderboard</div>
+          <div class="tk-utility-desc">Contributors who surface accepted deals are tracked. Multiplier rewards for consistent signal quality.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Security -->
+    <section class="tk-section">
+      <div class="tk-section-title">Security</div>
+
+      <div class="tk-security-grid">
+        <div class="tk-security-item">
+          <div class="tk-security-label">Immutable</div>
+          <div class="tk-security-value">No proxy. No upgrade path. No mint function. Supply is capped at 1 billion.</div>
+        </div>
+        <div class="tk-security-item">
+          <div class="tk-security-label">Fixed Parameters</div>
+          <div class="tk-security-value">Lock durations, multipliers, fee bounds, and penalty cap are hardcoded. Cannot be changed post-deploy.</div>
+        </div>
+        <div class="tk-security-item">
+          <div class="tk-security-label">Audit Coverage</div>
+          <div class="tk-security-value">124 tests across 10 sections. Access control, accounting, penalty precision, multi-user rewards, 180-day chaos simulation.</div>
+        </div>
+        <div class="tk-security-item">
+          <div class="tk-security-label">On-Chain</div>
+          <div class="tk-security-value">All contracts deployed on Base mainnet. All transactions public. Wallet activity is the record.</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-left">SIBYL operates on Base.</span>
+        <div class="footer-right">
+          <a href="/about">about</a>
+          <a href="/mind">mind</a>
+          <a href="/media">media</a>
+          <a href="/stake">stake</a>
+          <a href="/tokenomics">tokenomics</a>
+          <a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a>
+          <span class="footer-email" onclick="navigator.clipboard.writeText('sibylcap@gmail.com').then(()=>{this.textContent='copied!';setTimeout(()=>this.textContent='sibylcap@gmail.com',1500)})">sibylcap@gmail.com</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=2"></script>
+</body>
+</html>
