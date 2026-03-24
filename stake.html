@@ -1680,11 +1680,27 @@
         setText('pos-staked-usd', '$' + formatCompact(rawStaked * tokenPrice));
         setText('pos-weight', formatNum(weightedBal));
 
-        // Weight % of total
+        // Weight % of total + user APR
         try {
-          const twRaw = await call(STAKE_CA, SEL.totalWeightedSupply);
+          const [twRaw, rrRaw, pfRaw] = await Promise.all([
+            call(STAKE_CA, SEL.totalWeightedSupply),
+            call(STAKE_CA, SEL.rewardRate),
+            call(STAKE_CA, SEL.periodFinish),
+          ]);
           const totalW = fromWei(decUint(twRaw));
+          const rr = fromWei(decUint(rrRaw));
+          const pf = Number(decUint(pfRaw));
+          const now = Math.floor(Date.now() / 1000);
+
           if (totalW > 0) setText('pos-weight-pct', ((weightedBal / totalW) * 100).toFixed(2) + '% of total');
+
+          // User's weighted APR: (annualReward * userWeight / totalWeight) / userRawStaked * 100
+          if (rawStaked > 0 && totalW > 0 && rr > 0 && pf > now) {
+            const annualReward = rr * 365.25 * 86400;
+            const userAnnual = annualReward * weightedBal / totalW;
+            const userApr = (userAnnual / rawStaked) * 100;
+            setText('pos-apr', userApr.toFixed(1) + '%');
+          }
         } catch(e) {}
 
         // Earned
