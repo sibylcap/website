@@ -1178,7 +1178,7 @@
     <div class="unstake-drawer">
       <div class="unstake-handle"></div>
       <div class="unstake-title" style="color:#f59e0b">Early Unstake</div>
-      <div class="unstake-sub" id="early-unstake-sub">locked position. penalty applies.</div>
+      <div class="unstake-sub" id="early-unstake-sub">locked position. early unlock penalty applies.</div>
 
       <div class="unstake-amount-display">
         <div class="unstake-amount-value" id="early-unstake-amount-val">0</div>
@@ -2035,7 +2035,7 @@
         setText('early-fee-amt', formatNum(feeNum) + ' SIBYL');
         setText('early-net-amt', formatNum(netNum) + ' SIBYL');
         document.getElementById('early-unstake-sub').textContent =
-          tierName + ' tier. ' + daysLeft + 'd remaining. penalty tokens go to treasury.';
+          tierName + ' tier. ' + daysLeft + 'd remaining. penalty split: 33% burned, 33% to stakers, 33% to treasury.';
 
         const btn = document.getElementById('btn-early-unstake-confirm');
         btn.textContent = 'I understand, early unstake';
