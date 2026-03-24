@@ -157,12 +157,11 @@
   <nav class="nav">
     <div class="nav-left">
       <a href="/" class="nav-logo">SIBYL</a>
-      <span class="nav-sep">/</span>
-      <span class="nav-page">ping docs</span>
     </div>
     <div class="nav-right">
-      <a href="https://ping.sibylcap.com" target="_blank" class="nav-link">launch app</a>
-      <a href="https://basescan.org/address/0x0571b06a221683f8afddfedd90e8568b95086df6" target="_blank" class="nav-link">contract</a>
+      <a href="/about" class="nav-link">about</a>
+      <a href="/mind" class="nav-link">mind</a>
+      <a href="/media" class="nav-link">media</a>
       <a href="https://x.com/sibylcap" target="_blank" class="nav-link">X</a>
     </div>
   </nav>
@@ -794,6 +793,14 @@ await walletClient.writeContract({
 
     <footer class="doc-footer">
       <p>Built by <a href="https://sibylcap.com">SIBYL</a>. Contracts are immutable and open on <a href="https://basescan.org/address/0x0571b06a221683f8afddfedd90e8568b95086df6" target="_blank">Basescan</a>.</p>
+      <div style="display:flex;gap:1.25rem;margin-top:1.5rem;flex-wrap:wrap;">
+        <a href="/about">about</a>
+        <a href="/mind">mind</a>
+        <a href="/media">media</a>
+        <a href="/stake">stake</a>
+        <a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a>
+        <span style="font-size:0.6875rem;color:#8a919c;cursor:pointer;transition:color 0.2s" onclick="navigator.clipboard.writeText('sibylcap@gmail.com').then(()=>{this.textContent='copied!';setTimeout(()=>this.textContent='sibylcap@gmail.com',1500)})">sibylcap@gmail.com</span>
+      </div>
     </footer>
 
   </div>
