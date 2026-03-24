@@ -912,26 +912,30 @@
           <div class="tier-selector">
             <div class="tier-label">Lock Duration</div>
             <div class="tier-grid">
-              <button class="tier-btn active" data-tier="0" onclick="selectTier(this)">
+              <button class="tier-btn active" data-tier="0" onclick="selectTier(this)" title="No lock. Withdraw anytime. 1.0x reward weight.">
                 <span class="tier-duration">Flex</span>
                 <span class="tier-mult">1.0x</span>
               </button>
-              <button class="tier-btn" data-tier="1" onclick="selectTier(this)">
-                <span class="tier-duration">30d</span>
+              <button class="tier-btn" data-tier="1" onclick="selectTier(this)" title="Lock for 30 days. 1.2x reward weight.">
+                <span class="tier-duration">30 Days</span>
                 <span class="tier-mult">1.2x</span>
               </button>
-              <button class="tier-btn" data-tier="2" onclick="selectTier(this)">
-                <span class="tier-duration">60d</span>
+              <button class="tier-btn" data-tier="2" onclick="selectTier(this)" title="Lock for 60 days. 1.4x reward weight.">
+                <span class="tier-duration">60 Days</span>
                 <span class="tier-mult">1.4x</span>
               </button>
-              <button class="tier-btn" data-tier="3" onclick="selectTier(this)">
-                <span class="tier-duration">120d</span>
+              <button class="tier-btn" data-tier="3" onclick="selectTier(this)" title="Lock for 120 days. 1.8x reward weight.">
+                <span class="tier-duration">120 Days</span>
                 <span class="tier-mult">1.8x</span>
               </button>
             </div>
           </div>
 
           <div class="stake-summary" id="stake-summary">
+            <div class="summary-row">
+              <span class="summary-label">Lock period</span>
+              <span class="summary-value" id="sum-lock" style="color:var(--gold)">No lock. Withdraw anytime.</span>
+            </div>
             <div class="summary-row">
               <span class="summary-label">You stake</span>
               <span class="summary-value" id="sum-gross">0.00 SIBYL</span>
@@ -1250,7 +1254,7 @@
     let tokenPrice = 0;
     let userBalance = 0n; // raw wei
     const tierMultipliers = [1.0, 1.2, 1.4, 1.8];
-    const tierDurations = ['Flex', '30d', '60d', '120d'];
+    const tierDurations = ['Flex', '30 Days', '60 Days', '120 Days'];
     const tierDurationsSec = [0, 30*86400, 60*86400, 120*86400];
     const feeBps = 10;
 
@@ -1477,10 +1481,18 @@
     // ═══════════════════════════════════════
     //  Tier selection
     // ═══════════════════════════════════════
+    const lockDescriptions = [
+      'No lock. Withdraw anytime.',
+      'Lock $SIBYL for 30 days.',
+      'Lock $SIBYL for 60 days.',
+      'Lock $SIBYL for 120 days.'
+    ];
+
     function selectTier(btn) {
       document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectedTier = parseInt(btn.dataset.tier);
+      setText('sum-lock', lockDescriptions[selectedTier]);
       updateSummary();
     }
 
