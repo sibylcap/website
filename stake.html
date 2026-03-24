@@ -739,6 +739,14 @@
       background: rgba(196,120,120,0.08);
     }
     .btn-unstake-sm:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-early-unstake {
+      border-color: rgba(245,158,11,0.3); color: #f59e0b;
+      background: rgba(245,158,11,0.04);
+    }
+    .btn-early-unstake:hover {
+      border-color: #f59e0b; color: #f59e0b;
+      background: rgba(245,158,11,0.1);
+    }
 
     /* ═══════════════════════════════════════
        Connect State
@@ -1167,12 +1175,40 @@
     </div>
   </div>
 
+  <div class="unstake-overlay" id="early-unstake-overlay" onclick="if(event.target===this)closeEarlyUnstakeDrawer()">
+    <div class="unstake-drawer">
+      <div class="unstake-handle"></div>
+      <div class="unstake-title" style="color:#f59e0b">Early Unstake</div>
+      <div class="unstake-sub" id="early-unstake-sub">locked position. penalty applies.</div>
+
+      <div class="unstake-amount-display">
+        <div class="unstake-amount-value" id="early-unstake-amount-val">0</div>
+        <div class="unstake-amount-usd" id="early-unstake-amount-usd">$0.00</div>
+        <div style="margin-top:12px;font-size:0.6875rem;">
+          <div style="margin-bottom:4px">
+            <span style="color:#f59e0b">Penalty: </span><span style="color:#f59e0b;font-weight:600" id="early-penalty-amt">0</span>
+            <span style="color:var(--text-muted);margin-left:8px" id="early-penalty-pct"></span>
+          </div>
+          <div>
+            <span style="color:var(--text-muted)">Fee (0.1%): </span><span style="color:var(--text-secondary)" id="early-fee-amt">0</span>
+            <span style="color:var(--text-muted);margin-left:16px">You receive: </span><span style="color:var(--text-primary);font-weight:600" id="early-net-amt">0</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-unstake-confirm" id="btn-early-unstake-confirm" style="background:#f59e0b;color:#000" onclick="executeEarlyUnstake()">
+        Confirm Early Unstake
+      </button>
+      <button class="btn-unstake-cancel" onclick="closeEarlyUnstakeDrawer()">cancel</button>
+    </div>
+  </div>
+
   <script>
     // ═══════════════════════════════════════
     //  Constants
     // ═══════════════════════════════════════
     const SIBYL_CA  = '0x797f214a2CD64a4963A91Fa21c8C55Ec3EBa4714';
-    const STAKE_CA  = ''; // V2 CONTRACT — update after mainnet deploy
+    const STAKE_CA  = '0x3f8507b62448020760c452188b071f4155131e28';
     const VESTING_CA = '0xD6B830F72FE36AC6Fb2Bb959642B29c64bE3cF11';
     const TOTAL_SUPPLY = 1_000_000_000;
     const DECIMALS = 18;
@@ -1201,7 +1237,10 @@
       // Staking writes
       stake:              '0x10087fb1',
       unstake:            '0x2e17de78',
+      earlyUnstake:       '0x7c0712b4',
       claimRewards:       '0x372500ab',
+      // Early unstake view
+      earlyUnstakePenalty:'0xa3bb5eb2',
     };
 
     // ═══════════════════════════════════════
@@ -1727,13 +1766,19 @@
           }
 
           const badgeClass = p.lockTier === 0 ? 'flex' : 'locked';
-          const btnDisabled = canUnstake ? '' : 'disabled';
+
+          let actionBtn;
+          if (canUnstake) {
+            actionBtn = '<button class="btn-unstake-sm" onclick="doUnstake(' + p.index + ')">Unstake</button>';
+          } else {
+            actionBtn = '<button class="btn-unstake-sm btn-early-unstake" onclick="openEarlyUnstakeDrawer(' + p.index + ',' + p.lockTier + ',' + p.unlockTime + ',\'' + p.amount.toString() + '\')">Early Unstake</button>';
+          }
 
           return '<tr>' +
             '<td>' + formatNum(amtNum) + '</td>' +
             '<td><span class="lock-badge ' + badgeClass + '">' + tierName + ' (' + tierMultipliers[p.lockTier] + 'x)</span>' + progressHtml + '</td>' +
             '<td>' + unlockLabel + '</td>' +
-            '<td><button class="btn-unstake-sm" ' + btnDisabled + ' onclick="doUnstake(' + p.index + ')">Unstake</button></td>' +
+            '<td>' + actionBtn + '</td>' +
           '</tr>';
         }).join('');
 
@@ -1922,6 +1967,109 @@
         }
       } catch (e) {
         btn.textContent = 'CONFIRM UNSTAKE'; btn.disabled = false;
+        status.className = 'tx-status error'; status.style.display = 'block';
+        status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
+      }
+    }
+
+    // ═══════════════════════════════════════
+    //  Actions: Early Unstake
+    // ═══════════════════════════════════════
+    let earlyUnstakeIdx = null;
+    let earlyUnstakeConfirmed = false;
+
+    async function openEarlyUnstakeDrawer(posIdx, lockTier, unlockTime, amountStr) {
+      if (!connected) return;
+      earlyUnstakeIdx = posIdx;
+      earlyUnstakeConfirmed = false;
+
+      const amount = BigInt(amountStr);
+      const amtNum = fromWei(amount);
+
+      // Fetch penalty from contract
+      try {
+        const penaltyData = await call(STAKE_CA, SEL.earlyUnstakePenalty,
+          padAddr(userAddress) + padUint(posIdx));
+        const d = penaltyData.slice(2);
+        const penalty = BigInt('0x' + d.slice(0, 64));
+        const penaltyBps = parseInt(d.slice(64, 128), 16);
+        const netAfterAll = BigInt('0x' + d.slice(128, 192));
+
+        const penaltyNum = fromWei(penalty);
+        const netNum = fromWei(netAfterAll);
+        const feeNum = amtNum - penaltyNum - netNum;
+        const penaltyPct = (penaltyBps / 100).toFixed(1);
+
+        const tierName = tierDurations[lockTier];
+        const remaining = unlockTime - Math.floor(Date.now() / 1000);
+        const daysLeft = Math.ceil(remaining / 86400);
+
+        setText('early-unstake-amount-val', formatNum(amtNum) + ' SIBYL');
+        setText('early-unstake-amount-usd', '$' + (amtNum * tokenPrice).toFixed(2));
+        setText('early-penalty-amt', formatNum(penaltyNum) + ' SIBYL');
+        document.getElementById('early-penalty-pct').textContent = '(' + penaltyPct + '% penalty)';
+        setText('early-fee-amt', formatNum(feeNum) + ' SIBYL');
+        setText('early-net-amt', formatNum(netNum) + ' SIBYL');
+        document.getElementById('early-unstake-sub').textContent =
+          tierName + ' tier. ' + daysLeft + 'd remaining. penalty tokens go to treasury.';
+
+        const btn = document.getElementById('btn-early-unstake-confirm');
+        btn.textContent = 'I understand, early unstake';
+        btn.disabled = false;
+        btn.style.background = '#f59e0b';
+
+        document.getElementById('early-unstake-overlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      } catch (e) {
+        console.warn('Failed to fetch early unstake penalty:', e.message);
+        const status = document.getElementById('tx-status');
+        status.className = 'tx-status error'; status.style.display = 'block';
+        status.textContent = 'failed to fetch penalty: ' + (e.message || 'unknown');
+      }
+    }
+
+    function closeEarlyUnstakeDrawer() {
+      document.getElementById('early-unstake-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+      earlyUnstakeConfirmed = false;
+    }
+
+    async function executeEarlyUnstake() {
+      if (earlyUnstakeIdx === null) return;
+      const btn = document.getElementById('btn-early-unstake-confirm');
+
+      // First click: "Are you sure?" confirmation
+      if (!earlyUnstakeConfirmed) {
+        earlyUnstakeConfirmed = true;
+        btn.textContent = 'Are you sure? Click again to confirm';
+        btn.style.background = '#dc2626';
+        return;
+      }
+
+      // Second click: execute
+      const status = document.getElementById('tx-status');
+      btn.disabled = true;
+      btn.textContent = 'UNSTAKING...';
+
+      try {
+        const calldata = SEL.earlyUnstake + padUint(earlyUnstakeIdx);
+        const hash = await sendTx(STAKE_CA, calldata, '0x493E0');
+
+        btn.textContent = 'WAITING...';
+        const receipt = await waitTx(hash);
+
+        if (receipt && receipt.status === '0x1') {
+          closeEarlyUnstakeDrawer();
+          status.className = 'tx-status success'; status.style.display = 'block';
+          status.innerHTML = 'early unstake complete. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+        } else {
+          throw new Error('Early unstake transaction failed');
+        }
+      } catch (e) {
+        btn.textContent = 'I understand, early unstake'; btn.disabled = false;
+        btn.style.background = '#f59e0b';
+        earlyUnstakeConfirmed = false;
         status.className = 'tx-status error'; status.style.display = 'block';
         status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
       }
