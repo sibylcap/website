@@ -964,30 +964,7 @@
           <div class="tx-status" id="tx-status"></div>
         </div>
 
-        <!-- Active Positions Card -->
-        <div class="card reveal reveal-d3">
-          <div class="card-header">
-            <span class="card-title">Your Positions</span>
-          </div>
-          <div id="positions-content">
-            <table class="positions-table" id="positions-table" style="display:none">
-              <thead>
-                <tr>
-                  <th>Amount</th>
-                  <th>Lock</th>
-                  <th>Unlock</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="positions-body"></tbody>
-            </table>
-            <div id="no-positions" style="text-align:center;padding:36px 24px;color:var(--text-secondary);font-size:0.8125rem;">
-              <div style="font-size:1.5rem;opacity:0.2;margin-bottom:8px;">&#9670;</div>
-              no active positions
-              <div style="font-size:0.6875rem;color:var(--text-muted);margin-top:6px;">stake above to create a position. unstake anytime (flex) or after lock expires.</div>
-            </div>
-          </div>
-        </div>
+        <!-- Positions moved to right panel "Your Position" card -->
       </div>
 
       <!-- ═══ RIGHT: Analytics Dashboard ═══ -->
@@ -1029,6 +1006,24 @@
               <div class="claim-usd" id="claim-usd">$0.00</div>
             </div>
             <button class="btn-claim" id="btn-claim" disabled onclick="doClaim()">Claim</button>
+          </div>
+
+          <!-- Active Positions Table -->
+          <div id="positions-content" style="margin-top:20px">
+            <table class="positions-table" id="positions-table" style="display:none">
+              <thead>
+                <tr>
+                  <th>Amount</th>
+                  <th>Lock</th>
+                  <th>Unlock</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="positions-body"></tbody>
+            </table>
+            <div id="no-positions" style="text-align:center;padding:24px 16px;color:var(--text-muted);font-size:0.75rem;">
+              no active positions
+            </div>
           </div>
         </div>
 
