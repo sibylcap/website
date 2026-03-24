@@ -79,23 +79,15 @@
       display: flex; align-items: center; justify-content: space-between;
       max-width: 1200px; margin: 0 auto; padding: 0 2rem;
     }
-    .nav-left { display: flex; align-items: center; gap: 1.25rem; }
     .nav-logo {
       font-family: var(--font-display); font-size: 1rem;
       font-weight: 700; letter-spacing: 0.25em; color: var(--text-primary);
       text-transform: uppercase; text-decoration: none;
     }
-    .nav-back {
-      font-size: 0.625rem; color: var(--text-muted);
-      letter-spacing: 0.1em; text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-back:hover { color: var(--text-secondary); }
-    .nav-page-tag {
-      font-size: 0.625rem; color: var(--gold-dim);
-      letter-spacing: 0.2em; text-transform: uppercase;
-      font-family: var(--font-display); font-weight: 600;
-    }
+    .nav-links { display: flex; gap: 1.25rem; align-items: center; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.06em; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a.active { color: var(--accent); }
     .btn-wallet {
       display: flex; align-items: center; gap: 8px;
       background: rgba(181,160,112,0.06); border: 1px solid rgba(181,160,112,0.25);
@@ -820,15 +812,17 @@
   <!-- Nav -->
   <nav class="nav">
     <div class="nav-inner">
-      <div class="nav-left">
-        <a href="/" class="nav-logo">SIBYL</a>
-        <a href="/" class="nav-back">/ back</a>
-        <span class="nav-page-tag">Staking</span>
+      <a href="/" class="nav-logo">SIBYL</a>
+      <div class="nav-links">
+        <a href="/about">about</a>
+        <a href="/mind">mind</a>
+        <a href="/media">media</a>
+        <a href="/stake" class="active">stake</a>
+        <button class="btn-wallet disconnected" id="btn-connect" onclick="connectWallet()">
+          <span class="dot"></span>
+          <span id="wallet-label">Connect Wallet</span>
+        </button>
       </div>
-      <button class="btn-wallet disconnected" id="btn-connect" onclick="connectWallet()">
-        <span class="dot"></span>
-        <span id="wallet-label">Connect Wallet</span>
-      </button>
     </div>
   </nav>
 
@@ -2217,5 +2211,20 @@
       setInterval(() => { if (connected) loadUserData(); }, 10_000);
     });
   </script>
+
+  <!-- Footer -->
+  <footer class="footer" style="padding:2rem 2rem;border-top:1px solid var(--border);margin-top:3rem;">
+    <div class="footer-inner" style="display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;flex-wrap:wrap;gap:0.75rem;">
+      <span style="font-size:0.6875rem;color:var(--text-muted);letter-spacing:0.05em;">SIBYL operates on Base.</span>
+      <div style="display:flex;gap:1.25rem;flex-wrap:wrap;">
+        <a href="/about" style="font-size:0.6875rem;color:var(--text-muted);text-decoration:none;">about</a>
+        <a href="/mind" style="font-size:0.6875rem;color:var(--text-muted);text-decoration:none;">mind</a>
+        <a href="/media" style="font-size:0.6875rem;color:var(--text-muted);text-decoration:none;">media</a>
+        <a href="/stake" style="font-size:0.6875rem;color:var(--text-muted);text-decoration:none;">stake</a>
+        <a href="https://x.com/sibylcap" target="_blank" rel="noopener" style="font-size:0.6875rem;color:var(--text-muted);text-decoration:none;">x.com/sibylcap</a>
+        <span style="font-size:0.6875rem;color:var(--text-muted);cursor:pointer;" onclick="navigator.clipboard.writeText('sibylcap@gmail.com').then(()=>{this.textContent='copied!';setTimeout(()=>this.textContent='sibylcap@gmail.com',1500)})">sibylcap@gmail.com</span>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
