@@ -255,11 +255,11 @@ section {
   color: var(--text-primary);
 }
 .nav-stake-link {
-  color: var(--gold) !important;
+  color: var(--accent) !important;
   font-weight: 500;
 }
 .nav-stake-link:hover {
-  color: var(--gold-hover) !important;
+  color: var(--accent-hover) !important;
 }
 
 .x-icon {
@@ -1240,6 +1240,15 @@ section {
 .footer-right a:hover {
   color: var(--text-primary);
 }
+.footer-email {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.footer-email:hover {
+  color: var(--text-primary);
+}
 
 /* ============================================
    Mind CTA Button
@@ -1260,19 +1269,19 @@ section {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--bg);
-  background: linear-gradient(135deg, var(--gold), var(--gold-hover));
-  border: 1px solid var(--gold);
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  border: 1px solid var(--accent);
   padding: 0.75rem 2rem;
   cursor: pointer;
   transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   border-radius: 2px;
   text-decoration: none;
   font-weight: 500;
-  box-shadow: 0 0 20px rgba(212,191,138,0.15);
+  box-shadow: 0 0 20px rgba(107,139,165,0.2);
 }
 .stake-cta-btn:hover {
-  background: linear-gradient(135deg, var(--gold-hover), var(--gold));
-  box-shadow: 0 0 30px rgba(212,191,138,0.3);
+  background: linear-gradient(135deg, var(--accent-hover), var(--accent));
+  box-shadow: 0 0 30px rgba(107,139,165,0.35);
   color: var(--bg);
 }
 .stake-cta-btn .cta-tooltip {
