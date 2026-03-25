@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIBYL : Upload</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    body { background:#08090a; color:#c8ccd4; font-family:'IBM Plex Mono',monospace; margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .wrap { max-width:500px; width:100%; padding:2rem; }
+    h1 { font-size:1rem; letter-spacing:0.06em; margin-bottom:1.5rem; }
+    .drop {
+      border:2px dashed #252a36; border-radius:8px; padding:3rem 2rem; text-align:center;
+      cursor:pointer; transition:all 0.2s; position:relative;
+    }
+    .drop:hover, .drop.over { border-color:#6b8ba5; background:#0e1118; }
+    .drop input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .drop-text { color:#8a919c; font-size:0.85rem; }
+    .preview { margin-top:1.5rem; display:none; }
+    .preview img { max-width:100%; border-radius:6px; border:1px solid #1a1e28; }
+    .meta { font-size:0.75rem; color:#555d6b; margin-top:0.5rem; }
+    .status { margin-top:1rem; font-size:0.8rem; }
+    .status.ok { color:#5a8a6a; }
+    .status.err { color:#8a5a5a; }
+    .status.info { color:#6b8ba5; }
+    .upload-btn {
+      margin-top:0.75rem; padding:0.5rem 1rem; background:#0e1118; border:1px solid #252a36;
+      border-radius:4px; color:#6b8ba5; font-family:inherit; font-size:0.8rem; cursor:pointer;
+      display:none;
+    }
+    .upload-btn:hover { border-color:#6b8ba5; color:#c8ccd4; }
+    .upload-btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .history { margin-top:2rem; border-top:1px solid #1a1e28; padding-top:1rem; }
+    .history h2 { font-size:0.8rem; color:#555d6b; margin-bottom:0.5rem; }
+    .history-item { font-size:0.7rem; color:#444; padding:0.2rem 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>upload to SIBYL</h1>
+    <div class="drop" id="drop">
+      <div class="drop-text">drop an image here or click to select</div>
+      <input type="file" id="file" accept="image/*,.pdf,.svg">
+    </div>
+    <div class="preview" id="preview">
+      <img id="img">
+      <div class="meta" id="meta"></div>
+    </div>
+    <button class="upload-btn" id="uploadBtn">upload to SIBYL</button>
+    <div class="status" id="status"></div>
+    <div class="history" id="history"></div>
+  </div>
+  <script>
+    const UPLOAD_SERVER = 'http://18.204.215.66:3999';
+    const drop = document.getElementById('drop');
+    const fileInput = document.getElementById('file');
+    const preview = document.getElementById('preview');
+    const img = document.getElementById('img');
+    const meta = document.getElementById('meta');
+    const status = document.getElementById('status');
+    const uploadBtn = document.getElementById('uploadBtn');
+    let currentFile = null;
+
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+    drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); handleFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+    function handleFile(file) {
+      if (!file) return;
+      currentFile = file;
+      meta.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB, ' + file.type + ')';
+
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => { img.src = reader.result; preview.style.display = 'block'; };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = 'none';
+      }
+      uploadBtn.style.display = 'inline-block';
+      status.textContent = '';
+    }
+
+    uploadBtn.addEventListener('click', async () => {
+      if (!currentFile) return;
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = 'uploading...';
+      status.className = 'status info';
+      status.textContent = 'sending...';
+
+      try {
+        const form = new FormData();
+        form.append('file', currentFile);
+
+        const res = await fetch(UPLOAD_SERVER + '/upload', { method: 'POST', body: form });
+        const data = await res.json();
+
+        if (data.ok) {
+          status.className = 'status ok';
+          status.textContent = 'saved. tell SIBYL: "check uploads" or "look at ' + data.name + '"';
+          uploadBtn.textContent = 'uploaded';
+          loadHistory();
+        } else {
+          status.className = 'status err';
+          status.textContent = 'error: ' + (data.error || 'unknown');
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = 'retry';
+        }
+      } catch (e) {
+        status.className = 'status err';
+        status.textContent = 'upload failed: ' + e.message;
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'retry';
+      }
+    });
+
+    async function loadHistory() {
+      try {
+        const res = await fetch(UPLOAD_SERVER + '/files');
+        const data = await res.json();
+        const el = document.getElementById('history');
+        if (data.files && data.files.length > 0) {
+          el.innerHTML = '<h2>recent uploads</h2>' + data.files.map(f =>
+            '<div class="history-item">' + f + '</div>'
+          ).join('');
+        }
+      } catch(e) {}
+    }
+    loadHistory();
+  </script>
+</body>
+</html>
