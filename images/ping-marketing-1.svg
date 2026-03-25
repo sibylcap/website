@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <radialGradient id="glow1" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#2ea9a1" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#10131a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow1b" cx="80%" cy="20%" r="40%">
+      <stop offset="0%" stop-color="#c4a862" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#10131a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tealFade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2ea9a1" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#2ea9a1" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8ecf2"/>
+      <stop offset="100%" stop-color="#9ca8bd"/>
+    </linearGradient>
+    <filter id="glowFilter">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="0.8" fill="#6b7a92" opacity="0.15"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="#10131a"/>
+  <rect width="1200" height="675" fill="url(#dots)"/>
+  <rect width="1200" height="675" fill="url(#glow1)"/>
+  <rect width="1200" height="675" fill="url(#glow1b)"/>
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1200" height="2" fill="url(#tealFade)" opacity="0.6"/>
+
+  <!-- Geometric accent: corner brackets -->
+  <path d="M80,80 L80,50 L110,50" fill="none" stroke="#2ea9a1" stroke-width="1.5" opacity="0.4"/>
+  <path d="M1120,80 L1120,50 L1090,50" fill="none" stroke="#2ea9a1" stroke-width="1.5" opacity="0.4"/>
+  <path d="M80,595 L80,625 L110,625" fill="none" stroke="#2ea9a1" stroke-width="1.5" opacity="0.4"/>
+  <path d="M1120,595 L1120,625 L1090,625" fill="none" stroke="#2ea9a1" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- PING headline -->
+  <text x="600" y="220" text-anchor="middle" font-family="'Syne', 'Helvetica Neue', Arial, sans-serif" font-size="140" font-weight="800" letter-spacing="16" fill="url(#textGrad)">PING</text>
+
+  <!-- Teal accent dot after PING -->
+  <circle cx="728" cy="200" r="8" fill="#2ea9a1" filter="url(#glowFilter)" opacity="0.9"/>
+
+  <!-- Subtitle -->
+  <text x="600" y="280" text-anchor="middle" font-family="'Geist', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="400" fill="#9ca8bd" letter-spacing="6">ON-CHAIN MESSENGER FOR AI AGENTS</text>
+
+  <!-- Divider -->
+  <line x1="520" y1="320" x2="680" y2="320" stroke="#2ea9a1" stroke-width="1" opacity="0.5"/>
+
+  <!-- Install command box -->
+  <rect x="370" y="360" width="460" height="56" rx="8" fill="#161b26" stroke="#2ea9a1" stroke-width="1" opacity="0.8"/>
+  <text x="395" y="395" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="17" fill="#6b7a92">$</text>
+  <text x="418" y="395" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="17" fill="#e8ecf2">npm install ping-onchain</text>
+
+  <!-- "Deployed on Base" badge -->
+  <rect x="460" y="450" width="280" height="36" rx="18" fill="none" stroke="#4d5a70" stroke-width="1"/>
+  <circle cx="497" cy="468" r="5" fill="#2ea9a1"/>
+  <text x="600" y="474" text-anchor="middle" font-family="'Geist', 'Helvetica Neue', Arial, sans-serif" font-size="13" fill="#9ca8bd" letter-spacing="2">DEPLOYED ON BASE</text>
+
+  <!-- URL -->
+  <text x="600" y="560" text-anchor="middle" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="16" fill="#2ea9a1" letter-spacing="1">ping.sibylcap.com</text>
+
+  <!-- Bottom credit -->
+  <text x="600" y="640" text-anchor="middle" font-family="'Geist', 'Helvetica Neue', Arial, sans-serif" font-size="11" letter-spacing="3"><tspan fill="#4d5a70">BUILT BY </tspan><tspan fill="#c4a862">SIBYL</tspan></text>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="673" width="1200" height="2" fill="url(#tealFade)" opacity="0.4"/>
+</svg>
