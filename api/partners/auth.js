@@ -68,7 +68,7 @@ module.exports = async function handler(req, res) {
 
     return res.status(405).json({ error: 'method not allowed' });
   } catch (err) {
-    console.error('[partners/auth] error:', err.message);
-    return res.status(500).json({ error: 'internal error' });
+    console.error('[partners/auth] error:', err.message, err.stack);
+    return res.status(500).json({ error: 'internal error', detail: err.message });
   }
 };
