@@ -190,26 +190,19 @@
       overflow: hidden;
     }
 
-    /* ── Modal overlay ─────────────────────────────────────────── */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 200;
-      display: none;
-    }
-    .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; padding-top: 6vh; }
+    /* ── Floating task panels (no overlay) ────────────────────── */
     .modal-card {
+      position: fixed;
       background: var(--surface);
       border: 1px solid var(--border-strong);
       border-radius: 6px;
-      width: 520px;
+      width: 480px;
       max-width: 94vw;
-      max-height: 82vh;
+      max-height: 75vh;
       display: flex;
       flex-direction: column;
       box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      position: relative;
+      z-index: 200;
     }
     .modal-drag-handle {
       padding: 0.8rem 1rem 0.5rem;
@@ -713,15 +706,7 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-    <div class="modal-card" id="modalCard">
-      <div class="modal-drag-handle" id="modalDragHandle">
-        <div class="modal-title" id="modalTitle"></div>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      <div class="modal-body" id="modalBody"></div>
-    </div>
-  </div>
+  <div id="panelContainer"></div>
   <div class="toast" id="toast"></div>
 
   <script>
@@ -817,21 +802,54 @@
       return h;
     }
 
-    // ── Modal ───────────────────────────────────────────────────────
+    // ── Panels (multi-open, no overlay) ────────────────────────────
 
-    var currentModalTask = null;
+    var openPanels = {}; // taskId -> DOM element
+    var panelZIndex = 200;
+    var panelOffset = 0; // cascade offset
 
-    async function openModal(taskId) {
+    function openModal(taskId) {
+      // If already open, bring to front
+      if (openPanels[taskId]) {
+        bringToFront(openPanels[taskId]);
+        return;
+      }
+
       var t = allTasks.find(function(x) { return x.id === taskId; });
       if (!t) return;
-      currentModalTask = t;
 
-      document.getElementById('modalTitle').textContent = t.title;
+      var panel = document.createElement('div');
+      panel.className = 'modal-card';
+      panel.setAttribute('data-task-id', taskId);
 
-      var moves = MOVE_OPTIONS[t.status] || [];
-      var html = '';
+      // Cascade position
+      var baseTop = 60 + (panelOffset % 5) * 30;
+      var baseLeft = Math.min(window.innerWidth - 500, 200 + (panelOffset % 5) * 25);
+      panel.style.top = baseTop + 'px';
+      panel.style.left = baseLeft + 'px';
+      panelOffset++;
 
-      // Meta badges + status actions
+      panel.innerHTML = buildPanelHTML(t);
+      document.getElementById('panelContainer').appendChild(panel);
+      openPanels[taskId] = panel;
+      bringToFront(panel);
+      setupPanelDrag(panel);
+      loadPanelAttachments(taskId);
+
+      // Note input enter handler
+      var ni = panel.querySelector('.panel-note-input');
+      if (ni) ni.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); panelAddNote(taskId); }
+      });
+    }
+
+    function buildPanelHTML(t) {
+      var html = '<div class="modal-drag-handle" onmousedown="startPanelDrag(event,' + t.id + ')">';
+      html += '<div class="modal-title">' + esc(t.title) + '</div>';
+      html += '<button class="modal-close" onclick="closePanel(' + t.id + ')">&times;</button>';
+      html += '</div>';
+      html += '<div class="modal-body">';
+
       html += '<div class="modal-meta">';
       html += '<span class="modal-badge status-' + t.status + '">' + t.status.replace('_', ' ') + '</span>';
       html += '<span class="modal-badge owner-' + t.owner + '">' + t.owner + '</span>';
@@ -840,22 +858,19 @@
       html += '<div class="modal-actions">';
       COLUMNS.forEach(function(s) {
         var cls = s === t.status ? ' active' : '';
-        html += '<button class="modal-action-btn' + cls + '" onclick="modalMoveTask(' + t.id + ',\'' + s + '\')">' + COL_LABELS[s].toLowerCase() + '</button>';
+        html += '<button class="modal-action-btn' + cls + '" onclick="panelMoveTask(' + t.id + ',\'' + s + '\')">' + COL_LABELS[s].toLowerCase() + '</button>';
       });
       html += '</div>';
 
-      // Description
       if (t.description) {
         html += '<div class="modal-section-label">Description</div>';
         html += '<div class="modal-desc">' + esc(t.description) + '</div>';
       }
 
-      // Notes
       html += '<div class="modal-section-label">Notes</div>';
-      html += '<div class="modal-notes" id="modalNotes">';
+      html += '<div class="modal-notes">';
       if (t.notes) {
-        var noteEntries = t.notes.split('\n\n');
-        noteEntries.forEach(function(n) {
+        t.notes.split('\n\n').forEach(function(n) {
           if (n.trim()) html += '<div class="modal-note">' + esc(n.trim()) + '</div>';
         });
       } else {
@@ -863,70 +878,90 @@
       }
       html += '</div>';
       html += '<div class="modal-note-input">';
-      html += '<textarea id="modalNoteInput" placeholder="add a note..." rows="2"></textarea>';
-      html += '<button class="modal-note-btn" onclick="modalAddNote(' + t.id + ')">add</button>';
+      html += '<textarea class="panel-note-input" data-task="' + t.id + '" placeholder="add a note..." rows="2"></textarea>';
+      html += '<button class="modal-note-btn" onclick="panelAddNote(' + t.id + ')">add</button>';
       html += '</div>';
 
-      // Files
       html += '<div class="modal-section-label">Files</div>';
-      html += '<div class="modal-files" id="modalFiles"><div style="color:var(--text-muted);font-size:0.65rem;">loading...</div></div>';
-      html += '<div class="modal-upload-zone" id="modalUpload" onclick="document.getElementById(\'fileInput\').click()" ondragover="event.preventDefault();this.classList.add(\'drag-active\')" ondragleave="this.classList.remove(\'drag-active\')" ondrop="handleFileDrop(event,' + t.id + ')">';
+      html += '<div class="modal-files" id="files-' + t.id + '"><div style="color:var(--text-muted);font-size:0.65rem;">loading...</div></div>';
+      html += '<div class="modal-upload-zone" onclick="this.querySelector(\'input\').click()" ondragover="event.preventDefault();this.classList.add(\'drag-active\')" ondragleave="this.classList.remove(\'drag-active\')" ondrop="handleFileDrop(event,' + t.id + ')">';
       html += 'drop a file here or click to upload (max 5MB)';
-      html += '<input type="file" id="fileInput" onchange="handleFileSelect(event,' + t.id + ')">';
+      html += '<input type="file" onchange="handleFileSelect(event,' + t.id + ')">';
       html += '</div>';
 
-      document.getElementById('modalBody').innerHTML = html;
-      document.getElementById('modalOverlay').classList.add('open');
-
-      // Focus note input
-      var ni = document.getElementById('modalNoteInput');
-      if (ni) ni.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); modalAddNote(t.id); }
-      });
-
-      // Load attachments
-      loadAttachments(t.id);
+      html += '</div>';
+      return html;
     }
 
-    function closeModal() {
-      document.getElementById('modalOverlay').classList.remove('open');
-      currentModalTask = null;
+    function closePanel(taskId) {
+      var panel = openPanels[taskId];
+      if (panel) { panel.remove(); delete openPanels[taskId]; }
     }
 
-    // Close on Escape
+    function bringToFront(panel) {
+      panelZIndex++;
+      panel.style.zIndex = panelZIndex;
+    }
+
+    // Close topmost panel on Escape
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && currentModalTask) closeModal();
+      if (e.key === 'Escape') {
+        var ids = Object.keys(openPanels);
+        if (ids.length === 0) return;
+        // Find the one with highest z-index
+        var topId = ids.reduce(function(a, b) {
+          return (parseInt(openPanels[a].style.zIndex) || 0) > (parseInt(openPanels[b].style.zIndex) || 0) ? a : b;
+        });
+        closePanel(parseInt(topId));
+      }
     });
 
-    async function modalMoveTask(id, status) {
-      await apiFetch('/tasks?id=' + id + '&action=status', {
-        method: 'PATCH',
-        body: JSON.stringify({ status: status }),
-      });
+    async function panelMoveTask(id, status) {
+      await apiFetch('/tasks?id=' + id + '&action=status', { method: 'PATCH', body: JSON.stringify({ status: status }) });
       toast(status.replace('_', ' '));
-      closeModal();
-      loadBoard();
+      await loadBoard();
+      // Refresh panel content if still open
+      if (openPanels[id]) {
+        var t = allTasks.find(function(x) { return x.id === id; });
+        if (t) {
+          var panel = openPanels[id];
+          var pos = { top: panel.style.top, left: panel.style.left, z: panel.style.zIndex };
+          panel.innerHTML = buildPanelHTML(t);
+          panel.style.top = pos.top; panel.style.left = pos.left; panel.style.zIndex = pos.z;
+          setupPanelDrag(panel);
+          loadPanelAttachments(id);
+        }
+      }
     }
 
-    async function modalAddNote(id) {
-      var input = document.getElementById('modalNoteInput');
+    async function panelAddNote(id) {
+      var panel = openPanels[id];
+      if (!panel) return;
+      var input = panel.querySelector('.panel-note-input');
       var note = input && input.value.trim();
       if (!note) return;
       input.value = '';
-      await apiFetch('/tasks?id=' + id + '&action=notes', {
-        method: 'PATCH',
-        body: JSON.stringify({ note: note }),
-      });
+      await apiFetch('/tasks?id=' + id + '&action=notes', { method: 'PATCH', body: JSON.stringify({ note: note }) });
       toast('note added');
-      // Refresh task data and reopen modal
       await loadBoard();
-      openModal(id);
+      // Refresh panel
+      if (openPanels[id]) {
+        var t = allTasks.find(function(x) { return x.id === id; });
+        if (t) {
+          var pos = { top: panel.style.top, left: panel.style.left, z: panel.style.zIndex };
+          panel.innerHTML = buildPanelHTML(t);
+          panel.style.top = pos.top; panel.style.left = pos.left; panel.style.zIndex = pos.z;
+          setupPanelDrag(panel);
+          loadPanelAttachments(id);
+        }
+      }
     }
 
     // Attachments
-    async function loadAttachments(taskId) {
+    async function loadPanelAttachments(taskId) {
       var data = await apiFetch('/attachments?task_id=' + taskId);
-      var el = document.getElementById('modalFiles');
+      var el = document.getElementById('files-' + taskId);
+      if (!el) return;
       if (!data || !data.attachments || data.attachments.length === 0) {
         el.innerHTML = '<div style="color:var(--text-muted);font-size:0.65rem;">no files attached</div>';
         return;
@@ -937,7 +972,7 @@
           : a.size_bytes < 1048576 ? (a.size_bytes / 1024).toFixed(1) + ' KB'
           : (a.size_bytes / 1048576).toFixed(1) + ' MB';
         var icon = a.mime_type && a.mime_type.startsWith('image/') ? '\u{1f5bc}' : '\u{1f4c4}';
-        html += '<a class="modal-file" href="#" onclick="event.preventDefault();downloadFile(' + a.id + ',\'' + esc(a.filename) + '\',\'' + esc(a.mime_type || '') + '\')">';
+        html += '<a class="modal-file" href="#" onclick="event.preventDefault();downloadFile(' + a.id + ',\'' + esc(a.filename) + '\')">';
         html += '<span class="modal-file-icon">' + icon + '</span>';
         html += '<span class="modal-file-name">' + esc(a.filename) + '</span>';
         html += '<span class="modal-file-size">' + size + '</span>';
@@ -971,7 +1006,7 @@
         });
         if (res && res.attachment) {
           toast('file attached');
-          loadAttachments(taskId);
+          loadPanelAttachments(taskId);
         } else {
           toast('upload failed');
         }
@@ -979,7 +1014,7 @@
       reader.readAsDataURL(file);
     }
 
-    async function downloadFile(id, filename, mimeType) {
+    async function downloadFile(id, filename) {
       var res = await fetch(API + '/attachments?id=' + id + '&download=1', { headers: headers() });
       if (!res.ok) { toast('download failed'); return; }
       var blob = await res.blob();
@@ -991,30 +1026,29 @@
       URL.revokeObjectURL(url);
     }
 
-    // Draggable modal
-    (function() {
-      var handle = document.getElementById('modalDragHandle');
-      var card = document.getElementById('modalCard');
-      var dragging = false, startX, startY, origX, origY;
-      handle.addEventListener('mousedown', function(e) {
-        if (e.target.tagName === 'BUTTON') return;
-        dragging = true;
-        startX = e.clientX; startY = e.clientY;
-        var rect = card.getBoundingClientRect();
-        origX = rect.left; origY = rect.top;
-        card.style.position = 'fixed';
-        card.style.margin = '0';
-        card.style.left = origX + 'px';
-        card.style.top = origY + 'px';
-        e.preventDefault();
-      });
-      document.addEventListener('mousemove', function(e) {
-        if (!dragging) return;
-        card.style.left = (origX + e.clientX - startX) + 'px';
-        card.style.top = (origY + e.clientY - startY) + 'px';
-      });
-      document.addEventListener('mouseup', function() { dragging = false; });
-    })();
+    // Panel dragging
+    var activeDrag = null;
+
+    function setupPanelDrag(panel) {
+      panel.addEventListener('mousedown', function() { bringToFront(panel); });
+    }
+
+    function startPanelDrag(e, taskId) {
+      if (e.target.tagName === 'BUTTON') return;
+      var panel = openPanels[taskId];
+      if (!panel) return;
+      bringToFront(panel);
+      var rect = panel.getBoundingClientRect();
+      activeDrag = { panel: panel, startX: e.clientX, startY: e.clientY, origX: rect.left, origY: rect.top };
+      e.preventDefault();
+    }
+
+    document.addEventListener('mousemove', function(e) {
+      if (!activeDrag) return;
+      activeDrag.panel.style.left = (activeDrag.origX + e.clientX - activeDrag.startX) + 'px';
+      activeDrag.panel.style.top = (activeDrag.origY + e.clientY - activeDrag.startY) + 'px';
+    });
+    document.addEventListener('mouseup', function() { activeDrag = null; });
 
     async function moveTask(id, status) {
       await apiFetch('/tasks?id=' + id + '&action=status', {
