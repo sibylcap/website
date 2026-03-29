@@ -197,7 +197,7 @@
 
         if (!verifyRes.ok) {
           status.className = 'status-text error';
-          status.textContent = verifyData.error || 'verification failed';
+          status.textContent = (verifyData.detail || verifyData.error || 'verification failed');
           btn.disabled = false;
           btn.textContent = 'Connect Wallet';
           return;
