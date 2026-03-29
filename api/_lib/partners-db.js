@@ -61,6 +61,19 @@ async function ensureSchema() {
     )`;
 
   await sql`
+    CREATE TABLE IF NOT EXISTS partner_attachments (
+      id          SERIAL PRIMARY KEY,
+      task_id     INTEGER NOT NULL REFERENCES partner_tasks(id),
+      project_id  TEXT NOT NULL REFERENCES partner_projects(id),
+      filename    TEXT NOT NULL,
+      mime_type   TEXT,
+      size_bytes  INTEGER,
+      data        TEXT NOT NULL,
+      uploaded_by TEXT NOT NULL,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`;
+
+  await sql`
     CREATE TABLE IF NOT EXISTS partner_nonces (
       nonce       TEXT PRIMARY KEY,
       wallet      TEXT,
@@ -244,10 +257,34 @@ async function consumeNonce(nonce) {
   return rows[0];
 }
 
+// ── Attachments ────────────────────────────────────────────────────────────
+
+async function getAttachmentsByTask(taskId) {
+  await ensureSchema();
+  var { rows } = await sql`SELECT id, task_id, project_id, filename, mime_type, size_bytes, uploaded_by, created_at FROM partner_attachments WHERE task_id = ${taskId} ORDER BY created_at ASC`;
+  return rows;
+}
+
+async function createAttachment({ task_id, project_id, filename, mime_type, size_bytes, data, uploaded_by }) {
+  await ensureSchema();
+  var { rows } = await sql`
+    INSERT INTO partner_attachments (task_id, project_id, filename, mime_type, size_bytes, data, uploaded_by)
+    VALUES (${task_id}, ${project_id}, ${filename}, ${mime_type}, ${size_bytes}, ${data}, ${uploaded_by})
+    RETURNING id, task_id, project_id, filename, mime_type, size_bytes, uploaded_by, created_at`;
+  return rows[0];
+}
+
+async function getAttachmentById(id) {
+  await ensureSchema();
+  var { rows } = await sql`SELECT * FROM partner_attachments WHERE id = ${id} LIMIT 1`;
+  return rows[0] || null;
+}
+
 module.exports = {
   getProjectByWallet, getProjectById, getAllProjects, createProject,
   getSessionsByProject, getSessionById, createSession, updateSession,
   getTasksByProject, getTaskById, createTask, updateTaskStatus, updateTaskNotes, adminUpdateTask, getTaskCountsByProject,
   getMessages, createMessage,
+  getAttachmentsByTask, createAttachment, getAttachmentById,
   createNonce, consumeNonce,
 };
