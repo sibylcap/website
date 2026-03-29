@@ -2,7 +2,11 @@
    Uses Vercel Postgres (auto-configured via POSTGRES_URL env var).
    Schema auto-creates on first call. */
 
-var { sql } = require('@vercel/postgres');
+var { createPool, sql: defaultSql } = require('@vercel/postgres');
+
+// Vercel Postgres store uses advisory_ prefix for env vars
+var pool = createPool({ connectionString: process.env.advisory_POSTGRES_URL || process.env.POSTGRES_URL });
+var sql = pool.sql.bind(pool);
 
 var _initialized = false;
 
