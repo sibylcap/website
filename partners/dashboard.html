@@ -39,6 +39,8 @@
       font-size: 0.8125rem;
       line-height: 1.6;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
     ::selection { background: var(--accent); color: var(--bg); }
 
@@ -47,9 +49,15 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 2rem;
+      padding: 0.8rem 1.5rem;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
+      flex-shrink: 0;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
     }
     .topbar-brand {
       font-family: var(--font-display);
@@ -58,256 +66,358 @@
       color: var(--gold);
       letter-spacing: 0.1em;
     }
-    .topbar-nav {
+    .project-name {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .topbar-right {
       display: flex;
-      gap: 1.5rem;
+      gap: 1rem;
       align-items: center;
     }
-    .topbar-nav a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.72rem;
-      letter-spacing: 0.05em;
-      transition: color 0.2s;
-    }
-    .topbar-nav a:hover, .topbar-nav a.active { color: var(--gold); }
     .topbar-wallet {
       color: var(--text-muted);
-      font-size: 0.68rem;
+      font-size: 0.65rem;
     }
     .logout-btn {
       background: none;
       border: 1px solid var(--border-strong);
       color: var(--text-muted);
       font-family: var(--font-mono);
-      font-size: 0.65rem;
-      padding: 0.3rem 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .logout-btn:hover { border-color: var(--negative); color: var(--negative); }
-
-    /* Content */
-    .content { max-width: 900px; margin: 0 auto; padding: 2rem; }
-
-    /* Project card */
-    .project-card {
-      background: var(--elevated);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--gold);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .project-name {
-      font-family: var(--font-display);
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    .project-meta {
-      display: flex;
-      gap: 2rem;
-      margin-top: 0.8rem;
-      font-size: 0.72rem;
-    }
-    .project-meta .label { color: var(--text-muted); }
-    .project-meta .value { color: var(--text-secondary); }
-
-    /* Stats row */
-    .stats-row {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    .stat-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 1rem;
-      flex: 1;
-      text-align: center;
-    }
-    .stat-number {
-      font-size: 1.4rem;
-      font-weight: 600;
-      font-family: var(--font-display);
-    }
-    .stat-number.pending { color: var(--text-secondary); }
-    .stat-number.in-progress { color: var(--warning); }
-    .stat-number.completed { color: var(--positive); }
-    .stat-number.blocked { color: var(--negative); }
-    .stat-label {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-top: 0.3rem;
-    }
-
-    /* Sessions */
-    .section-title {
-      font-family: var(--font-display);
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      margin-bottom: 1rem;
-    }
-    .session-block {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      margin-bottom: 1rem;
-    }
-    .session-header {
-      padding: 1rem;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.2s;
-    }
-    .session-header:hover { background: var(--elevated); }
-    .session-title {
-      font-size: 0.8rem;
-      color: var(--text-primary);
-    }
-    .session-status {
-      font-size: 0.65rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 2px;
-    }
-    .session-status.open { background: var(--warning); color: var(--bg); }
-    .session-status.closed { background: var(--text-muted); color: var(--bg); }
-    .session-body {
-      display: none;
-      padding: 0 1rem 1rem;
-      border-top: 1px solid var(--border);
-    }
-    .session-body.expanded { display: block; }
-    .session-summary {
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      margin: 0.8rem 0;
-      padding: 0.8rem;
-      background: var(--elevated);
-      border-left: 2px solid var(--accent);
-    }
-
-    /* Tasks */
-    .task-card {
-      background: var(--elevated);
-      border: 1px solid var(--border);
-      padding: 1rem;
-      margin-top: 0.8rem;
-    }
-    .task-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-    .task-title {
-      font-size: 0.8rem;
-      color: var(--text-primary);
-      flex: 1;
-    }
-    .task-badges {
-      display: flex;
-      gap: 0.5rem;
-      flex-shrink: 0;
-    }
-    .badge {
-      font-size: 0.6rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 2px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .badge.status-pending { background: var(--highest); color: var(--text-secondary); }
-    .badge.status-in_progress { background: #3d3520; color: var(--warning); }
-    .badge.status-completed { background: #1a2e22; color: var(--positive); }
-    .badge.status-blocked { background: #2e1a1a; color: var(--negative); }
-    .badge.owner-sibyl { background: #1a2030; color: var(--accent); }
-    .badge.owner-founder { background: #2a2518; color: var(--gold); }
-    .task-description {
-      color: var(--text-secondary);
-      font-size: 0.72rem;
-      margin-top: 0.5rem;
-    }
-    .task-notes {
-      margin-top: 0.6rem;
-      padding: 0.6rem;
-      background: var(--surface);
-      border-left: 2px solid var(--text-muted);
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-      white-space: pre-wrap;
-    }
-    .task-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.8rem;
-      align-items: center;
-    }
-    .status-btn {
-      background: none;
-      border: 1px solid var(--border-strong);
-      color: var(--text-secondary);
-      font-family: var(--font-mono);
       font-size: 0.62rem;
       padding: 0.25rem 0.6rem;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .status-btn:hover { border-color: var(--gold); color: var(--gold); }
-    .status-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(181,160,112,0.1); }
-    .note-input {
+    .logout-btn:hover { border-color: var(--negative); color: var(--negative); }
+
+    /* Main layout: kanban + chat side by side on large screens */
+    .main-layout {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Kanban */
+    .kanban-container {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 1.2rem;
+      min-height: 0;
+    }
+    .kanban {
+      display: flex;
+      gap: 0.8rem;
+      height: 100%;
+      min-width: min-content;
+    }
+    .kanban-col {
+      width: 260px;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
       background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .col-header {
+      padding: 0.7rem 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .col-title {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .col-title.pending { color: var(--text-secondary); }
+    .col-title.in_progress { color: var(--warning); }
+    .col-title.completed { color: var(--positive); }
+    .col-title.blocked { color: var(--negative); }
+    .col-count {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      background: var(--elevated);
+      padding: 0.1rem 0.4rem;
+      border-radius: 2px;
+    }
+    .col-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .col-body::-webkit-scrollbar { width: 3px; }
+    .col-body::-webkit-scrollbar-track { background: transparent; }
+    .col-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+    /* Task card */
+    .task-card {
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.7rem;
+      cursor: grab;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .task-card:hover { border-color: var(--border-strong); }
+    .task-card.dragging { opacity: 0.5; transform: rotate(1deg); }
+    .task-card-title {
+      font-size: 0.75rem;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin-bottom: 0.3rem;
+    }
+    .task-card-desc {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .task-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+    .task-owner-badge {
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.1rem 0.35rem;
+      border-radius: 2px;
+    }
+    .owner-sibyl { background: #1a2030; color: var(--accent); }
+    .owner-founder { background: #2a2518; color: var(--gold); }
+    .owner-both { background: #1a2028; color: var(--text-secondary); }
+    .task-card-actions {
+      display: flex;
+      gap: 0.3rem;
+    }
+    .move-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.55rem;
+      padding: 0.1rem 0.3rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+      font-family: var(--font-mono);
+    }
+    .move-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Drop zone highlight */
+    .col-body.drag-over {
+      background: rgba(107, 139, 165, 0.04);
+      outline: 1px dashed var(--accent);
+      outline-offset: -2px;
+    }
+
+    /* Chat panel */
+    .chat-panel {
+      height: 280px;
+      min-height: 200px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .chat-header {
+      padding: 0.5rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .chat-resize {
+      cursor: ns-resize;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      user-select: none;
+    }
+    .chat-thread {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .chat-thread::-webkit-scrollbar { width: 3px; }
+    .chat-thread::-webkit-scrollbar-track { background: transparent; }
+    .chat-thread::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+    .chat-msg {
+      max-width: 70%;
+      padding: 0.5rem 0.7rem;
+      font-size: 0.72rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .chat-msg.sibyl {
+      align-self: flex-start;
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--accent);
+    }
+    .chat-msg.founder {
+      align-self: flex-end;
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-right: 2px solid var(--gold);
+    }
+    .chat-sender {
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.2rem;
+    }
+    .chat-time {
+      font-size: 0.52rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+    .chat-compose {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .chat-compose textarea {
+      flex: 1;
+      background: var(--elevated);
       border: 1px solid var(--border-strong);
       color: var(--text-primary);
       font-family: var(--font-mono);
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       padding: 0.4rem 0.6rem;
+      resize: none;
       outline: none;
+      min-height: 2rem;
+      max-height: 5rem;
     }
-    .note-input:focus { border-color: var(--accent); }
-    .note-submit {
-      background: var(--accent);
+    .chat-compose textarea:focus { border-color: var(--accent); }
+    .chat-compose textarea::placeholder { color: var(--text-muted); }
+    .chat-send {
+      background: var(--gold);
       border: none;
       color: var(--bg);
       font-family: var(--font-mono);
-      font-size: 0.62rem;
-      padding: 0.35rem 0.8rem;
+      font-size: 0.65rem;
+      font-weight: 500;
+      padding: 0.4rem 1rem;
       cursor: pointer;
+      align-self: flex-end;
+      transition: background 0.15s;
     }
-    .note-submit:hover { background: var(--accent-hover); }
+    .chat-send:hover { background: var(--gold-hover); }
+    .chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .empty-col {
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      text-align: center;
+      padding: 1.5rem 0.5rem;
+    }
+    .chat-empty {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 2rem;
+    }
 
     .loading { color: var(--text-muted); text-align: center; padding: 3rem; }
 
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--elevated);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+      font-size: 0.7rem;
+      padding: 0.4rem 1rem;
+      border-radius: 3px;
+      opacity: 0;
+      transition: all 0.2s;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 900px) {
+      .kanban-col { width: 220px; min-width: 220px; }
+      .chat-msg { max-width: 85%; }
+    }
     @media (max-width: 600px) {
-      .content { padding: 1rem; }
-      .stats-row { flex-wrap: wrap; }
-      .stat-box { min-width: 45%; }
-      .topbar { padding: 0.8rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
-      .project-meta { flex-wrap: wrap; gap: 1rem; }
+      .topbar { padding: 0.6rem 0.8rem; flex-wrap: wrap; gap: 0.5rem; }
+      .kanban-container { padding: 0.8rem; }
+      .kanban-col { width: 200px; min-width: 200px; }
+      .chat-panel { height: 240px; }
     }
   </style>
 </head>
 <body>
   <div class="topbar">
-    <span class="topbar-brand">SIBYL</span>
-    <div class="topbar-nav">
-      <a href="/dashboard" class="active">Dashboard</a>
-      <a href="/messages">Messages</a>
+    <div class="topbar-left">
+      <span class="topbar-brand">SIBYL</span>
+      <span class="project-name" id="projectName"></span>
+    </div>
+    <div class="topbar-right">
       <span class="topbar-wallet" id="walletDisplay"></span>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="logout()">logout</button>
     </div>
   </div>
 
-  <div class="content" id="main">
-    <div class="loading">loading...</div>
+  <div class="main-layout" id="main">
+    <div class="kanban-container">
+      <div class="kanban" id="kanban">
+        <div class="loading">loading...</div>
+      </div>
+    </div>
+    <div class="chat-panel">
+      <div class="chat-header">
+        <span>Messages</span>
+      </div>
+      <div class="chat-thread" id="chatThread">
+        <div class="chat-empty">loading...</div>
+      </div>
+      <div class="chat-compose">
+        <textarea id="chatInput" placeholder="message sibyl..." rows="1"></textarea>
+        <button class="chat-send" id="chatSend" onclick="sendMessage()">send</button>
+      </div>
+    </div>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <script>
     var API = '/api/partners';
@@ -315,24 +425,43 @@
     var isSubdomain = window.location.host.startsWith('partners.');
     if (!token) window.location.href = isSubdomain ? '/' : '/partners';
 
+    var COLUMNS = ['pending', 'in_progress', 'completed', 'blocked'];
+    var COL_LABELS = { pending: 'Pending', in_progress: 'In Progress', completed: 'Completed', blocked: 'Blocked' };
+    var MOVE_OPTIONS = {
+      pending: [['in_progress', 'start'], ['blocked', 'block']],
+      in_progress: [['completed', 'done'], ['blocked', 'block']],
+      completed: [['in_progress', 'reopen']],
+      blocked: [['in_progress', 'unblock']],
+    };
+
+    var draggedTaskId = null;
+
     function headers() {
       return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
     }
-
     function logout() {
       localStorage.removeItem('sibyl_partner_token');
       window.location.href = isSubdomain ? '/' : '/partners';
     }
-
     async function apiFetch(path, opts) {
       var res = await fetch(API + path, Object.assign({ headers: headers() }, opts || {}));
       if (res.status === 401) { logout(); return null; }
       return res.json();
     }
+    function toast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(function() { el.classList.remove('show'); }, 2000);
+    }
+    function esc(s) {
+      if (!s) return '';
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
-    function statusLabel(s) { return s.replace('_', ' '); }
+    // ── Kanban ──────────────────────────────────────────────────────
 
-    async function loadDashboard() {
+    async function loadBoard() {
       var [projData, taskData] = await Promise.all([
         apiFetch('/project'),
         apiFetch('/tasks'),
@@ -340,127 +469,134 @@
       if (!projData || !taskData) return;
 
       var p = projData.project;
-      var sessions = projData.sessions;
-      var counts = projData.taskCounts;
-      var tasks = taskData.tasks;
-
+      document.getElementById('projectName').textContent = p.name;
       document.getElementById('walletDisplay').textContent = p.wallet.slice(0, 6) + '...' + p.wallet.slice(-4);
 
+      var tasks = taskData.tasks;
+      var grouped = {};
+      COLUMNS.forEach(function(c) { grouped[c] = []; });
+      tasks.forEach(function(t) { if (grouped[t.status]) grouped[t.status].push(t); });
+
+      var kanban = document.getElementById('kanban');
       var html = '';
-
-      // Project card
-      html += '<div class="project-card">';
-      html += '<div class="project-name">' + esc(p.name) + '</div>';
-      html += '<div class="project-meta">';
-      if (p.conviction) html += '<div><span class="label">conviction: </span><span class="value">' + esc(p.conviction) + '</span></div>';
-      if (p.score) html += '<div><span class="label">score: </span><span class="value">' + esc(p.score) + '</span></div>';
-      html += '<div><span class="label">status: </span><span class="value">' + esc(p.status) + '</span></div>';
-      if (p.token_ca) html += '<div><span class="label">token: </span><span class="value">' + p.token_ca.slice(0, 8) + '...' + '</span></div>';
-      html += '</div></div>';
-
-      // Stats
-      html += '<div class="stats-row">';
-      html += statBox(counts.pending, 'pending', 'pending');
-      html += statBox(counts.in_progress, 'in progress', 'in-progress');
-      html += statBox(counts.completed, 'completed', 'completed');
-      html += statBox(counts.blocked, 'blocked', 'blocked');
-      html += '</div>';
-
-      // Sessions
-      html += '<div class="section-title">Advisory Sessions</div>';
-      if (sessions.length === 0) {
-        html += '<div style="color:var(--text-muted);font-size:0.75rem;">no sessions yet. SIBYL will create your first advisory session soon.</div>';
-      }
-      for (var i = 0; i < sessions.length; i++) {
-        var s = sessions[i];
-        var sessionTasks = tasks.filter(function(t) { return t.session_id === s.id; });
-        html += '<div class="session-block">';
-        html += '<div class="session-header" onclick="toggleSession(' + s.id + ')">';
-        html += '<span class="session-title">' + esc(s.title) + '</span>';
-        html += '<span class="session-status ' + s.status + '">' + s.status + '</span>';
-        html += '</div>';
-        html += '<div class="session-body" id="session-' + s.id + '">';
-        if (s.summary) html += '<div class="session-summary">' + esc(s.summary) + '</div>';
-        for (var j = 0; j < sessionTasks.length; j++) {
-          html += renderTask(sessionTasks[j]);
+      COLUMNS.forEach(function(col) {
+        var items = grouped[col];
+        html += '<div class="kanban-col">';
+        html += '<div class="col-header"><span class="col-title ' + col + '">' + COL_LABELS[col] + '</span><span class="col-count">' + items.length + '</span></div>';
+        html += '<div class="col-body" data-status="' + col + '" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">';
+        if (items.length === 0) {
+          html += '<div class="empty-col">no tasks</div>';
         }
-        if (sessionTasks.length === 0) {
-          html += '<div style="color:var(--text-muted);font-size:0.72rem;margin-top:0.8rem;">no tasks in this session.</div>';
-        }
+        items.forEach(function(t) {
+          html += renderCard(t);
+        });
         html += '</div></div>';
-      }
-
-      document.getElementById('main').innerHTML = html;
-
-      // Auto-expand first open session
-      for (var k = 0; k < sessions.length; k++) {
-        if (sessions[k].status === 'open') {
-          toggleSession(sessions[k].id);
-          break;
-        }
-      }
+      });
+      kanban.innerHTML = html;
     }
 
-    function statBox(num, label, cls) {
-      return '<div class="stat-box"><div class="stat-number ' + cls + '">' + num + '</div><div class="stat-label">' + label + '</div></div>';
-    }
-
-    function renderTask(t) {
-      var h = '<div class="task-card" id="task-' + t.id + '">';
-      h += '<div class="task-top">';
-      h += '<div class="task-title">' + esc(t.title) + '</div>';
-      h += '<div class="task-badges">';
-      h += '<span class="badge owner-' + t.owner + '">' + t.owner + '</span>';
-      h += '<span class="badge status-' + t.status + '">' + statusLabel(t.status) + '</span>';
-      h += '</div></div>';
-      if (t.description) h += '<div class="task-description">' + esc(t.description) + '</div>';
-      if (t.notes) h += '<div class="task-notes">' + esc(t.notes) + '</div>';
-      h += '<div class="task-actions">';
-      h += statusBtn(t.id, 'pending', t.status);
-      h += statusBtn(t.id, 'in_progress', t.status);
-      h += statusBtn(t.id, 'completed', t.status);
-      h += statusBtn(t.id, 'blocked', t.status);
-      h += '<input class="note-input" id="note-input-' + t.id + '" placeholder="add a note...">';
-      h += '<button class="note-submit" onclick="addNote(' + t.id + ')">add</button>';
-      h += '</div></div>';
+    function renderCard(t) {
+      var moves = MOVE_OPTIONS[t.status] || [];
+      var h = '<div class="task-card" draggable="true" data-id="' + t.id + '" ondragstart="onDragStart(event)" ondragend="onDragEnd(event)">';
+      h += '<div class="task-card-title">' + esc(t.title) + '</div>';
+      if (t.description) h += '<div class="task-card-desc">' + esc(t.description) + '</div>';
+      h += '<div class="task-card-footer">';
+      h += '<span class="task-owner-badge owner-' + t.owner + '">' + t.owner + '</span>';
+      h += '<div class="task-card-actions">';
+      moves.forEach(function(m) {
+        h += '<button class="move-btn" onclick="event.stopPropagation();moveTask(' + t.id + ',\'' + m[0] + '\')">' + m[1] + '</button>';
+      });
+      h += '</div></div></div>';
       return h;
     }
 
-    function statusBtn(taskId, status, current) {
-      var cls = status === current ? ' active' : '';
-      return '<button class="status-btn' + cls + '" onclick="setStatus(' + taskId + ',\'' + status + '\')">' + statusLabel(status) + '</button>';
-    }
-
-    function toggleSession(id) {
-      var el = document.getElementById('session-' + id);
-      if (el) el.classList.toggle('expanded');
-    }
-
-    async function setStatus(taskId, status) {
-      await apiFetch('/tasks?id=' + taskId + '&action=status', {
+    async function moveTask(id, status) {
+      await apiFetch('/tasks?id=' + id + '&action=status', {
         method: 'PATCH',
         body: JSON.stringify({ status: status }),
       });
-      loadDashboard();
+      toast(status.replace('_', ' '));
+      loadBoard();
     }
 
-    async function addNote(taskId) {
-      var input = document.getElementById('note-input-' + taskId);
-      var note = input.value.trim();
-      if (!note) return;
-      await apiFetch('/tasks?id=' + taskId + '&action=notes', {
-        method: 'PATCH',
-        body: JSON.stringify({ note: note }),
+    // Drag and drop
+    function onDragStart(e) {
+      draggedTaskId = e.target.getAttribute('data-id');
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+    function onDragEnd(e) {
+      e.target.classList.remove('dragging');
+      draggedTaskId = null;
+      document.querySelectorAll('.col-body').forEach(function(el) { el.classList.remove('drag-over'); });
+    }
+    function onDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      e.currentTarget.classList.add('drag-over');
+    }
+    function onDragLeave(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+    function onDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      var newStatus = e.currentTarget.getAttribute('data-status');
+      if (draggedTaskId && newStatus) {
+        moveTask(parseInt(draggedTaskId), newStatus);
+      }
+    }
+
+    // ── Chat ────────────────────────────────────────────────────────
+
+    async function loadMessages() {
+      var data = await apiFetch('/messages?limit=100');
+      if (!data) return;
+
+      var thread = document.getElementById('chatThread');
+      var messages = data.messages;
+
+      if (messages.length === 0) {
+        thread.innerHTML = '<div class="chat-empty">no messages yet</div>';
+        return;
+      }
+
+      var html = '';
+      messages.forEach(function(m) {
+        var isSibyl = m.sender === 'sibyl';
+        var cls = isSibyl ? 'sibyl' : 'founder';
+        var label = isSibyl ? 'SIBYL' : 'you';
+        var time = new Date(m.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        html += '<div class="chat-msg ' + cls + '">';
+        html += '<div class="chat-sender">' + label + '</div>';
+        html += esc(m.body);
+        html += '<div class="chat-time">' + time + '</div>';
+        html += '</div>';
       });
-      loadDashboard();
+      thread.innerHTML = html;
+      thread.scrollTop = thread.scrollHeight;
     }
 
-    function esc(s) {
-      if (!s) return '';
-      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    async function sendMessage() {
+      var input = document.getElementById('chatInput');
+      var btn = document.getElementById('chatSend');
+      var body = input.value.trim();
+      if (!body) return;
+      btn.disabled = true;
+      input.value = '';
+      await apiFetch('/messages', { method: 'POST', body: JSON.stringify({ body: body }) });
+      btn.disabled = false;
+      loadMessages();
     }
 
-    loadDashboard();
+    document.getElementById('chatInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+
+    // ── Init ────────────────────────────────────────────────────────
+
+    Promise.all([loadBoard(), loadMessages()]);
+    setInterval(loadMessages, 30000);
   </script>
 </body>
 </html>
