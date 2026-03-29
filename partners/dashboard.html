@@ -180,7 +180,7 @@
       line-height: 1.4;
       margin-bottom: 0.3rem;
     }
-    .task-card-desc {
+    .task-card-summary {
       font-size: 0.65rem;
       color: var(--text-muted);
       line-height: 1.5;
@@ -189,6 +189,70 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    .task-card.expanded .task-card-summary { display: none; }
+    .task-card-detail {
+      display: none;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .task-card.expanded .task-card-detail { display: block; }
+    .task-card.expanded { cursor: default; }
+    .task-detail-desc {
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+    .task-notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .task-note {
+      font-size: 0.62rem;
+      color: var(--text-secondary);
+      padding: 0.35rem 0.5rem;
+      background: var(--surface);
+      border-left: 2px solid var(--border-strong);
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .task-note-time {
+      font-size: 0.52rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+    .task-note-input {
+      display: flex;
+      gap: 0.3rem;
+      margin-top: 0.4rem;
+    }
+    .task-note-input input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.3rem 0.5rem;
+      outline: none;
+      min-width: 0;
+    }
+    .task-note-input input:focus { border-color: var(--accent); }
+    .task-note-input input::placeholder { color: var(--text-muted); }
+    .note-add-btn {
+      background: var(--accent);
+      border: none;
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .note-add-btn:hover { background: var(--accent-hover); }
     .task-card-footer {
       display: flex;
       justify-content: space-between;
@@ -594,11 +658,36 @@
       kanban.innerHTML = html;
     }
 
+    var expandedCards = {};
+
     function renderCard(t) {
       var moves = MOVE_OPTIONS[t.status] || [];
-      var h = '<div class="task-card" draggable="true" data-id="' + t.id + '" ondragstart="onDragStart(event)" ondragend="onDragEnd(event)">';
+      var isExpanded = expandedCards[t.id];
+      var h = '<div class="task-card' + (isExpanded ? ' expanded' : '') + '" draggable="' + (isExpanded ? 'false' : 'true') + '" data-id="' + t.id + '" ondragstart="onDragStart(event)" ondragend="onDragEnd(event)" onclick="toggleCard(' + t.id + ', event)">';
       h += '<div class="task-card-title">' + esc(t.title) + '</div>';
-      if (t.description) h += '<div class="task-card-desc">' + esc(t.description) + '</div>';
+      if (t.description) h += '<div class="task-card-summary">' + esc(t.description) + '</div>';
+
+      // Expanded detail section
+      h += '<div class="task-card-detail" onclick="event.stopPropagation()">';
+      if (t.description) h += '<div class="task-detail-desc">' + esc(t.description) + '</div>';
+
+      // Notes list
+      if (t.notes) {
+        h += '<div class="task-notes-list">';
+        var noteEntries = t.notes.split('\n\n');
+        noteEntries.forEach(function(n) {
+          if (n.trim()) h += '<div class="task-note">' + esc(n.trim()) + '</div>';
+        });
+        h += '</div>';
+      }
+
+      // Note input
+      h += '<div class="task-note-input">';
+      h += '<input type="text" id="note-' + t.id + '" placeholder="add a note..." onkeydown="if(event.key===\'Enter\')addNote(' + t.id + ')">';
+      h += '<button class="note-add-btn" onclick="addNote(' + t.id + ')">add</button>';
+      h += '</div>';
+      h += '</div>';
+
       h += '<div class="task-card-footer">';
       h += '<span class="task-owner-badge owner-' + t.owner + '">' + t.owner + '</span>';
       h += '<div class="task-card-actions">';
@@ -607,6 +696,24 @@
       });
       h += '</div></div></div>';
       return h;
+    }
+
+    function toggleCard(id, e) {
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+      expandedCards[id] = !expandedCards[id];
+      loadBoard();
+    }
+
+    async function addNote(id) {
+      var input = document.getElementById('note-' + id);
+      var note = input && input.value.trim();
+      if (!note) return;
+      await apiFetch('/tasks?id=' + id + '&action=notes', {
+        method: 'PATCH',
+        body: JSON.stringify({ note: note }),
+      });
+      toast('note added');
+      loadBoard();
     }
 
     async function moveTask(id, status) {
