@@ -2,6 +2,7 @@
 
 var { SiweMessage } = require('siwe');
 var jwt = require('jsonwebtoken');
+var { ethers } = require('ethers');
 
 var JWT_SECRET = process.env.ADVISORY_JWT_SECRET || 'dev-secret-change-me';
 var JWT_EXPIRY = '24h';
@@ -19,13 +20,35 @@ function verifyToken(token) {
 }
 
 async function verifySiwe(message, signature) {
-  var siweMessage = new SiweMessage(message);
-  var result = await siweMessage.verify({ signature: signature });
-  if (!result.success) return null;
-  return {
-    address: siweMessage.address.toLowerCase(),
-    nonce: siweMessage.nonce,
-  };
+  // Try standard SIWE parser first
+  try {
+    var siweMessage = new SiweMessage(message);
+    var result = await siweMessage.verify({ signature: signature });
+    if (!result.success) return null;
+    return {
+      address: siweMessage.address.toLowerCase(),
+      nonce: siweMessage.nonce,
+    };
+  } catch (e) {
+    // Fallback: manually parse EIP-4361 message and verify signature
+    try {
+      var recovered = ethers.verifyMessage(message, signature);
+      // Extract address and nonce from message text
+      var lines = message.split('\n');
+      var address = null;
+      var nonce = null;
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        if (/^0x[a-fA-F0-9]{40}$/.test(line)) address = line;
+        if (line.startsWith('Nonce: ')) nonce = line.slice(7).trim();
+      }
+      if (!address || !nonce) return null;
+      if (recovered.toLowerCase() !== address.toLowerCase()) return null;
+      return { address: address.toLowerCase(), nonce: nonce };
+    } catch (e2) {
+      return null;
+    }
+  }
 }
 
 // Middleware-style: extracts user from Authorization header
