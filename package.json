@@ -3,6 +3,7 @@
   "dependencies": {
     "@vercel/postgres": "^0.10.0",
     "siwe": "^2.3.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "ethers": "^6.13.5"
   }
 }
