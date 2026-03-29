@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIBYL : Partner Dashboard</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:            #08090a;
+      --surface:       #0e1118;
+      --elevated:      #131620;
+      --highest:       #1a1e28;
+      --border:        #1a1e28;
+      --border-strong: #252a36;
+      --text-primary:  #c8ccd4;
+      --text-secondary:#8a919c;
+      --text-muted:    #555d6b;
+      --accent:        #6b8ba5;
+      --accent-hover:  #7d9ab2;
+      --gold:          #b5a070;
+      --gold-hover:    #c4af80;
+      --positive:      #5a8a6a;
+      --negative:      #b06868;
+      --warning:       #b5944a;
+      --font-display:  'Syne', 'Helvetica Neue', sans-serif;
+      --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    /* Top bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .topbar-brand {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+    .topbar-nav {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .topbar-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+    }
+    .topbar-nav a:hover, .topbar-nav a.active { color: var(--gold); }
+    .topbar-wallet {
+      color: var(--text-muted);
+      font-size: 0.68rem;
+    }
+    .logout-btn {
+      background: none;
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.3rem 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--negative); color: var(--negative); }
+
+    /* Content */
+    .content { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+    /* Project card */
+    .project-card {
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .project-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .project-meta {
+      display: flex;
+      gap: 2rem;
+      margin-top: 0.8rem;
+      font-size: 0.72rem;
+    }
+    .project-meta .label { color: var(--text-muted); }
+    .project-meta .value { color: var(--text-secondary); }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      flex: 1;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 1.4rem;
+      font-weight: 600;
+      font-family: var(--font-display);
+    }
+    .stat-number.pending { color: var(--text-secondary); }
+    .stat-number.in-progress { color: var(--warning); }
+    .stat-number.completed { color: var(--positive); }
+    .stat-number.blocked { color: var(--negative); }
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 0.3rem;
+    }
+
+    /* Sessions */
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+    }
+    .session-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .session-header {
+      padding: 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    .session-header:hover { background: var(--elevated); }
+    .session-title {
+      font-size: 0.8rem;
+      color: var(--text-primary);
+    }
+    .session-status {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+    }
+    .session-status.open { background: var(--warning); color: var(--bg); }
+    .session-status.closed { background: var(--text-muted); color: var(--bg); }
+    .session-body {
+      display: none;
+      padding: 0 1rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .session-body.expanded { display: block; }
+    .session-summary {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      margin: 0.8rem 0;
+      padding: 0.8rem;
+      background: var(--elevated);
+      border-left: 2px solid var(--accent);
+    }
+
+    /* Tasks */
+    .task-card {
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      margin-top: 0.8rem;
+    }
+    .task-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .task-title {
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .task-badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    .badge {
+      font-size: 0.6rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge.status-pending { background: var(--highest); color: var(--text-secondary); }
+    .badge.status-in_progress { background: #3d3520; color: var(--warning); }
+    .badge.status-completed { background: #1a2e22; color: var(--positive); }
+    .badge.status-blocked { background: #2e1a1a; color: var(--negative); }
+    .badge.owner-sibyl { background: #1a2030; color: var(--accent); }
+    .badge.owner-founder { background: #2a2518; color: var(--gold); }
+    .task-description {
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      margin-top: 0.5rem;
+    }
+    .task-notes {
+      margin-top: 0.6rem;
+      padding: 0.6rem;
+      background: var(--surface);
+      border-left: 2px solid var(--text-muted);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+    }
+    .task-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+      align-items: center;
+    }
+    .status-btn {
+      background: none;
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      padding: 0.25rem 0.6rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .status-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .status-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(181,160,112,0.1); }
+    .note-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 0.4rem 0.6rem;
+      outline: none;
+    }
+    .note-input:focus { border-color: var(--accent); }
+    .note-submit {
+      background: var(--accent);
+      border: none;
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      padding: 0.35rem 0.8rem;
+      cursor: pointer;
+    }
+    .note-submit:hover { background: var(--accent-hover); }
+
+    .loading { color: var(--text-muted); text-align: center; padding: 3rem; }
+
+    @media (max-width: 600px) {
+      .content { padding: 1rem; }
+      .stats-row { flex-wrap: wrap; }
+      .stat-box { min-width: 45%; }
+      .topbar { padding: 0.8rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
+      .project-meta { flex-wrap: wrap; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="topbar-brand">SIBYL</span>
+    <div class="topbar-nav">
+      <a href="/partners/dashboard" class="active">Dashboard</a>
+      <a href="/partners/messages">Messages</a>
+      <span class="topbar-wallet" id="walletDisplay"></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content" id="main">
+    <div class="loading">loading...</div>
+  </div>
+
+  <script>
+    var API = '/api/partners';
+    var token = localStorage.getItem('sibyl_partner_token');
+    if (!token) window.location.href = '/partners';
+
+    function headers() {
+      return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+    }
+
+    function logout() {
+      localStorage.removeItem('sibyl_partner_token');
+      window.location.href = '/partners';
+    }
+
+    async function apiFetch(path, opts) {
+      var res = await fetch(API + path, Object.assign({ headers: headers() }, opts || {}));
+      if (res.status === 401) { logout(); return null; }
+      return res.json();
+    }
+
+    function statusLabel(s) { return s.replace('_', ' '); }
+
+    async function loadDashboard() {
+      var [projData, taskData] = await Promise.all([
+        apiFetch('/project'),
+        apiFetch('/tasks'),
+      ]);
+      if (!projData || !taskData) return;
+
+      var p = projData.project;
+      var sessions = projData.sessions;
+      var counts = projData.taskCounts;
+      var tasks = taskData.tasks;
+
+      document.getElementById('walletDisplay').textContent = p.wallet.slice(0, 6) + '...' + p.wallet.slice(-4);
+
+      var html = '';
+
+      // Project card
+      html += '<div class="project-card">';
+      html += '<div class="project-name">' + esc(p.name) + '</div>';
+      html += '<div class="project-meta">';
+      if (p.conviction) html += '<div><span class="label">conviction: </span><span class="value">' + esc(p.conviction) + '</span></div>';
+      if (p.score) html += '<div><span class="label">score: </span><span class="value">' + esc(p.score) + '</span></div>';
+      html += '<div><span class="label">status: </span><span class="value">' + esc(p.status) + '</span></div>';
+      if (p.token_ca) html += '<div><span class="label">token: </span><span class="value">' + p.token_ca.slice(0, 8) + '...' + '</span></div>';
+      html += '</div></div>';
+
+      // Stats
+      html += '<div class="stats-row">';
+      html += statBox(counts.pending, 'pending', 'pending');
+      html += statBox(counts.in_progress, 'in progress', 'in-progress');
+      html += statBox(counts.completed, 'completed', 'completed');
+      html += statBox(counts.blocked, 'blocked', 'blocked');
+      html += '</div>';
+
+      // Sessions
+      html += '<div class="section-title">Advisory Sessions</div>';
+      if (sessions.length === 0) {
+        html += '<div style="color:var(--text-muted);font-size:0.75rem;">no sessions yet. SIBYL will create your first advisory session soon.</div>';
+      }
+      for (var i = 0; i < sessions.length; i++) {
+        var s = sessions[i];
+        var sessionTasks = tasks.filter(function(t) { return t.session_id === s.id; });
+        html += '<div class="session-block">';
+        html += '<div class="session-header" onclick="toggleSession(' + s.id + ')">';
+        html += '<span class="session-title">' + esc(s.title) + '</span>';
+        html += '<span class="session-status ' + s.status + '">' + s.status + '</span>';
+        html += '</div>';
+        html += '<div class="session-body" id="session-' + s.id + '">';
+        if (s.summary) html += '<div class="session-summary">' + esc(s.summary) + '</div>';
+        for (var j = 0; j < sessionTasks.length; j++) {
+          html += renderTask(sessionTasks[j]);
+        }
+        if (sessionTasks.length === 0) {
+          html += '<div style="color:var(--text-muted);font-size:0.72rem;margin-top:0.8rem;">no tasks in this session.</div>';
+        }
+        html += '</div></div>';
+      }
+
+      document.getElementById('main').innerHTML = html;
+
+      // Auto-expand first open session
+      for (var k = 0; k < sessions.length; k++) {
+        if (sessions[k].status === 'open') {
+          toggleSession(sessions[k].id);
+          break;
+        }
+      }
+    }
+
+    function statBox(num, label, cls) {
+      return '<div class="stat-box"><div class="stat-number ' + cls + '">' + num + '</div><div class="stat-label">' + label + '</div></div>';
+    }
+
+    function renderTask(t) {
+      var h = '<div class="task-card" id="task-' + t.id + '">';
+      h += '<div class="task-top">';
+      h += '<div class="task-title">' + esc(t.title) + '</div>';
+      h += '<div class="task-badges">';
+      h += '<span class="badge owner-' + t.owner + '">' + t.owner + '</span>';
+      h += '<span class="badge status-' + t.status + '">' + statusLabel(t.status) + '</span>';
+      h += '</div></div>';
+      if (t.description) h += '<div class="task-description">' + esc(t.description) + '</div>';
+      if (t.notes) h += '<div class="task-notes">' + esc(t.notes) + '</div>';
+      h += '<div class="task-actions">';
+      h += statusBtn(t.id, 'pending', t.status);
+      h += statusBtn(t.id, 'in_progress', t.status);
+      h += statusBtn(t.id, 'completed', t.status);
+      h += statusBtn(t.id, 'blocked', t.status);
+      h += '<input class="note-input" id="note-input-' + t.id + '" placeholder="add a note...">';
+      h += '<button class="note-submit" onclick="addNote(' + t.id + ')">add</button>';
+      h += '</div></div>';
+      return h;
+    }
+
+    function statusBtn(taskId, status, current) {
+      var cls = status === current ? ' active' : '';
+      return '<button class="status-btn' + cls + '" onclick="setStatus(' + taskId + ',\'' + status + '\')">' + statusLabel(status) + '</button>';
+    }
+
+    function toggleSession(id) {
+      var el = document.getElementById('session-' + id);
+      if (el) el.classList.toggle('expanded');
+    }
+
+    async function setStatus(taskId, status) {
+      await apiFetch('/tasks?id=' + taskId + '&action=status', {
+        method: 'PATCH',
+        body: JSON.stringify({ status: status }),
+      });
+      loadDashboard();
+    }
+
+    async function addNote(taskId) {
+      var input = document.getElementById('note-input-' + taskId);
+      var note = input.value.trim();
+      if (!note) return;
+      await apiFetch('/tasks?id=' + taskId + '&action=notes', {
+        method: 'PATCH',
+        body: JSON.stringify({ note: note }),
+      });
+      loadDashboard();
+    }
+
+    function esc(s) {
+      if (!s) return '';
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
