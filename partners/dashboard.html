@@ -298,8 +298,8 @@
   <div class="topbar">
     <span class="topbar-brand">SIBYL</span>
     <div class="topbar-nav">
-      <a href="/partners/dashboard" class="active">Dashboard</a>
-      <a href="/partners/messages">Messages</a>
+      <a href="/dashboard" class="active">Dashboard</a>
+      <a href="/messages">Messages</a>
       <span class="topbar-wallet" id="walletDisplay"></span>
       <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
@@ -312,7 +312,8 @@
   <script>
     var API = '/api/partners';
     var token = localStorage.getItem('sibyl_partner_token');
-    if (!token) window.location.href = '/partners';
+    var isSubdomain = window.location.host.startsWith('partners.');
+    if (!token) window.location.href = isSubdomain ? '/' : '/partners';
 
     function headers() {
       return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
@@ -320,7 +321,7 @@
 
     function logout() {
       localStorage.removeItem('sibyl_partner_token');
-      window.location.href = '/partners';
+      window.location.href = isSubdomain ? '/' : '/partners';
     }
 
     async function apiFetch(path, opts) {

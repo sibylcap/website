@@ -118,7 +118,10 @@
       if (token) {
         fetch(API + '/auth', { headers: { 'Authorization': 'Bearer ' + token } })
           .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
-          .then(function() { window.location.href = '/partners/dashboard'; })
+          .then(function() {
+            var isSubdomain = window.location.host.startsWith('partners.');
+            window.location.href = isSubdomain ? '/dashboard' : '/partners/dashboard';
+          })
           .catch(function() { localStorage.removeItem('sibyl_partner_token'); });
       }
     })();
@@ -202,7 +205,8 @@
 
         // Store token and redirect
         localStorage.setItem('sibyl_partner_token', verifyData.token);
-        window.location.href = '/partners/dashboard';
+        var isSubdomain = window.location.host.startsWith('partners.');
+        window.location.href = isSubdomain ? '/dashboard' : '/partners/dashboard';
 
       } catch (err) {
         status.className = 'status-text error';
