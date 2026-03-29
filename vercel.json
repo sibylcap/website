@@ -105,7 +105,11 @@
       ]
     }
   ],
-  "rewrites": [],
+  "rewrites": [
+    { "source": "/", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/index.html" },
+    { "source": "/dashboard", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/dashboard.html" },
+    { "source": "/messages", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/messages.html" }
+  ],
   "cleanUrls": true,
   "trailingSlash": false
 }
