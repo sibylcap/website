@@ -12,6 +12,21 @@ const blocked = new Map();
 export default function middleware(request) {
   const url = new URL(request.url);
   const path = url.pathname;
+  const host = request.headers.get('host') || '';
+
+  // Subdomain routing: partners.sibylcap.com -> /partners/*
+  if (host.startsWith('partners.')) {
+    if (!path.startsWith('/api/') && !path.startsWith('/partners/') && !path.startsWith('/images/')) {
+      const mapped = path === '/' ? '/partners/index.html'
+        : path === '/dashboard' ? '/partners/dashboard.html'
+        : path === '/messages' ? '/partners/messages.html'
+        : null;
+      if (mapped) {
+        const rewriteUrl = new URL(mapped, request.url);
+        return fetch(rewriteUrl, { headers: request.headers });
+      }
+    }
+  }
 
   // Static assets: skip rate limiting entirely
   if (
