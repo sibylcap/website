@@ -22,7 +22,7 @@
       ]
     },
     {
-      "source": "/images/_sp_terms\\.(pdf|svg)",
+      "source": "/images/_sp_9709968e2e12062a\\.(pdf|svg)",
       "headers": [
         {
           "key": "X-Frame-Options",
@@ -66,6 +66,19 @@
       ]
     },
     {
+      "source": "/files",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
       "source": "/claim",
       "headers": [
         {
@@ -77,9 +90,26 @@
           "value": "no-cache"
         }
       ]
+    },
+    {
+      "source": "/partners/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ],
-  "rewrites": [],
+  "rewrites": [
+    { "source": "/", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/index.html" },
+    { "source": "/dashboard", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/dashboard.html" },
+    { "source": "/messages", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/messages.html" }
+  ],
   "cleanUrls": true,
   "trailingSlash": false
 }

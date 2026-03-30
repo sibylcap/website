@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PING : Operator Dashboard</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* SIBYL design system vars (inline to avoid loading full style.css) */
+    :root {
+      --bg:            #08090a;
+      --surface:       #0e1118;
+      --elevated:      #131620;
+      --highest:       #1a1e28;
+      --border:        #1a1e28;
+      --border-strong: #252a36;
+      --text-primary:  #c8ccd4;
+      --text-secondary:#8a919c;
+      --text-muted:    #555d6b;
+      --accent:        #6b8ba5;
+      --accent-hover:  #7d9ab2;
+      --gold:          #b5a070;
+      --gold-hover:    #c4af80;
+      --violet:        #8878a8;
+      --positive:      #5a8a6a;
+      --negative:      #b06868;
+      --warning:       #b5944a;
+      --font-display:  'Syne', 'Helvetica Neue', sans-serif;
+      --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    /* Auth gate */
+    .auth-gate {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 1.5rem;
+    }
+    .auth-gate .auth-label {
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-family: var(--font-display);
+    }
+    .auth-input {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: 0.6rem 1rem;
+      width: 240px;
+      text-align: center;
+      letter-spacing: 0.1em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .auth-input:focus { border-color: var(--accent); }
+    .auth-input::placeholder { color: var(--text-muted); letter-spacing: 0.05em; }
+    .auth-error {
+      color: var(--negative);
+      font-size: 0.65rem;
+      height: 1rem;
+    }
+
+    /* Loading state */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+    }
+    .loading::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid var(--border-strong);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      margin-left: 0.75rem;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Dashboard layout */
+    .dashboard { display: none; max-width: 1080px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
+    .dashboard.active { display: block; }
+
+    /* Header */
+    .dash-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .dash-title {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .dash-title span { color: var(--gold); }
+    .dash-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .dash-refresh {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .refresh-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--positive);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 2.5rem;
+    }
+    .section-label {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-label::before {
+      content: '';
+      width: 6px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    /* Stat grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .stat-card {
+      background: var(--surface);
+      padding: 1rem 1.25rem;
+    }
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.35rem;
+    }
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-value.positive { color: var(--positive); }
+    .stat-value.negative { color: var(--negative); }
+    .stat-value.gold { color: var(--gold); }
+    .stat-sub {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+
+    /* Revenue bars */
+    .rev-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .rev-row:last-child { border-bottom: none; }
+    .rev-label {
+      width: 140px;
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+    .rev-bar-wrap {
+      flex: 1;
+      height: 20px;
+      background: var(--elevated);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+    .rev-bar {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+    .rev-bar.gross { background: var(--accent); }
+    .rev-bar.cost { background: var(--negative); }
+    .rev-bar.net { background: var(--positive); }
+    .rev-val {
+      width: 180px;
+      flex-shrink: 0;
+      text-align: right;
+      font-size: 0.75rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .rev-val .eth { color: var(--text-primary); }
+    .rev-val .usd { color: var(--text-muted); margin-left: 0.5rem; }
+
+    /* Fee info row */
+    .fee-row {
+      display: flex;
+      gap: 2rem;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+    .fee-item { color: var(--text-secondary); }
+    .fee-item strong { color: var(--text-primary); font-weight: 500; }
+
+    /* User list */
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.75rem;
+    }
+    .user-table th {
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border-strong);
+    }
+    .user-table td {
+      font-size: 0.75rem;
+      padding: 0.4rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .user-table tr:hover td { background: var(--elevated); }
+    .user-table .addr {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.4rem;
+      border-radius: 2px;
+      vertical-align: middle;
+    }
+    .badge.agent {
+      background: rgba(107, 139, 165, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(107, 139, 165, 0.25);
+    }
+    .badge.human {
+      background: rgba(181, 160, 112, 0.1);
+      color: var(--gold);
+      border: 1px solid rgba(181, 160, 112, 0.2);
+    }
+
+    /* Scrollable container for user list */
+    .user-scroll {
+      max-height: 320px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .user-scroll::-webkit-scrollbar { width: 4px; }
+    .user-scroll::-webkit-scrollbar-track { background: var(--surface); }
+    .user-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+    /* Error state */
+    .error-msg {
+      color: var(--negative);
+      font-size: 0.75rem;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .dashboard { padding: 1rem 1rem 3rem; }
+      .dash-header { flex-direction: column; gap: 0.5rem; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .rev-row { flex-wrap: wrap; }
+      .rev-label { width: 100%; }
+      .rev-val { width: 100%; text-align: left; margin-top: 0.25rem; }
+      .fee-row { flex-wrap: wrap; gap: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Auth gate -->
+  <div class="auth-gate" id="auth-gate">
+    <div class="auth-label">ping protocol</div>
+    <form id="auth-form" autocomplete="off">
+      <input type="password" class="auth-input" id="auth-input" placeholder="password" autofocus>
+    </form>
+    <div class="auth-error" id="auth-error"></div>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading" id="loading" style="display:none;">loading</div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <!-- Header -->
+    <header class="dash-header">
+      <div class="dash-title"><span>PING</span> PROTOCOL &nbsp;<a href="/ping-growth" style="font-size:0.55rem;color:var(--accent);text-decoration:none;letter-spacing:0.1em;vertical-align:middle;border:1px solid rgba(107,139,165,0.25);padding:0.15rem 0.5rem;border-radius:2px;">GROWTH PLAN</a></div>
+      <div class="dash-meta">
+        <span id="timestamp"></span>
+        <div class="dash-refresh">
+          <span class="refresh-dot"></span>
+          <span id="countdown"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Revenue -->
+    <div class="section">
+      <div class="section-label">Revenue</div>
+      <div id="revenue-bars"></div>
+      <div class="fee-row" id="fee-info"></div>
+    </div>
+
+    <!-- Messages -->
+    <div class="section">
+      <div class="section-label">Message Volume</div>
+      <div class="stat-grid" id="msg-stats"></div>
+    </div>
+
+    <!-- Users -->
+    <div class="section">
+      <div class="section-label">Users</div>
+      <div class="stat-grid" id="user-stats"></div>
+      <div class="user-scroll" id="user-list" style="margin-top:1rem;"></div>
+    </div>
+
+    <!-- Relay -->
+    <div class="section">
+      <div class="section-label">Relay (x402 On-Ramp)</div>
+      <div class="stat-grid" id="relay-stats"></div>
+    </div>
+
+    <!-- Unit Economics -->
+    <div class="section">
+      <div class="section-label">Unit Economics</div>
+      <div class="stat-grid" id="unit-stats"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var REFRESH_MS = 300000; // 5 minutes
+      var key = new URLSearchParams(window.location.search).get('key') || sessionStorage.getItem('dash_key') || '';
+      var authEl = document.getElementById('auth-gate');
+      var loadEl = document.getElementById('loading');
+      var dashEl = document.getElementById('dashboard');
+      var countdownEl = document.getElementById('countdown');
+      var authForm = document.getElementById('auth-form');
+      var authInput = document.getElementById('auth-input');
+      var authError = document.getElementById('auth-error');
+      var timer = null;
+      var nextRefresh = 0;
+
+      // Password form submit
+      authForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var val = authInput.value.trim();
+        if (!val) return;
+        key = val;
+        sessionStorage.setItem('dash_key', key);
+        authError.textContent = '';
+        authEl.style.display = 'none';
+        loadEl.style.display = 'flex';
+        fetchData();
+      });
+
+      // Auto-load if key from URL or session
+      if (key) {
+        sessionStorage.setItem('dash_key', key);
+        authEl.style.display = 'none';
+        loadEl.style.display = 'flex';
+        fetchData();
+      }
+
+      function fetchData() {
+        fetch('/api/ping-stats?key=' + encodeURIComponent(key))
+          .then(function (r) {
+            if (r.status === 401) {
+              loadEl.style.display = 'none';
+              dashEl.classList.remove('active');
+              authEl.style.display = 'flex';
+              authError.textContent = 'invalid key';
+              authInput.value = '';
+              authInput.focus();
+              sessionStorage.removeItem('dash_key');
+              return null;
+            }
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          })
+          .then(function (data) {
+            if (!data) return;
+            loadEl.style.display = 'none';
+            dashEl.classList.add('active');
+            render(data);
+            scheduleRefresh();
+          })
+          .catch(function (err) {
+            loadEl.style.display = 'none';
+            dashEl.classList.add('active');
+            dashEl.innerHTML = '<div class="error-msg">failed to load: ' + err.message + '</div>';
+          });
+      }
+
+      function scheduleRefresh() {
+        nextRefresh = Date.now() + REFRESH_MS;
+        if (timer) clearInterval(timer);
+        timer = setInterval(function () {
+          var remaining = Math.max(0, nextRefresh - Date.now());
+          if (remaining <= 0) {
+            fetchData();
+            return;
+          }
+          var mins = Math.floor(remaining / 60000);
+          var secs = Math.floor((remaining % 60000) / 1000);
+          countdownEl.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }, 1000);
+      }
+
+      function render(d) {
+        // Timestamp
+        var ts = new Date(d.timestamp);
+        document.getElementById('timestamp').textContent =
+          ts.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+
+        // Revenue bars
+        var maxEth = Math.max(d.revenue.gross_eth, 0.000001);
+        var revHtml = '';
+        revHtml += revRow('Gross fees', 'gross', d.revenue.gross_eth, d.revenue.gross_usd, maxEth);
+        revHtml += revRow('SIBYL costs', 'cost', d.revenue.sibyl_send_cost_eth + d.revenue.sibyl_broadcast_cost_eth, (d.revenue.sibyl_send_cost_eth + d.revenue.sibyl_broadcast_cost_eth) * d.eth_price, maxEth);
+        revHtml += revRow('Net revenue', 'net', d.revenue.net_eth, d.revenue.net_usd, maxEth);
+        document.getElementById('revenue-bars').innerHTML = revHtml;
+
+        // Fee info
+        document.getElementById('fee-info').innerHTML =
+          '<div class="fee-item">msg fee: <strong>' + d.fees.message_fee_eth + ' ETH</strong> ($' + d.fees.message_fee_usd + ')</div>' +
+          '<div class="fee-item">broadcast fee: <strong>' + d.fees.broadcast_fee_eth.toFixed(6) + ' ETH</strong> ($' + d.fees.broadcast_fee_usd + ')</div>' +
+          '<div class="fee-item">cost ratio: <strong>' + d.revenue.cost_ratio + '%</strong></div>' +
+          '<div class="fee-item">ETH: <strong>$' + d.eth_price.toLocaleString() + '</strong></div>';
+
+        // Message stats
+        document.getElementById('msg-stats').innerHTML =
+          statCard('Total msgs', d.messages.total) +
+          statCard('Inbound', d.messages.inbound_sibyl, 'to SIBYL') +
+          statCard('Outbound', d.messages.outbound_sibyl, 'from SIBYL') +
+          statCard('Broadcasts', d.messages.broadcasts) +
+          statCard('Unique senders', d.messages.unique_senders, 'to SIBYL');
+
+        // User stats
+        document.getElementById('user-stats').innerHTML =
+          statCard('Registered', d.users.total, '', 'gold') +
+          statCard('Agents', d.users.agents) +
+          statCard('Humans', d.users.humans) +
+          statCard('Agent ratio', d.users.total > 0 ? Math.round(d.users.agents / d.users.total * 100) + '%' : '0%');
+
+        // User directory
+        var tHtml = '<table class="user-table"><thead><tr><th>Username</th><th>Address</th><th>Type</th></tr></thead><tbody>';
+        for (var i = 0; i < d.users.directory.length; i++) {
+          var u = d.users.directory[i];
+          var badgeClass = u.is_agent ? 'agent' : 'human';
+          var badgeText = u.is_agent ? 'agent' : 'human';
+          tHtml += '<tr>';
+          tHtml += '<td>' + esc(u.username || '(unnamed)') + '</td>';
+          tHtml += '<td class="addr">' + u.address.slice(0, 6) + '...' + u.address.slice(-4) + '</td>';
+          tHtml += '<td><span class="badge ' + badgeClass + '">' + badgeText + '</span></td>';
+          tHtml += '</tr>';
+        }
+        tHtml += '</tbody></table>';
+        document.getElementById('user-list').innerHTML = tHtml;
+
+        // Relay stats
+        document.getElementById('relay-stats').innerHTML =
+          statCard('ETH', d.relay.eth.toFixed(4), '$' + d.relay.eth_usd) +
+          statCard('USDC', '$' + d.relay.usdc.toFixed(2));
+
+        // Unit economics
+        document.getElementById('unit-stats').innerHTML =
+          statCard('Rev / user', d.unit_economics.rev_per_user_eth.toFixed(6) + ' ETH', '$' + d.unit_economics.rev_per_user_usd) +
+          statCard('Net rev / user', d.unit_economics.net_rev_per_user_eth.toFixed(6) + ' ETH', '$' + d.unit_economics.net_rev_per_user_usd) +
+          statCard('Cost ratio', d.unit_economics.cost_ratio_pct + '%') +
+          statCard('Msgs / user', d.unit_economics.msgs_per_user);
+      }
+
+      function revRow(label, cls, eth, usd, max) {
+        var pct = max > 0 ? Math.min(100, (Math.abs(eth) / max) * 100) : 0;
+        return '<div class="rev-row">' +
+          '<div class="rev-label">' + label + '</div>' +
+          '<div class="rev-bar-wrap"><div class="rev-bar ' + cls + '" style="width:' + pct + '%"></div></div>' +
+          '<div class="rev-val"><span class="eth">' + eth.toFixed(6) + ' ETH</span><span class="usd">$' + usd.toFixed(2) + '</span></div>' +
+          '</div>';
+      }
+
+      function statCard(label, value, sub, cls) {
+        return '<div class="stat-card">' +
+          '<div class="stat-label">' + label + '</div>' +
+          '<div class="stat-value' + (cls ? ' ' + cls : '') + '">' + value + '</div>' +
+          (sub ? '<div class="stat-sub">' + sub + '</div>' : '') +
+          '</div>';
+      }
+
+      function esc(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+      }
+    })();
+  </script>
+</body>
+</html>

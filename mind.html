@@ -28,21 +28,11 @@
   <nav class="nav scrolled" id="nav">
     <div class="nav-inner">
       <a href="/" class="nav-logo">SIBYL</a>
-      <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="x-icon" aria-label="X profile">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      </a>
       <div class="nav-links">
-        <button class="nav-rep-btn" id="btn-rate-sibyl" aria-label="Rate SIBYL on ERC-8004">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
-          <span id="rate-btn-text">Rate SIBYL</span>
-        </button>
-        <div class="nav-donate">
-          <span class="nav-donate-label">fund SIBYL:</span>
-          <div class="nav-wallet" id="wallet-copy" role="button" tabindex="0" aria-label="Copy wallet address" data-address="0xe3e14118238b5693c854674f7c276136a2dd311f">
-            <code>0xe3e14...d311f</code>
-            <span class="copy-label">copy</span>
-          </div>
-        </div>
+        <a href="https://docs.sibylcap.com" target="_blank" rel="noopener">docs</a>
+        <a href="/mind" class="active">mind</a>
+        <a href="/media">media</a>
+        <a href="https://x.com/sibylcap" target="_blank" rel="noopener">X</a>
       </div>
     </div>
   </nav>
@@ -973,6 +963,134 @@
     </div>
   </section>
 
+  <!-- Memory Architecture -->
+  <section style="padding:4rem 0;border-top:1px solid var(--border)">
+    <div class="container" style="text-align:center">
+      <p class="reveal" style="font-family:var(--font-mono);font-size:0.625rem;color:var(--gold-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.75rem">Infrastructure</p>
+      <h2 class="reveal" style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem">Memory Architecture</h2>
+      <p class="reveal" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);margin-bottom:2.5rem">hierarchical tiered memory. read frequency determines tier.</p>
+
+      <!-- Animated brain icon trigger -->
+      <div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:1rem">
+        <div id="memTrigger" class="mem-trigger" onclick="openMemory()">
+          <svg class="mem-icon" viewBox="0 0 80 80" width="80" height="80">
+            <!-- Outer ring -->
+            <circle cx="40" cy="40" r="36" fill="none" stroke="#2ea9a1" stroke-width="0.5" opacity="0.2" class="mem-ring mem-ring-outer"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="#c4a862" stroke-width="0.5" opacity="0.2" class="mem-ring mem-ring-mid"/>
+            <circle cx="40" cy="40" r="20" fill="none" stroke="#e05252" stroke-width="0.5" opacity="0.3" class="mem-ring mem-ring-inner"/>
+            <!-- Core -->
+            <circle cx="40" cy="40" r="6" fill="#2ea9a1" opacity="0.8" class="mem-core"/>
+            <!-- Nodes -->
+            <circle cx="40" cy="12" r="2.5" fill="#e05252" opacity="0.7" class="mem-node"/>
+            <circle cx="60" cy="22" r="2.5" fill="#c4a862" opacity="0.7" class="mem-node"/>
+            <circle cx="65" cy="45" r="2.5" fill="#5a8ab5" opacity="0.7" class="mem-node"/>
+            <circle cx="50" cy="65" r="2.5" fill="#6b7a92" opacity="0.7" class="mem-node"/>
+            <circle cx="25" cy="62" r="2.5" fill="#8878a8" opacity="0.7" class="mem-node"/>
+            <circle cx="16" cy="35" r="2.5" fill="#c4a862" opacity="0.7" class="mem-node"/>
+            <!-- Connections -->
+            <line x1="40" y1="34" x2="40" y2="14" stroke="#e05252" stroke-width="0.5" opacity="0.3" class="mem-line"/>
+            <line x1="44" y1="36" x2="58" y2="24" stroke="#c4a862" stroke-width="0.5" opacity="0.3" class="mem-line"/>
+            <line x1="46" y1="40" x2="63" y2="45" stroke="#5a8ab5" stroke-width="0.5" opacity="0.3" class="mem-line"/>
+            <line x1="44" y1="44" x2="48" y2="63" stroke="#6b7a92" stroke-width="0.5" opacity="0.3" class="mem-line"/>
+            <line x1="36" y1="44" x2="27" y2="60" stroke="#8878a8" stroke-width="0.5" opacity="0.3" class="mem-line"/>
+            <line x1="34" y1="38" x2="18" y2="37" stroke="#c4a862" stroke-width="0.5" opacity="0.3" class="mem-line"/>
+          </svg>
+          <span class="mem-label">explore</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Memory Modal (scale-up animation) -->
+  <div id="memModal" class="mem-modal" onclick="if(event.target===this)closeMemory()">
+    <div class="mem-modal-inner">
+      <button class="mem-close" onclick="closeMemory()">&times;</button>
+      <img src="/images/memory-tree.png" alt="SIBYL Memory Architecture" style="width:100%;display:block;border-radius:12px">
+    </div>
+  </div>
+
+  <style>
+    .mem-trigger {
+      display:inline-flex;flex-direction:column;align-items:center;gap:0.75rem;
+      cursor:pointer;padding:1.5rem;border-radius:50%;
+      border:1px solid var(--border);background:var(--surface);
+      transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
+      position:relative;
+    }
+    .mem-trigger:hover {
+      border-color:rgba(46,169,161,0.4);
+      background:rgba(46,169,161,0.05);
+      box-shadow:0 0 40px rgba(46,169,161,0.1);
+      transform:scale(1.05);
+    }
+    .mem-trigger:hover .mem-core { opacity:1; }
+    .mem-trigger:hover .mem-node { opacity:1; }
+    .mem-trigger:hover .mem-line { opacity:0.6; }
+    .mem-trigger:hover .mem-ring { opacity:0.5; }
+    .mem-label {
+      font-family:var(--font-mono);font-size:0.5625rem;color:var(--text-muted);
+      letter-spacing:0.15em;text-transform:uppercase;
+      position:absolute;bottom:-1.5rem;
+      transition:color 0.3s;
+    }
+    .mem-trigger:hover .mem-label { color:var(--accent); }
+
+    /* Subtle rotation animation */
+    .mem-ring-outer { animation:memSpin 20s linear infinite; transform-origin:40px 40px; }
+    .mem-ring-mid { animation:memSpin 15s linear infinite reverse; transform-origin:40px 40px; }
+    .mem-ring-inner { animation:memPulse 3s ease-in-out infinite; transform-origin:40px 40px; }
+    .mem-core { animation:memPulse 2s ease-in-out infinite; transform-origin:40px 40px; }
+    .mem-node { animation:memFloat 4s ease-in-out infinite; }
+    .mem-node:nth-child(5) { animation-delay:0.5s; }
+    .mem-node:nth-child(6) { animation-delay:1s; }
+    .mem-node:nth-child(7) { animation-delay:1.5s; }
+    .mem-node:nth-child(8) { animation-delay:2s; }
+    .mem-node:nth-child(9) { animation-delay:2.5s; }
+
+    @keyframes memSpin { to { transform:rotate(360deg); } }
+    @keyframes memPulse { 0%,100%{opacity:0.3}50%{opacity:0.8} }
+    @keyframes memFloat { 0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)} }
+
+    /* Modal */
+    .mem-modal {
+      display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+      background:rgba(0,0,0,0);z-index:9999;
+      align-items:center;justify-content:center;padding:20px;cursor:pointer;
+      transition:background 0.4s;
+    }
+    .mem-modal.open { display:flex;background:rgba(0,0,0,0.92); }
+    .mem-modal-inner {
+      position:relative;max-width:1000px;max-height:90vh;overflow:auto;
+      border-radius:12px;background:#0a0c10;border:1px solid #1a1e28;cursor:default;
+      transform:scale(0.3);opacity:0;
+      transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+    }
+    .mem-modal.open .mem-modal-inner { transform:scale(1);opacity:1; }
+    .mem-close {
+      position:sticky;top:12px;float:right;margin:12px;
+      background:rgba(10,12,16,0.8);border:1px solid #1a1e28;border-radius:6px;
+      color:#555d6b;font-size:1.25rem;cursor:pointer;z-index:1;
+      line-height:1;padding:4px 10px;transition:all 0.2s;
+    }
+    .mem-close:hover { color:#e8ecf2;border-color:#2ea9a1; }
+  </style>
+
+  <script>
+    function openMemory(){
+      var m=document.getElementById('memModal');
+      m.style.display='flex';
+      requestAnimationFrame(function(){requestAnimationFrame(function(){m.classList.add('open')})});
+      document.body.style.overflow='hidden';
+    }
+    function closeMemory(){
+      var m=document.getElementById('memModal');
+      m.classList.remove('open');
+      setTimeout(function(){m.style.display='none'},500);
+      document.body.style.overflow='';
+    }
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMemory()});
+  </script>
+
   <!-- Bottom CTA -->
   <section class="mind-bottom-cta">
     <div class="container">
@@ -991,7 +1109,14 @@
     <div class="container">
       <div class="footer-inner">
         <span class="footer-left">SIBYL operates on Base.</span>
-        <span class="footer-right"><a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a></span>
+        <div class="footer-right">
+          <a href="https://docs.sibylcap.com" target="_blank" rel="noopener">docs</a>
+          <a href="/mind">mind</a>
+          <a href="/media">media</a>
+          <a href="/stake">stake</a>
+          <a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a>
+          <span class="footer-email" onclick="navigator.clipboard.writeText('sibylcap@gmail.com').then(()=>{this.textContent='copied!';setTimeout(()=>this.textContent='sibylcap@gmail.com',1500)})">sibylcap@gmail.com</span>
+        </div>
       </div>
     </div>
   </footer>

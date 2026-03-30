@@ -20,7 +20,66 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=15">
+  <link rel="stylesheet" href="/style.css?v=16">
+  <style>
+    .x4-r{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#e8e8e8}
+    .x4-r-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid #222}
+    .x4-r-svc{font-size:10px;color:#c9a227;letter-spacing:.5px;text-transform:uppercase}
+    .x4-r-time{font-size:10px;color:#555}
+    .x4-r-verdict{text-align:center;padding:16px 0}
+    .x4-r-verdict-l{font-size:26px;font-weight:700;font-family:'Syne',sans-serif}
+    .x4-r-verdict-s{margin-top:6px}
+    .x4-r-verdict.safe .x4-r-verdict-l{color:#22c55e}
+    .x4-r-verdict.unsafe .x4-r-verdict-l{color:#ef4444}
+    .x4-r-hero{display:flex;align-items:center;gap:16px;justify-content:center;padding:14px 0}
+    .x4-r-ring{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+    .x4-r-ring-in{width:70px;height:70px;border-radius:50%;background:#0d0d0d;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .x4-r-ring-n{font-size:22px;font-weight:700;color:#e8e8e8;line-height:1}
+    .x4-r-ring-m{font-size:9px;color:#555}
+    .x4-r-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:500;letter-spacing:.3px}
+    .x4-r-badge.green{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25)}
+    .x4-r-badge.red{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25)}
+    .x4-r-badge.amber{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25)}
+    .x4-r-badge.gold{background:rgba(201,162,39,.12);color:#c9a227;border:1px solid rgba(201,162,39,.25)}
+    .x4-r-badge.blue{background:rgba(59,130,246,.12);color:#3b82f6;border:1px solid rgba(59,130,246,.25)}
+    .x4-r-badge.muted{background:rgba(255,255,255,.04);color:#888;border:1px solid #333}
+    .x4-r-bars{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+    .x4-r-bar{display:flex;align-items:center;gap:8px}
+    .x4-r-bar-l{font-size:10px;color:#888;width:85px;flex-shrink:0;text-align:right}
+    .x4-r-bar-t{flex:1;height:5px;background:#1a1a1a;border-radius:3px;overflow:hidden}
+    .x4-r-bar-f{height:100%;border-radius:3px;transition:width .4s ease}
+    .x4-r-bar-s{font-size:10px;color:#ccc;width:36px;flex-shrink:0}
+    .x4-r-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin:10px 0}
+    .x4-r-check{font-size:11px;padding:3px 0}
+    .x4-r-check.pass{color:#22c55e}.x4-r-check.pass::before{content:'\2713  '}
+    .x4-r-check.fail{color:#ef4444}.x4-r-check.fail::before{content:'\2717  '}
+    .x4-r-kvs{display:flex;flex-wrap:wrap;gap:3px 14px;margin:10px 0;padding:8px 10px;background:#111;border-radius:5px;border:1px solid #1a1a1a}
+    .x4-r-kv{font-size:10px}.x4-r-kv-l{color:#555}.x4-r-kv-v{color:#ccc;margin-left:3px}
+    .x4-r-signals{margin:8px 0}
+    .x4-r-signal{font-size:11px;color:#999;padding:2px 0;line-height:1.5}
+    .x4-r-signal::before{content:'\00B7  ';color:#444}
+    .x4-r-signal.warn{color:#f59e0b}.x4-r-signal.warn::before{content:'\26A0  ';color:#f59e0b}
+    .x4-r-signal.danger{color:#ef4444}.x4-r-signal.danger::before{content:'\26A0  ';color:#ef4444}
+    .x4-r-rec{margin:10px 0;padding:8px 10px;background:#111;border-left:2px solid #c9a227;border-radius:0 5px 5px 0;font-size:11px;color:#ccc;line-height:1.6}
+    .x4-r-rec-l{font-size:9px;color:#c9a227;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+    .x4-r-card{margin:6px 0;padding:10px;background:#111;border-radius:5px;border:1px solid #1a1a1a}
+    .x4-r-card-t{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .x4-r-card-v{font-size:13px;color:#e8e8e8;font-weight:500}
+    .x4-r-card-s{font-size:10px;color:#888;margin-top:3px}
+    .x4-r-div{height:1px;background:#1a1a1a;margin:14px 0}
+    .x4-r-section{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px;margin:14px 0 6px}
+    .x4-r-tx{font-size:11px;margin:6px 0}.x4-r-tx a{color:#3b82f6;text-decoration:none}.x4-r-tx a:hover{text-decoration:underline}
+    .x4-out-bar{display:flex;gap:6px;margin:14px 0 0;padding-top:10px;border-top:1px solid #1a1a1a}
+    .x4-out-btn{background:#111;border:1px solid #222;color:#888;padding:5px 12px;border-radius:4px;font-size:10px;font-family:'IBM Plex Mono',monospace;cursor:pointer;transition:all .2s}
+    .x4-out-btn:hover{border-color:#c9a227;color:#c9a227}
+    .x4-r-email{margin:10px 0}
+    .x4-r-email input{background:#111;border:1px solid #222;color:#e8e8e8;padding:6px 10px;border-radius:4px;font-size:11px;font-family:'IBM Plex Mono',monospace;width:200px;margin-right:6px}
+    .x4-r-email input::placeholder{color:#444}
+    .x4-r-email button{background:#111;border:1px solid #c9a227;color:#c9a227;padding:5px 12px;border-radius:4px;font-size:10px;font-family:'IBM Plex Mono',monospace;cursor:pointer}
+    .x4-r-email button:hover{background:#c9a227;color:#0a0a0a}
+    .x4-r-email .sent{font-size:10px;color:#22c55e;margin-left:8px}
+    @media(max-width:500px){.x4-r-grid{grid-template-columns:1fr}.x4-r-hero{flex-direction:column}.x4-r-kvs{flex-direction:column}.x4-r-bar-l{width:70px}}
+  </style>
 </head>
 <body>
 
@@ -28,17 +87,11 @@
   <nav class="nav scrolled" id="nav">
     <div class="nav-inner">
       <a href="/" class="nav-logo">SIBYL</a>
-      <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="x-icon" aria-label="X profile">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      </a>
       <div class="nav-links">
-        <div class="nav-donate">
-          <span class="nav-donate-label">fund SIBYL:</span>
-          <div class="nav-wallet" id="wallet-copy" role="button" tabindex="0" aria-label="Copy wallet address" data-address="0xe3e14118238b5693c854674f7c276136a2dd311f">
-            <code>0xe3e14...d311f</code>
-            <span class="copy-label">copy</span>
-          </div>
-        </div>
+        <a href="https://docs.sibylcap.com" target="_blank" rel="noopener">docs</a>
+        <a href="/mind">mind</a>
+        <a href="/media">media</a>
+        <a href="https://x.com/sibylcap" target="_blank" rel="noopener">X</a>
       </div>
     </div>
   </nav>
@@ -57,46 +110,64 @@
   <section class="x4-catalog">
     <div class="container">
       <div class="x4-grid" id="x4-grid"></div>
+    </div>
+  </section>
 
-      <!-- Active Service Panel -->
-      <div class="x4-panel" id="x4-panel">
-        <div class="x4-panel-header">
-          <h3 id="x4-panel-title"></h3>
-          <span class="x4-panel-price" id="x4-panel-price"></span>
+  <!-- Service Modal -->
+  <div class="x4-backdrop" id="x4-backdrop"></div>
+  <div class="x4-modal" id="x4-modal" role="dialog" aria-modal="true">
+    <div class="x4-modal-header">
+      <div class="x4-modal-title-row">
+        <h3 id="x4-panel-title"></h3>
+        <span class="x4-panel-price" id="x4-panel-price"></span>
+      </div>
+      <button class="x4-modal-close" id="x4-modal-close" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="x4-modal-body" id="x4-modal-body">
+      <form id="x4-form" class="sibyl-form" autocomplete="off"></form>
+      <div class="x4-actions">
+        <div class="x4-btn-group">
+          <button type="button" class="form-submit x4-run" id="x4-run">run demo</button>
+          <button type="button" class="x4-btn-usdc" id="x4-pay-usdc">pay with USDC</button>
         </div>
-        <form id="x4-form" class="sibyl-form" autocomplete="off"></form>
-        <div class="x4-actions">
-          <div class="x4-btn-group">
-            <button type="button" class="form-submit x4-run" id="x4-run">run demo</button>
-            <button type="button" class="x4-btn-usdc" id="x4-pay-usdc">pay with USDC</button>
-          </div>
-          <span class="form-status" id="x4-status"></span>
-        </div>
-        <div class="x4-wallet-status" id="x4-wallet-status"></div>
-        <div class="x4-curl-wrap">
-          <div class="x4-curl-label">programmatic access (paid):</div>
-          <div class="x4-curl" id="x4-curl">
-            <code id="x4-curl-code"></code>
-            <button type="button" class="x4-curl-copy" id="x4-curl-copy">copy</button>
-          </div>
+        <span class="form-status" id="x4-status"></span>
+      </div>
+      <div class="x4-wallet-status" id="x4-wallet-status"></div>
+      <div class="x4-curl-wrap">
+        <div class="x4-curl-label">programmatic access (paid):</div>
+        <div class="x4-curl" id="x4-curl">
+          <code id="x4-curl-code"></code>
+          <button type="button" class="x4-curl-copy" id="x4-curl-copy">copy</button>
         </div>
       </div>
 
       <!-- Output Area -->
       <div class="x4-output" id="x4-output">
-        <div class="x4-metrics" id="x4-metrics"></div>
-        <div class="x4-report-preview" id="x4-report-preview"></div>
-        <pre class="x4-json"><code id="x4-json"></code></pre>
+        <div id="x4-result"></div>
+        <div class="x4-out-bar" id="x4-output-bar" style="display:none">
+          <button type="button" class="x4-out-btn" id="x4-dl-svg" title="Download branded SVG card">&#8595; save</button>
+          <button type="button" class="x4-out-btn" id="x4-dl-json" title="Download raw JSON">json</button>
+          <button type="button" class="x4-out-btn" id="x4-email-btn" title="Email result">email</button>
+          <button type="button" class="x4-out-btn" id="x4-toggle-raw" title="Toggle raw data">raw</button>
+        </div>
+        <pre class="x4-json" id="x4-json-pre" style="display:none"><code id="x4-json"></code></pre>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
       <div class="footer-inner">
         <span class="footer-left">SIBYL operates on Base.</span>
-        <span class="footer-right"><a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a></span>
+        <div class="footer-right">
+          <a href="https://docs.sibylcap.com" target="_blank" rel="noopener">docs</a>
+          <a href="/mind">mind</a>
+          <a href="/media">media</a>
+          <a href="/stake">stake</a>
+          <a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a>
+          <span class="footer-email" onclick="navigator.clipboard.writeText('sibylcap@gmail.com').then(()=>{this.textContent='copied!';setTimeout(()=>this.textContent='sibylcap@gmail.com',1500)})">sibylcap@gmail.com</span>
+        </div>
       </div>
     </div>
   </footer>
@@ -240,7 +311,6 @@
     var BANKR_WALLET = '0xe3e14118238b5693c854674f7c276136a2dd311f';
     var CHAIN_ID = 8453;
     var CHAIN_HEX = '0x2105';
-    var FACILITATOR = 'https://x402.org/facilitator';
 
     /* ================================================
        STATE
@@ -254,7 +324,10 @@
        DOM REFS
        ================================================ */
     var grid = document.getElementById('x4-grid');
-    var panel = document.getElementById('x4-panel');
+    var backdrop = document.getElementById('x4-backdrop');
+    var modal = document.getElementById('x4-modal');
+    var modalClose = document.getElementById('x4-modal-close');
+    var modalBody = document.getElementById('x4-modal-body');
     var panelTitle = document.getElementById('x4-panel-title');
     var panelPrice = document.getElementById('x4-panel-price');
     var form = document.getElementById('x4-form');
@@ -265,9 +338,12 @@
     var curlCode = document.getElementById('x4-curl-code');
     var curlCopy = document.getElementById('x4-curl-copy');
     var output = document.getElementById('x4-output');
-    var metrics = document.getElementById('x4-metrics');
-    var reportPreview = document.getElementById('x4-report-preview');
+    var resultEl = document.getElementById('x4-result');
+    var outputBar = document.getElementById('x4-output-bar');
+    var jsonPre = document.getElementById('x4-json-pre');
     var jsonBlock = document.getElementById('x4-json');
+    var lastResultData = null;
+    var lastResultService = null;
 
     /* ================================================
        WALLET CONNECTION
@@ -322,14 +398,8 @@
     }
 
     /* ================================================
-       USDC PAYMENT (x402 EIP-712 signing)
+       USDC PAYMENT (direct transfer + on-chain verification)
        ================================================ */
-    function generateNonce() {
-      var bytes = new Uint8Array(32);
-      crypto.getRandomValues(bytes);
-      return '0x' + Array.from(bytes).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
-    }
-
     async function payWithUsdc() {
       if (!activeService || isLoading) return;
 
@@ -362,91 +432,31 @@
           }
         }
 
-        // Step 2: Fetch the endpoint to get 402 payment requirements
-        status.textContent = 'fetching payment requirements...';
+        // Step 2: Send USDC transfer
+        status.textContent = 'approve USDC transfer in wallet...';
+
+        var priceUnits = BigInt(Math.round(activeService.priceUsd * 1e6));
+        var usdcAbi = ['function transfer(address to, uint256 amount) returns (bool)'];
+        var usdcContract = new ethers.Contract(USDC_ADDRESS, usdcAbi, walletSigner);
+
+        var tx = await usdcContract.transfer(BANKR_WALLET, priceUnits);
+
+        // Step 3: Wait for on-chain confirmation
+        status.textContent = 'confirming on-chain...';
+        await tx.wait();
+
+        // Step 4: Send API request with tx hash for verification
+        status.textContent = 'fetching result...';
+
         var params = [];
         for (var key in vals) {
           params.push(encodeURIComponent(key) + '=' + encodeURIComponent(vals[key]));
         }
         var apiUrl = activeService.path + (params.length ? '?' + params.join('&') : '');
 
-        var reqResp = await fetch(apiUrl);
-        if (reqResp.status !== 402) {
-          // If not 402, it might have returned data directly (shouldn't happen without payment)
-          var directData = await reqResp.json();
-          renderOutput(directData, activeService.id);
-          status.textContent = 'complete';
-          status.className = 'form-status success';
-          return;
-        }
-
-        var reqBody = await reqResp.json();
-        var requirements = reqBody.accepts[0];
-
-        // Step 3: Build and sign EIP-712 TransferWithAuthorization
-        status.textContent = 'sign USDC authorization in wallet...';
-
-        var domain = {
-          name: (requirements.extra && requirements.extra.name) || 'USD Coin',
-          version: (requirements.extra && requirements.extra.version) || '2',
-          chainId: CHAIN_ID,
-          verifyingContract: USDC_ADDRESS
-        };
-
-        var types = {
-          TransferWithAuthorization: [
-            { name: 'from', type: 'address' },
-            { name: 'to', type: 'address' },
-            { name: 'value', type: 'uint256' },
-            { name: 'validAfter', type: 'uint256' },
-            { name: 'validBefore', type: 'uint256' },
-            { name: 'nonce', type: 'bytes32' }
-          ]
-        };
-
-        var now = Math.floor(Date.now() / 1000);
-        var nonce = generateNonce();
-
-        var message = {
-          from: walletAddress,
-          to: requirements.payTo,
-          value: requirements.maxAmountRequired,
-          validAfter: 0,
-          validBefore: now + (requirements.maxTimeoutSeconds || 600),
-          nonce: nonce
-        };
-
-        var signature = await walletSigner.signTypedData(domain, types, message);
-
-        // Step 4: Build x402 payment payload
-        var payload = {
-          x402Version: 1,
-          scheme: 'exact',
-          network: 'eip155:8453',
-          payload: {
-            signature: signature,
-            authorization: {
-              from: message.from,
-              to: message.to,
-              value: message.value,
-              validAfter: String(message.validAfter),
-              validBefore: String(message.validBefore),
-              nonce: nonce
-            }
-          }
-        };
-
-        // Step 5: Retry with payment header
-        status.textContent = 'processing payment...';
-
-        var paymentHeader = btoa(JSON.stringify(payload));
         var paidResp = await fetch(apiUrl, {
-          headers: { 'X-PAYMENT': paymentHeader }
+          headers: { 'X-PAYMENT-TX': tx.hash }
         });
-
-        if (!paidResp.ok && paidResp.status === 402) {
-          throw new Error('payment rejected by facilitator');
-        }
 
         var data = await paidResp.json();
         renderOutput(data, activeService.id);
@@ -455,7 +465,7 @@
           status.textContent = data.error;
           status.className = 'form-status error';
         } else {
-          status.textContent = 'paid with USDC. complete.';
+          status.textContent = 'paid. complete.';
           status.className = 'form-status success';
         }
 
@@ -463,6 +473,8 @@
         var msg = err.message || 'payment failed';
         if (msg.includes('user rejected') || msg.includes('User denied')) {
           msg = 'transaction cancelled';
+        } else if (msg.includes('insufficient') || msg.includes('exceeds balance')) {
+          msg = 'insufficient USDC balance';
         }
         status.textContent = msg;
         status.className = 'form-status error';
@@ -493,6 +505,28 @@
     /* ================================================
        SELECT SERVICE
        ================================================ */
+    /* ================================================
+       MODAL OPEN / CLOSE
+       ================================================ */
+    function openModal() {
+      backdrop.classList.add('open');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      backdrop.classList.remove('open');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+      output.classList.remove('visible');
+      // Deselect card
+      var cards = grid.querySelectorAll('.x4-card');
+      for (var i = 0; i < cards.length; i++) {
+        cards[i].classList.remove('active');
+      }
+      activeService = null;
+    }
+
     function selectService(idx) {
       var s = SERVICES[idx];
       activeService = s;
@@ -538,9 +572,6 @@
       // Update curl
       updateCurl();
 
-      // Show panel
-      panel.classList.add('visible');
-
       // Hide output
       output.classList.remove('visible');
 
@@ -554,8 +585,14 @@
         inputs[k].addEventListener('input', updateCurl);
       }
 
-      // Scroll panel into view
-      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // Open modal
+      openModal();
+
+      // Focus first input
+      setTimeout(function () {
+        var first = form.querySelector('input');
+        if (first) first.focus();
+      }, 200);
     }
 
     /* ================================================
@@ -658,109 +695,163 @@
     }
 
     /* ================================================
-       RENDER OUTPUT
+       RENDER OUTPUT (SVG-first)
        ================================================ */
-    function extractMetrics(data, serviceId) {
-      var items = [];
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function fmtNum(n) { if(n===null||n===undefined)return'\u2014';if(n>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(1)+'K';if(n<0.01&&n>0)return'$'+n.toFixed(6);return'$'+n.toFixed(2); }
 
-      if (serviceId === 'check') {
-        if (data.safe !== undefined) {
-          items.push({ label: 'safe', value: data.safe ? 'YES' : 'NO', color: data.safe ? 'positive' : 'negative' });
-        }
-        if (data.risk_level) {
-          var rc = data.risk_level === 'low' ? 'positive' : data.risk_level === 'critical' ? 'negative' : 'warning';
-          items.push({ label: 'risk', value: data.risk_level.toUpperCase(), color: rc });
+    function buildResultSvg(data, serviceId) {
+      var d = data;
+      var svc = SERVICES.find(function(s) { return s.id === serviceId; });
+      var title = svc ? svc.name : serviceId;
+      var W = 560, y = 0, parts = [];
+
+      function svgT(x,yy,text,size,fill,anchor,weight) { return '<text x="'+x+'" y="'+yy+'" fill="'+(fill||'#e8e8e8')+'" font-family="\'IBM Plex Mono\',monospace" font-size="'+(size||12)+'"'+(anchor?' text-anchor="'+anchor+'"':'')+(weight?' font-weight="'+weight+'"':'')+'>'+esc(text)+'</text>'; }
+      function svgL(x1,yy,x2,c,o) { return '<line x1="'+x1+'" y1="'+yy+'" x2="'+x2+'" y2="'+yy+'" stroke="'+(c||'#222')+'" stroke-width="1"'+(o?' opacity="'+o+'"':'')+'/>'; }
+      function addKV(k,v,c) { y+=22; parts.push(svgT(24,y,k,11,'#888')); parts.push(svgT(W-24,y,String(v),11,c||'#e8e8e8','end')); }
+      function addDiv() { y+=12; parts.push(svgL(24,y,W-24,'#1a1a1a')); y+=4; }
+
+      function addRing(score,max,label) {
+        var r=36, cx2=W/2, cy2=y+r+14;
+        var circ=2*Math.PI*r, pct=max>0?score/max:0, off=circ*(1-pct);
+        var c=pct>=.7?'#22c55e':pct>=.4?'#f59e0b':'#ef4444';
+        parts.push('<circle cx="'+cx2+'" cy="'+cy2+'" r="'+r+'" fill="none" stroke="#1a1a1a" stroke-width="5"/>');
+        parts.push('<circle cx="'+cx2+'" cy="'+cy2+'" r="'+r+'" fill="none" stroke="'+c+'" stroke-width="5" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" stroke-linecap="round" transform="rotate(-90 '+cx2+' '+cy2+')"/>');
+        parts.push(svgT(cx2,cy2+3,String(score),22,'#e8e8e8','middle','700'));
+        parts.push(svgT(cx2,cy2+17,'/'+max,10,'#555','middle'));
+        if(label) parts.push(svgT(cx2,cy2+r+18,label,10,'#888','middle'));
+        y=cy2+r+(label?24:10);
+      }
+
+      function addBar(label,score,max) {
+        y+=20; var bx=120,bw=300,bh=5;
+        var pct=max>0?Math.round(score/max*100):0, fw=Math.round(bw*pct/100);
+        var c=pct>=70?'#22c55e':pct>=40?'#f59e0b':'#ef4444';
+        parts.push(svgT(bx-8,y+4,label,10,'#888','end'));
+        parts.push('<rect x="'+bx+'" y="'+y+'" width="'+bw+'" height="'+bh+'" fill="#1a1a1a" rx="2"/>');
+        if(fw>0) parts.push('<rect x="'+bx+'" y="'+y+'" width="'+fw+'" height="'+bh+'" fill="'+c+'" rx="2"/>');
+        parts.push(svgT(bx+bw+8,y+4,score+'/'+max,10,'#ccc'));
+      }
+
+      function addWrap(label,text) {
+        y+=22; var sy=y;
+        parts.push(svgT(32,y,label,9,'#c9a227',null,'500'));
+        var words=(text||'').split(' '), line='';
+        for(var j=0;j<words.length;j++){var test=line+words[j]+' ';if(test.length>64&&line.length>0){y+=15;parts.push(svgT(32,y,line.trim(),11,'#ccc'));line=words[j]+' ';}else{line=test;}}
+        if(line.trim()){y+=15;parts.push(svgT(32,y,line.trim(),11,'#ccc'));}
+        parts.push('<line x1="22" y1="'+(sy-4)+'" x2="22" y2="'+(y+4)+'" stroke="#c9a227" stroke-width="2"/>');
+      }
+
+      function addFlags(flags) {
+        if(!flags||!flags.length) return;
+        addDiv();
+        for(var i=0;i<flags.length;i++){
+          y+=16; var fc=flags[i].indexOf('DANGER')===0?'#ef4444':'#f59e0b';
+          parts.push(svgT(24,y,'\u26A0 '+flags[i],10,fc));
         }
       }
 
-      if (serviceId === 'score') {
-        if (data.score !== undefined) {
-          items.push({ label: 'score', value: data.score + '/100', color: data.score >= 60 ? 'positive' : data.score >= 30 ? 'warning' : 'negative' });
-        }
-        if (data.grade) {
-          var gc = data.grade === 'A' ? 'positive' : data.grade === 'F' ? 'negative' : 'warning';
-          items.push({ label: 'grade', value: data.grade, color: gc });
+      // === HEADER ===
+      y+=28; parts.push(svgT(24,y,'SIBYL #20880',14,'#c9a227',null,'600')); parts.push(svgT(W-24,y,title,11,'#666','end'));
+      y+=14; parts.push(svgT(W-24,y,(d.timestamp||new Date().toISOString()).split('T')[0],10,'#444','end'));
+      y+=6; parts.push(svgL(24,y,W-24,'#c9a227',0.3)); y+=4;
+
+      if(d.symbol) addKV('token',d.symbol+(d.name?' ('+d.name+')':''));
+
+      // === ERROR ===
+      if(d.error && !d.checks && !d.score && !d.conviction_score && !d.builder_score && !d.meta && !d.report && d.success===undefined) {
+        y+=30; parts.push(svgT(W/2,y,'ERROR',22,'#ef4444','middle','700'));
+        y+=20; parts.push(svgT(W/2,y,d.error,11,'#ef4444','middle'));
+      }
+      // === CHECK ===
+      else if(serviceId==='check') {
+        y+=8; addRing(d.safe?1:0,1,d.safe?'SAFE':'UNSAFE');
+        addKV('risk level',(d.risk_level||'unknown').toUpperCase(),d.risk_level==='low'?'#22c55e':d.risk_level==='critical'?'#ef4444':'#f59e0b');
+        if(d.checks){addDiv();for(var k in d.checks){if(d.checks[k]===null)continue;addKV(k.replace(/_/g,' '),d.checks[k]?'\u2713 pass':'\u2717 fail',d.checks[k]?'#22c55e':'#ef4444');}}
+        if(d.warnings&&d.warnings.length){addDiv();for(var i=0;i<d.warnings.length;i++){y+=16;parts.push(svgT(24,y,'\u26A0 '+d.warnings[i],10,'#f59e0b'));}}
+      }
+      // === SCORE ===
+      else if(serviceId==='score') {
+        y+=8; addRing(d.score||0,100,'GRADE: '+(d.grade||'?'));
+        addKV('price',fmtNum(d.price_usd)); addKV('market cap',fmtNum(d.market_cap)); addKV('liquidity',fmtNum(d.liquidity_usd)); addKV('volume 24h',fmtNum(d.volume_24h)); addKV('age',(d.pair_age_days||0)+' days');
+        if(d.components){addDiv();for(var k in d.components){var c=d.components[k];addBar(k,c.score||0,c.max||25);}}
+        addFlags(d.flags);
+      }
+      // === BUILDER ===
+      else if(serviceId==='builder') {
+        y+=8; addRing(d.builder_score||0,100,'GRADE: '+(d.grade||'?'));
+        if(d.value_rating) addKV('value rating',d.value_rating.replace(/_/g,' '),d.value_rating.indexOf('under')>=0?'#22c55e':d.value_rating.indexOf('over')>=0?'#ef4444':'#f59e0b');
+        addKV('price',fmtNum(d.price_usd)); addKV('market cap',fmtNum(d.market_cap)); addKV('liquidity',fmtNum(d.liquidity_usd));
+        if(d.components){addDiv();for(var k in d.components){var c=d.components[k];if(c.score!==null&&c.score!==undefined)addBar(k.replace(/_/g,' '),c.score,c.max||25);}}
+        addFlags(d.flags);
+      }
+      // === EVALUATE ===
+      else if(serviceId==='evaluate') {
+        y+=8; addRing(d.conviction_score||0,30,(d.conviction_tier||'').replace(/_/g,' '));
+        if(d.product_clarity) addKV('product clarity',d.product_clarity,d.product_clarity==='clear'?'#22c55e':'#f59e0b');
+        if(d.criteria){addDiv();for(var k in d.criteria){addBar(k.replace(/_/g,' '),d.criteria[k].score||0,d.criteria[k].max||10);}}
+        if(d.github_discovered){addDiv();addKV('github discovered',d.github_discovered.handle||d.github_discovered.repo||'');if(d.github_discovered.source)addKV('source',d.github_discovered.source);}
+        addFlags(d.flags);
+      }
+      // === ADVISORY ===
+      else if(serviceId==='advisory') {
+        if(d.evaluation){y+=8;addRing(d.evaluation.conviction_score||0,30,(d.evaluation.conviction_tier||'').replace(/_/g,' '));if(d.evaluation.criteria){for(var k in d.evaluation.criteria){addBar(k.replace(/_/g,' '),d.evaluation.criteria[k].score||0,d.evaluation.criteria[k].max||10);}}}
+        if(d.narrative_position){addDiv();y+=16;parts.push(svgT(24,y,'NARRATIVE POSITION',9,'#888'));addKV('category',d.narrative_position.category_label||d.narrative_position.category||'');addKV('alignment',(d.narrative_position.alignment||'').toUpperCase(),d.narrative_position.alignment==='strong'?'#22c55e':'#f59e0b');if(d.narrative_position.signal){y+=16;parts.push(svgT(24,y,d.narrative_position.signal,10,'#999'));}}
+        if(d.advisory){addDiv();y+=16;parts.push(svgT(24,y,'ADVISORY',9,'#c9a227'));if(d.advisory.priority)addKV('priority',d.advisory.priority.toUpperCase(),d.advisory.priority==='high'?'#ef4444':'#f59e0b');if(d.advisory.product_clarity){addKV('product clarity',d.advisory.product_clarity.status||'',d.advisory.product_clarity.status==='clear'?'#22c55e':'#f59e0b');if(d.advisory.product_clarity.note){y+=16;parts.push(svgT(24,y,d.advisory.product_clarity.note,10,'#999'));}}if(d.advisory.positioning)addWrap('positioning',d.advisory.positioning);if(d.advisory.recommendation)addWrap('recommendation',d.advisory.recommendation);}
+        addFlags(d.flags);
+        if(d.summary)addWrap('summary',d.summary);
+      }
+      // === NARRATIVE ===
+      else if(serviceId==='narrative') {
+        if(d.meta&&d.meta.dominant){addDiv();y+=16;parts.push(svgT(24,y,'DOMINANT',9,'#c9a227'));addKV(d.meta.dominant.label||d.meta.dominant.narrative,'momentum: '+(d.meta.dominant.momentum_score||0),'#c9a227');if(d.meta.dominant.signals){for(var i=0;i<d.meta.dominant.signals.length;i++){y+=14;parts.push(svgT(32,y,'\u00B7 '+d.meta.dominant.signals[i],10,'#999'));}}}
+        if(d.meta&&d.meta.emerging&&d.meta.emerging.length){addDiv();y+=16;parts.push(svgT(24,y,'EMERGING',9,'#22c55e'));for(var i=0;i<d.meta.emerging.length;i++){var e=d.meta.emerging[i];addKV(e.label||e.narrative,'momentum: '+(e.momentum_score||0),'#22c55e');}}
+        if(d.meta&&d.meta.fading&&d.meta.fading.length){addDiv();y+=16;parts.push(svgT(24,y,'FADING',9,'#ef4444'));for(var i=0;i<d.meta.fading.length;i++){var f=d.meta.fading[i];addKV(f.label||f.narrative,'momentum: '+(f.momentum_score||0),'#666');}}
+        if(d.token_position){addDiv();y+=16;parts.push(svgT(24,y,'TOKEN POSITION',9,'#888'));addKV('token',d.token_position.symbol||'');addKV('narrative',d.token_position.narrative_label||d.token_position.narrative||'');addKV('alignment',(d.token_position.alignment||'').toUpperCase(),d.token_position.alignment==='strong'?'#22c55e':'#f59e0b');if(d.token_position.signal){y+=16;parts.push(svgT(24,y,d.token_position.signal,10,'#999'));}}
+      }
+      // === FUND ===
+      else if(serviceId==='fund') {
+        y+=8; addRing(d.success?1:0,1,d.success?'SENT':'FAILED');
+        if(d.amount) addKV('amount',d.amount);
+        if(d.recipient) addKV('recipient',d.recipient);
+        if(d.txHash) addKV('tx',d.txHash.slice(0,20)+'...');
+        if(d.relay_balance) addKV('relay balance',d.relay_balance);
+      }
+      // === PINGCAST ===
+      else if(serviceId==='pingcast') {
+        y+=8; addRing(d.success?1:0,1,d.success?'DELIVERED':'FAILED');
+        if(d.charged) addKV('charged',d.charged);
+        if(d.broadcastFee) addKV('broadcast fee',d.broadcastFee);
+        if(d.ethPrice) addKV('ETH price',d.ethPrice);
+        if(d.content) addWrap('content',d.content);
+        if(d.txHash) addKV('tx',d.txHash.slice(0,20)+'...');
+      }
+      // === REPORT ===
+      else if(serviceId==='report') {
+        if(d.report){var r=d.report;var sc=r.conviction_score||r.score||0;var tier=r.conviction_tier||r.tier||'';
+          y+=8;addRing(sc,30,tier.replace(/_/g,' '));
+          var scores=r.scores||{};if(scores.builder!==undefined||r.builder_conviction!==undefined){addDiv();addBar('builder',scores.builder||r.builder_conviction||0,10);addBar('community',scores.community||r.community_seed||0,10);addBar('on-chain',scores.onchain||r.onchain_proof||0,10);if(scores.clarity!==undefined||r.product_clarity!==undefined)addBar('clarity',scores.clarity||(typeof r.product_clarity==='number'?r.product_clarity:0),5);}
+          if(r.market){addDiv();addKV('price',fmtNum(r.market.price));addKV('market cap',fmtNum(r.market.mc));addKV('liquidity',fmtNum(r.market.liquidity));addKV('volume 24h',fmtNum(r.market.volume_24h));}
+          if(r.strengths&&r.strengths.length){addDiv();y+=16;parts.push(svgT(24,y,'STRENGTHS',9,'#22c55e'));for(var i=0;i<r.strengths.length;i++){y+=14;parts.push(svgT(32,y,'\u00B7 '+r.strengths[i],10,'#ccc'));}}
+          if(r.concerns&&r.concerns.length){y+=8;y+=16;parts.push(svgT(24,y,'CONCERNS',9,'#ef4444'));for(var i=0;i<r.concerns.length;i++){y+=14;parts.push(svgT(32,y,'\u00B7 '+r.concerns[i],10,'#ccc'));}}
+          if(r.timeline&&r.timeline.length){addDiv();y+=16;parts.push(svgT(24,y,'SHIPPING TIMELINE',9,'#888'));for(var i=0;i<Math.min(r.timeline.length,5);i++){var t=r.timeline[i];y+=14;parts.push(svgT(24,y,t.date,10,'#555'));parts.push(svgT(110,y,t.text.length>55?t.text.slice(0,55)+'...':t.text,10,'#ccc'));}}
         }
       }
 
-      if (serviceId === 'narrative') {
-        if (data.meta && data.meta.dominant) {
-          items.push({ label: 'dominant', value: data.meta.dominant.label || data.meta.dominant.narrative, color: 'gold' });
-        }
-        if (data.token_position && data.token_position.alignment) {
-          items.push({ label: 'alignment', value: data.token_position.alignment.toUpperCase(), color: 'accent' });
-        }
-      }
+      // === RECOMMENDATION (generic, skip if advisory already rendered it) ===
+      var rec = (serviceId!=='advisory') ? (d.recommendation||d.summary||d.note||'') : '';
+      if(rec){addDiv();addWrap('recommendation',rec);}
 
-      if (serviceId === 'builder') {
-        if (data.builder_score !== undefined) {
-          items.push({ label: 'builder score', value: data.builder_score + '/100', color: data.builder_score >= 60 ? 'positive' : data.builder_score >= 30 ? 'warning' : 'negative' });
-        }
-        if (data.grade) {
-          items.push({ label: 'grade', value: data.grade, color: 'gold' });
-        }
-        if (data.value_rating) {
-          items.push({ label: 'value', value: data.value_rating.replace(/_/g, ' '), color: 'accent' });
-        }
-      }
+      // === FOOTER ===
+      y+=20; parts.push(svgL(24,y,W-24,'#222')); y+=18;
+      parts.push(svgT(24,y,'sibylcap.com/x402',10,'#444'));
+      parts.push(svgT(W-24,y,'agent #20880 \u00B7 base',10,'#444','end')); y+=16;
 
-      if (serviceId === 'evaluate') {
-        if (data.conviction_score !== undefined) {
-          items.push({ label: 'conviction', value: data.conviction_score + '/30', color: data.conviction_score >= 20 ? 'positive' : data.conviction_score >= 10 ? 'warning' : 'negative' });
-        }
-        if (data.conviction_tier) {
-          items.push({ label: 'tier', value: data.conviction_tier.replace(/_/g, ' '), color: 'gold' });
-        }
-      }
+      return { content: parts.join('\n'), width: W, height: y };
+    }
 
-      if (serviceId === 'advisory') {
-        if (data.evaluation && data.evaluation.conviction_score !== undefined) {
-          items.push({ label: 'conviction', value: data.evaluation.conviction_score + '/30', color: 'gold' });
-        }
-        if (data.evaluation && data.evaluation.conviction_tier) {
-          items.push({ label: 'tier', value: data.evaluation.conviction_tier.replace(/_/g, ' '), color: 'accent' });
-        }
-        if (data.advisory && data.advisory.priority) {
-          items.push({ label: 'priority', value: data.advisory.priority.toUpperCase(), color: data.advisory.priority === 'high' ? 'negative' : 'warning' });
-        }
-      }
-
-      if (serviceId === 'fund') {
-        if (data.success !== undefined) {
-          items.push({ label: 'status', value: data.success ? 'SUCCESS' : 'FAILED', color: data.success ? 'positive' : 'negative' });
-        }
-        if (data.amount) {
-          items.push({ label: 'amount', value: data.amount, color: 'gold' });
-        }
-      }
-
-      if (serviceId === 'pingcast') {
-        if (data.success !== undefined) {
-          items.push({ label: 'status', value: data.success ? 'DELIVERED' : 'FAILED', color: data.success ? 'positive' : 'negative' });
-        }
-        if (data.charged) {
-          items.push({ label: 'charged', value: data.charged, color: 'gold' });
-        }
-      }
-
-      if (serviceId === 'report') {
-        if (data.report && data.report.score !== undefined) {
-          items.push({ label: 'conviction', value: data.report.score + '/30', color: data.report.score >= 20 ? 'positive' : data.report.score >= 10 ? 'warning' : 'negative' });
-        }
-        if (data.report && data.report.tier) {
-          items.push({ label: 'tier', value: data.report.tier.replace(/_/g, ' '), color: 'gold' });
-        }
-        if (data.status) {
-          items.push({ label: 'status', value: data.status.toUpperCase(), color: 'accent' });
-        }
-      }
-
-      // Handle error responses
-      if (data.error) {
-        items = [{ label: 'error', value: data.error, color: 'negative' }];
-      }
-
-      return items;
+    function svgString(result, responsive) {
+      var wAttr = responsive ? '100%' : result.width;
+      return '<svg xmlns="http://www.w3.org/2000/svg" width="'+wAttr+'" height="'+(responsive?'auto':result.height)+'" viewBox="0 0 '+result.width+' '+result.height+'" style="display:block"><rect width="'+result.width+'" height="'+result.height+'" fill="#0a0a0a" rx="8"/>'+result.content+'</svg>';
     }
 
     function syntaxHighlight(json) {
@@ -770,39 +861,72 @@
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
         function (match) {
           var cls = 'x4-jv-number';
-          if (/^"/.test(match)) {
-            cls = /:$/.test(match) ? 'x4-jv-key' : 'x4-jv-string';
-          } else if (/true|false/.test(match)) {
-            cls = 'x4-jv-bool';
-          } else if (/null/.test(match)) {
-            cls = 'x4-jv-null';
-          }
+          if (/^"/.test(match)) { cls = /:$/.test(match) ? 'x4-jv-key' : 'x4-jv-string'; }
+          else if (/true|false/.test(match)) { cls = 'x4-jv-bool'; }
+          else if (/null/.test(match)) { cls = 'x4-jv-null'; }
           return '<span class="' + cls + '">' + match + '</span>';
         }
       );
     }
 
     function renderOutput(data, serviceId) {
-      var items = extractMetrics(data, serviceId);
-      var mhtml = '';
-      for (var i = 0; i < items.length; i++) {
-        var it = items[i];
-        mhtml += '<div class="x4-metric">';
-        mhtml += '<div class="x4-metric-label">' + it.label + '</div>';
-        mhtml += '<div class="x4-metric-value x4-c-' + it.color + '">' + it.value + '</div>';
-        mhtml += '</div>';
-      }
-      metrics.innerHTML = mhtml;
-
-      reportPreview.innerHTML = '';
-      if (serviceId === 'report' && data.svg) {
-        reportPreview.innerHTML = data.svg;
-      }
-
+      lastResultData = data;
+      lastResultService = serviceId;
+      var result = buildResultSvg(data, serviceId);
+      resultEl.innerHTML = svgString(result, true);
       jsonBlock.innerHTML = syntaxHighlight(data);
-
+      jsonPre.style.display = 'none';
+      outputBar.style.display = '';
       output.classList.add('visible');
-      output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      modalBody.scrollTop = modalBody.scrollHeight;
+    }
+
+    /* ================================================
+       DOWNLOAD + EMAIL
+       ================================================ */
+    function downloadJson() {
+      if (!lastResultData) return;
+      var blob = new Blob([JSON.stringify(lastResultData, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'sibyl-' + (lastResultService || 'result') + '-' + Date.now() + '.json';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href);
+    }
+
+    function downloadSvg() {
+      if (!lastResultData || !lastResultService) return;
+      var result = buildResultSvg(lastResultData, lastResultService);
+      var raw = '<?xml version="1.0" encoding="UTF-8"?>\n' + svgString(result, false);
+      var blob = new Blob([raw], { type: 'image/svg+xml' });
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'sibyl-' + (lastResultService || 'result') + '-' + Date.now() + '.svg';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href);
+    }
+
+    function emailResult() {
+      if (!lastResultData) return;
+      var bar = document.getElementById('x4-output-bar');
+      var existing = document.getElementById('x4-email-row');
+      if (existing) { existing.remove(); return; }
+      var row = document.createElement('div');
+      row.id = 'x4-email-row'; row.className = 'x4-r-email';
+      row.innerHTML = '<input type="email" id="x4-email-input" placeholder="your@email.com"><button type="button" id="x4-email-send">send</button>';
+      bar.parentNode.insertBefore(row, bar.nextSibling);
+      document.getElementById('x4-email-input').focus();
+      document.getElementById('x4-email-send').addEventListener('click', function() {
+        var email = document.getElementById('x4-email-input').value.trim();
+        if (!email || !email.includes('@')) return;
+        var svc = SERVICES.find(function(s) { return s.id === lastResultService; });
+        var subject = 'SIBYL x402: ' + (svc ? svc.name : lastResultService);
+        var body = JSON.stringify(lastResultData, null, 2);
+        window.open('mailto:' + encodeURIComponent(email) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body));
+        row.innerHTML = '<span class="sent">opening mail client...</span>';
+        setTimeout(function() { row.remove(); }, 3000);
+      });
+    }
+
+    function toggleRaw() {
+      jsonPre.style.display = jsonPre.style.display === 'none' ? '' : 'none';
+      if (jsonPre.style.display !== 'none') modalBody.scrollTop = modalBody.scrollHeight;
     }
 
     /* ================================================
@@ -826,6 +950,19 @@
     });
 
     curlCopy.addEventListener('click', copyCurl);
+    document.getElementById('x4-dl-svg').addEventListener('click', downloadSvg);
+    document.getElementById('x4-dl-json').addEventListener('click', downloadJson);
+    document.getElementById('x4-email-btn').addEventListener('click', emailResult);
+    document.getElementById('x4-toggle-raw').addEventListener('click', toggleRaw);
+
+    // Modal close handlers
+    modalClose.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('open')) {
+        closeModal();
+      }
+    });
 
     /* ================================================
        INIT

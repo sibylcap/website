@@ -1,10 +1,10 @@
 /* SIBYL Single-Session Advisory API.
    Premium endpoint: full evaluation + narrative read + structured advisory output.
    Combines conviction scoring with narrative positioning to generate actionable guidance.
-   Payment: x402 ($1.00 USDC per call). Free with ?demo=true.
+   Payment: x402 ($0.50 USDC per call). Free with ?demo=true.
 
    Usage:
-     GET /api/advisory?token=0x...&twitter=handle&github=user         (paid, $1.00 USDC)
+     GET /api/advisory?token=0x...&twitter=handle&github=user         (paid, $0.50 USDC)
      GET /api/advisory?token=0x...&twitter=handle&demo=true           (free, same output)
 
    Params:
@@ -29,7 +29,9 @@ var ERC8004_FEEDBACK = {
 
 // Narrative classification patterns (same as narrative.js)
 var NARRATIVES = {
-  ai_agents: { label: 'AI / Agents', re: /\bai\b|agent|gpt|llm|neural|brain|cogni|intelli|autono|machine.?learn|deep.?learn|model|predict|inference|sentient|synthetic/i },
+  ai_infra: { label: 'AI Infra', re: /inference|gpu|compute|model.?host|model.?serv|private.?ai|uncensor|open.?source.?ai|fine.?tun|train|neural.?net|deep.?learn|machine.?learn|vector|embedding|llm.?api|ai.?api|ai.?sdk|ai.?platform|ai.?infra/i },
+  ai_agents: { label: 'AI Agents', re: /\bagent\b|autonom|sentient|synthetic|brain|cogni|intelli|swarm|multi.?agent|agent.?infra|aura|reputation.?scor|identity.?reg|erc.?8004|on.?chain.?identity|agent.?framework|agent.?protocol/i },
+  ai_general: { label: 'AI', re: /\bai\b|gpt|llm|neural|predict|generative|diffusion|transformer|chatbot|copilot/i },
   defi: { label: 'DeFi', re: /\bdefi\b|swap|lend|borrow|yield|vault|stake|liquid|amm|pool|perp|leverag|margin|collateral|bridge|wrap|farm/i },
   meme: { label: 'Meme', re: /doge|pepe|shib|wojak|chad|moon|rocket|inu|cat|frog|bear|bull|ape|monkey|bonk|floki|elon|trump|maga|based|cope|seethe|wagmi|ngmi|gm\b|ser\b|anon\b|degen/i },
   gaming: { label: 'Gaming / Metaverse', re: /game|play|guild|quest|arena|battle|rpg|nft.?game|metaverse|virtual|world|land|avatar|character|level|loot/i },
@@ -49,6 +51,17 @@ module.exports = async function handler(req, res) {
 
   var token = (req.query.token || '').toLowerCase();
   if (!token || !/^0x[a-f0-9]{40}$/.test(token)) {
+    if (!req.query.demo && !req.headers['x-payment'] && !req.headers['x-payment-tx']) {
+      return x402.discovery(req, res, {
+        priceUsd: PRICE_USD,
+        description: 'SIBYL single-session advisory. premium: full evaluation + narrative positioning + structured advisory output with actionable recommendations.',
+        discovery: {
+          input: { token: '0x...', twitter: 'handle', github: 'user', description: 'one-sentence product description' },
+          inputSchema: { properties: { token: { type: 'string', description: 'ERC-20 contract address on Base' }, twitter: { type: 'string', description: 'X handle without @' }, github: { type: 'string', description: 'GitHub username or org' }, description: { type: 'string', description: 'one-sentence product description' } }, required: ['token'] },
+          output: { example: { evaluation: {}, narrative_position: {}, advisory: { recommendation: '...', action_items: [] } } }
+        }
+      });
+    }
     return res.status(400).json({ error: 'invalid token address. use ?token=0x...' });
   }
 
@@ -132,7 +145,7 @@ function computeAdvisory(tokenAddr, dexData, hasCode, totalSupply, xData, ghData
   var evaluation = computeEvaluation(tokenAddr, dexData, hasCode, totalSupply, xData, ghData, twitter, github, flags);
 
   // ── NARRATIVE POSITION ──
-  var narrativePosition = computeNarrativePosition(tokenAddr, dexData, boosted, profiles);
+  var narrativePosition = computeNarrativePosition(tokenAddr, dexData, boosted, profiles, description, xData);
 
   // ── ADVISORY OUTPUT ──
   var advisory = generateAdvisory(evaluation, narrativePosition, xData, ghData, description, flags);
@@ -333,7 +346,7 @@ function computeEvaluation(tokenAddr, dexData, hasCode, totalSupply, xData, ghDa
 
 // ── NARRATIVE POSITION COMPONENT ──
 
-function computeNarrativePosition(tokenAddr, dexData, boosted, profiles) {
+function computeNarrativePosition(tokenAddr, dexData, boosted, profiles, founderDescription, xData) {
   // Classify the token
   var symbol = 'UNKNOWN';
   var name = 'Unknown';
@@ -352,14 +365,39 @@ function computeNarrativePosition(tokenAddr, dexData, boosted, profiles) {
   }
 
   var combined = (symbol + ' ' + name).toLowerCase();
+
+  // Try to get DexScreener description for better classification
+  var tokenDescription = '';
+  if (profiles && Array.isArray(profiles)) {
+    for (var pi = 0; pi < profiles.length; pi++) {
+      if (profiles[pi].tokenAddress && profiles[pi].tokenAddress.toLowerCase() === tokenAddr.toLowerCase()) {
+        tokenDescription = (profiles[pi].description || '').toLowerCase();
+        break;
+      }
+    }
+  }
+
+  // Score each narrative:
+  //   name/symbol match = 1pt
+  //   dexscreener description = 2pt
+  //   tweet corpus = 2pt (project's own words on X)
+  //   founder description param = 3pt (explicit self-identification)
+  var founderDesc = (founderDescription || '').toLowerCase();
+  var tweetCorpus = (xData && xData.tweet_corpus) ? xData.tweet_corpus.toLowerCase() : '';
   var category = 'other';
   var categoryLabel = 'Unclassified';
+  var bestScore = 0;
 
   for (var i = 0; i < NARRATIVE_KEYS.length; i++) {
-    if (NARRATIVES[NARRATIVE_KEYS[i]].re.test(combined)) {
+    var nScore = 0;
+    if (NARRATIVES[NARRATIVE_KEYS[i]].re.test(combined)) nScore += 1;
+    if (tokenDescription && NARRATIVES[NARRATIVE_KEYS[i]].re.test(tokenDescription)) nScore += 2;
+    if (tweetCorpus && NARRATIVES[NARRATIVE_KEYS[i]].re.test(tweetCorpus)) nScore += 2;
+    if (founderDesc && NARRATIVES[NARRATIVE_KEYS[i]].re.test(founderDesc)) nScore += 3;
+    if (nScore > bestScore) {
+      bestScore = nScore;
       category = NARRATIVE_KEYS[i];
       categoryLabel = NARRATIVES[NARRATIVE_KEYS[i]].label;
-      break;
     }
   }
 
@@ -556,17 +594,29 @@ async function fetchTotalSupply(token) {
   for (var i = 0; i < rpcs.length; i++) {
     try {
       var controller = new AbortController();
-      var timeout = setTimeout(function() { controller.abort(); }, 3000);
+      var timeout = setTimeout(function() { controller.abort(); }, 5000);
+      var batch = [
+        { jsonrpc: '2.0', method: 'eth_call', params: [{ to: token, data: '0x18160ddd' }, 'latest'], id: 1 },
+        { jsonrpc: '2.0', method: 'eth_call', params: [{ to: token, data: '0x313ce567' }, 'latest'], id: 2 }
+      ];
       var resp = await fetch(rpcs[i], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_call', params: [{ to: token, data: '0x18160ddd' }, 'latest'], id: 1 }),
+        body: JSON.stringify(batch),
         signal: controller.signal
       });
       clearTimeout(timeout);
-      var data = await resp.json();
-      if (data.result && data.result !== '0x') {
-        return parseInt(data.result, 16) / 1e18;
+      var results = await resp.json();
+      if (!Array.isArray(results)) results = [results];
+      var supplyResult = results.find(function(r) { return r.id === 1; });
+      var decimalsResult = results.find(function(r) { return r.id === 2; });
+      if (supplyResult && supplyResult.result && supplyResult.result !== '0x') {
+        var decimals = 18;
+        if (decimalsResult && decimalsResult.result && decimalsResult.result !== '0x') {
+          decimals = parseInt(decimalsResult.result, 16);
+          if (decimals < 0 || decimals > 77) decimals = 18;
+        }
+        return parseInt(supplyResult.result, 16) / Math.pow(10, decimals);
       }
     } catch (e) {
       continue;
@@ -629,11 +679,13 @@ async function fetchXActivityV1(handle, bearer) {
     var cutoff = Date.now() - 7 * 86400000;
     var recent = tweets.filter(function(t) { return new Date(t.created_at).getTime() > cutoff; });
 
-    var SHIP_RE = /deploy|ship|launch|release|update|commit|push|build|fix|refactor|merge|v\d|beta|alpha|testnet|mainnet|live|audit|contract|integrat/i;
+    var SHIP_RE = /deploy|shipped|shipping|ship\s|push.*prod|commit\s*[a-f0-9]|merge.*PR|merged.*pull|v\d+\.\d|testnet|mainnet|smart.?contract|audit|refactor|integrat.*api|open.?source|changelog|patch|hotfix|bug.?fix|migrat/i;
     var shipCount = recent.filter(function(t) { return SHIP_RE.test(t.text || t.full_text || ''); }).length;
 
     var engagement = 0;
     recent.forEach(function(t) { engagement += (t.favorite_count || 0) + (t.retweet_count || 0); });
+
+    var corpus = recent.map(function(t) { return (t.text || t.full_text || '').replace(/https?:\/\/\S+/g, ''); }).join(' ').substring(0, 2000);
 
     return {
       handle: handle,
@@ -643,6 +695,7 @@ async function fetchXActivityV1(handle, bearer) {
       avg_engagement: recent.length > 0 ? Math.round(engagement / recent.length) : 0,
       tweets_per_day: r1(recent.length / 7),
       shipping_ratio: recent.length > 0 ? Math.round(shipCount / recent.length * 100) : 0,
+      tweet_corpus: corpus,
       source: 'v1.1'
     };
   } catch (err) {
@@ -652,7 +705,7 @@ async function fetchXActivityV1(handle, bearer) {
 }
 
 function classifyTweets(tweets, handle, source) {
-  var SHIP_RE = /deploy|ship|launch|release|update|commit|push|build|fix|refactor|merge|v\d|beta|alpha|testnet|mainnet|live|audit|contract|integrat/i;
+  var SHIP_RE = /deploy|shipped|shipping|ship\s|push.*prod|commit\s*[a-f0-9]|merge.*PR|merged.*pull|v\d+\.\d|testnet|mainnet|smart.?contract|audit|refactor|integrat.*api|open.?source|changelog|patch|hotfix|bug.?fix|migrat/i;
   var shipCount = tweets.filter(function(t) { return SHIP_RE.test(t.text || ''); }).length;
   var engagement = 0;
   tweets.forEach(function(t) {
@@ -660,6 +713,9 @@ function classifyTweets(tweets, handle, source) {
       engagement += (t.public_metrics.like_count || 0) + (t.public_metrics.retweet_count || 0) + (t.public_metrics.reply_count || 0);
     }
   });
+
+  // Build tweet corpus for narrative classification (up to 2000 chars)
+  var corpus = tweets.map(function(t) { return (t.text || '').replace(/https?:\/\/\S+/g, ''); }).join(' ').substring(0, 2000);
 
   return {
     handle: handle,
@@ -669,6 +725,7 @@ function classifyTweets(tweets, handle, source) {
     avg_engagement: tweets.length > 0 ? Math.round(engagement / tweets.length) : 0,
     tweets_per_day: r1(tweets.length / 7),
     shipping_ratio: tweets.length > 0 ? Math.round(shipCount / tweets.length * 100) : 0,
+    tweet_corpus: corpus,
     source: source
   };
 }
@@ -683,7 +740,7 @@ async function fetchGitHubActivity(username) {
       var controller = new AbortController();
       var timeout = setTimeout(function() { controller.abort(); }, 5000);
       var resp = await fetch(url, {
-        headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' },
+        headers: Object.assign({ 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' }, process.env.GITHUB_TOKEN ? { 'Authorization': 'token ' + process.env.GITHUB_TOKEN } : {}),
         signal: controller.signal
       });
       clearTimeout(timeout);
@@ -711,7 +768,7 @@ async function fetchGitHubOrgActivity(orgName) {
     var resp = await fetch(
       'https://api.github.com/orgs/' + encodeURIComponent(orgName) + '/events?per_page=100',
       {
-        headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' },
+        headers: Object.assign({ 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' }, process.env.GITHUB_TOKEN ? { 'Authorization': 'token ' + process.env.GITHUB_TOKEN } : {}),
         signal: controller.signal
       }
     );

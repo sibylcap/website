@@ -2,11 +2,11 @@
    Reads the current Base chain meta by analyzing trending/boosted tokens on DexScreener.
    Classifies tokens into narrative categories, ranks by momentum.
    Optionally maps a specific token to its narrative position.
-   Payment: x402 ($0.25 USDC per call). Free with ?demo=true.
+   Payment: x402 ($0.10 USDC per call). Free with ?demo=true.
 
    Usage:
-     GET /api/narrative                          (paid, $0.25 USDC)
-     GET /api/narrative?token=0x...              (paid, with token positioning)
+     GET /api/narrative                          (paid, $0.10 USDC)
+     GET /api/narrative?token=0x...              (paid, $0.10 USDC, with token positioning)
      GET /api/narrative?demo=true                (free, same output)
 */
 
@@ -22,9 +22,17 @@ var ERC8004_FEEDBACK = {
 
 // Narrative classification patterns
 var NARRATIVES = {
+  ai_infra: {
+    label: 'AI Infra',
+    re: /inference|gpu|compute|model.?host|model.?serv|private.?ai|uncensor|open.?source.?ai|fine.?tun|train|neural.?net|deep.?learn|machine.?learn|vector|embedding|llm.?api|ai.?api|ai.?sdk|ai.?platform|ai.?infra/i
+  },
   ai_agents: {
-    label: 'AI / Agents',
-    re: /\bai\b|agent|gpt|llm|neural|brain|cogni|intelli|autono|machine.?learn|deep.?learn|model|predict|inference|sentient|synthetic/i
+    label: 'AI Agents',
+    re: /\bagent\b|autonom|sentient|synthetic|brain|cogni|intelli|swarm|multi.?agent|agent.?infra|aura|reputation.?scor|identity.?reg|erc.?8004|on.?chain.?identity|agent.?framework|agent.?protocol/i
+  },
+  ai_general: {
+    label: 'AI',
+    re: /\bai\b|gpt|llm|neural|predict|generative|diffusion|transformer|chatbot|copilot/i
   },
   defi: {
     label: 'DeFi',
@@ -301,13 +309,29 @@ function computeNarrative(boosted, profiles, trending, token, tokenData, isDemo)
     var tName = (tp.baseToken && tp.baseToken.name) || 'Unknown';
     var tCombined = (tSymbol + ' ' + tName).toLowerCase();
 
+    // Also check token profile description for better classification
+    var tDescription = '';
+    if (profiles && Array.isArray(profiles)) {
+      for (var pi = 0; pi < profiles.length; pi++) {
+        if (profiles[pi].tokenAddress && profiles[pi].tokenAddress.toLowerCase() === token) {
+          tDescription = (profiles[pi].description || '').toLowerCase();
+          break;
+        }
+      }
+    }
+
+    // Score each narrative: name match = 1 point, description match = 2 points
     var tNarrative = 'other';
     var tLabel = 'Unclassified';
+    var bestNarrativeScore = 0;
     for (var j = 0; j < NARRATIVE_KEYS.length; j++) {
-      if (NARRATIVES[NARRATIVE_KEYS[j]].re.test(tCombined)) {
+      var nScore = 0;
+      if (NARRATIVES[NARRATIVE_KEYS[j]].re.test(tCombined)) nScore += 1;
+      if (tDescription && NARRATIVES[NARRATIVE_KEYS[j]].re.test(tDescription)) nScore += 2;
+      if (nScore > bestNarrativeScore) {
+        bestNarrativeScore = nScore;
         tNarrative = NARRATIVE_KEYS[j];
         tLabel = NARRATIVES[NARRATIVE_KEYS[j]].label;
-        break;
       }
     }
 

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIBYL : Partner Dashboard</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.5/ethers.umd.min.js"></script>
+  <style>
+    :root {
+      --bg:            #08090a;
+      --surface:       #0e1118;
+      --elevated:      #131620;
+      --highest:       #1a1e28;
+      --border:        #1a1e28;
+      --border-strong: #252a36;
+      --text-primary:  #c8ccd4;
+      --text-secondary:#8a919c;
+      --text-muted:    #555d6b;
+      --accent:        #6b8ba5;
+      --accent-hover:  #7d9ab2;
+      --gold:          #b5a070;
+      --gold-hover:    #c4af80;
+      --positive:      #5a8a6a;
+      --negative:      #b06868;
+      --warning:       #b5944a;
+      --font-display:  'Syne', 'Helvetica Neue', sans-serif;
+      --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 2rem;
+    }
+    .login-brand {
+      text-align: center;
+    }
+    .login-brand h1 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .login-brand p {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
+    .connect-btn {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.7rem 2rem;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      transition: all 0.2s;
+    }
+    .connect-btn:hover {
+      background: var(--gold);
+      color: var(--bg);
+    }
+    .connect-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .status-text {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-align: center;
+      min-height: 1.2em;
+    }
+    .status-text.error {
+      color: var(--negative);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-brand">
+      <h1>SIBYL</h1>
+      <p>Partner Dashboard</p>
+    </div>
+    <button class="connect-btn" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+    <div class="status-text" id="status"></div>
+  </div>
+
+  <script>
+    var API = '/api/partners';
+
+    // Check for existing session
+    (function() {
+      var token = localStorage.getItem('sibyl_partner_token');
+      if (token) {
+        fetch(API + '/auth', { headers: { 'Authorization': 'Bearer ' + token } })
+          .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+          .then(function() {
+            var isSubdomain = window.location.host.startsWith('partners.');
+            window.location.href = isSubdomain ? '/dashboard' : '/partners/dashboard';
+          })
+          .catch(function() { localStorage.removeItem('sibyl_partner_token'); });
+      }
+    })();
+
+    async function connectWallet() {
+      var btn = document.getElementById('connectBtn');
+      var status = document.getElementById('status');
+      status.className = 'status-text';
+      status.textContent = '';
+
+      if (!window.ethereum) {
+        status.className = 'status-text error';
+        status.textContent = 'no wallet detected. install MetaMask or Rabby.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'connecting...';
+
+      try {
+        // Request accounts
+        var provider = new ethers.BrowserProvider(window.ethereum);
+        var signer = await provider.getSigner();
+        var address = await signer.getAddress();
+
+        status.textContent = 'requesting nonce...';
+
+        // Get nonce
+        var nonceRes = await fetch(API + '/auth?action=nonce', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: address }),
+        });
+        var nonceData = await nonceRes.json();
+
+        if (!nonceRes.ok) {
+          status.className = 'status-text error';
+          status.textContent = nonceData.error || 'failed to get nonce';
+          btn.disabled = false;
+          btn.textContent = 'Connect Wallet';
+          return;
+        }
+
+        status.textContent = 'sign the message in your wallet...';
+
+        // Build SIWE message
+        var domain = window.location.host;
+        var origin = window.location.origin;
+        var siweMessage = [
+          domain + ' wants you to sign in with your Ethereum account:',
+          address,
+          '',
+          'Sign in to SIBYL Advisory Partner Dashboard',
+          '',
+          'URI: ' + origin,
+          'Version: 1',
+          'Chain ID: 8453',
+          'Nonce: ' + nonceData.nonce,
+          'Issued At: ' + new Date().toISOString(),
+        ].join('\n');
+
+        var signature = await signer.signMessage(siweMessage);
+
+        status.textContent = 'verifying...';
+
+        // Verify
+        var verifyRes = await fetch(API + '/auth?action=verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: siweMessage, signature: signature }),
+        });
+        var verifyData = await verifyRes.json();
+
+        if (!verifyRes.ok) {
+          status.className = 'status-text error';
+          status.textContent = (verifyData.detail || verifyData.error || 'verification failed');
+          btn.disabled = false;
+          btn.textContent = 'Connect Wallet';
+          return;
+        }
+
+        // Store token and redirect
+        localStorage.setItem('sibyl_partner_token', verifyData.token);
+        var isSubdomain = window.location.host.startsWith('partners.');
+        window.location.href = isSubdomain ? '/dashboard' : '/partners/dashboard';
+
+      } catch (err) {
+        status.className = 'status-text error';
+        status.textContent = err.message || 'connection failed';
+        btn.disabled = false;
+        btn.textContent = 'Connect Wallet';
+      }
+    }
+  </script>
+</body>
+</html>
