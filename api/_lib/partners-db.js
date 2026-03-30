@@ -81,6 +81,9 @@ async function ensureSchema() {
       used        BOOLEAN NOT NULL DEFAULT FALSE
     )`;
 
+  // Migrations: add columns that may not exist on older schemas
+  await sql`ALTER TABLE partner_sessions ADD COLUMN IF NOT EXISTS document_url TEXT`.catch(function() {});
+
   _initialized = true;
 }
 
@@ -144,6 +147,9 @@ async function updateSession(id, fields) {
   }
   if (fields.summary !== undefined) {
     await sql`UPDATE partner_sessions SET summary = ${fields.summary} WHERE id = ${id}`;
+  }
+  if (fields.document_url !== undefined) {
+    await sql`UPDATE partner_sessions SET document_url = ${fields.document_url} WHERE id = ${id}`;
   }
   return getSessionById(id);
 }
