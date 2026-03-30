@@ -29,6 +29,19 @@ module.exports = async function handler(req, res) {
 
   var token = (req.query.token || '').toLowerCase();
   if (!token || !/^0x[a-f0-9]{40}$/.test(token)) {
+    // No token param: return 402 discovery for scanners/health checks
+    // unless actively attempting demo or payment (then it's a real 400)
+    if (!req.query.demo && !req.headers['x-payment'] && !req.headers['x-payment-tx']) {
+      return x402.discovery(req, res, {
+        priceUsd: PRICE_USD,
+        description: 'SIBYL token safety check. quick pass/fail pre-trade screening with danger flags.',
+        discovery: {
+          input: { token: '0x...' },
+          inputSchema: { properties: { token: { type: 'string', description: 'ERC-20 contract address on Base' } }, required: ['token'] },
+          output: { example: { safe: true, flags: [], verdict: 'pass' } }
+        }
+      });
+    }
     return res.status(400).json({ error: 'invalid token address. use ?token=0x...' });
   }
 
@@ -164,7 +177,7 @@ module.exports = async function handler(req, res) {
     }
 
     // Overall assessment
-    var safe = riskLevel === 'low' || riskLevel === 'medium';
+    var safe = riskLevel === 'low';
     var failedChecks = Object.keys(checks).filter(function(k) { return !checks[k]; });
 
     var recommendation;

@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIBYL : Stage</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Stake $SIBYL. Earn yield. Govern the record.">
+  <meta property="og:title" content="SIBYL : Stake">
+  <meta property="og:description" content="Stake $SIBYL. Earn yield. Govern the record.">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:            #08090a;
+      --surface:       #0e1118;
+      --elevated:      #131620;
+      --highest:       #1a1e28;
+      --border:        #1a1e28;
+      --border-strong: #252a36;
+      --text-primary:  #e4e8f0;
+      --text-secondary:#b8bfc9;
+      --text-muted:    #8e98aa;
+      --accent:        #7e9cb5;
+      --accent-hover:  #92afc4;
+      --gold:          #d4bf8a;
+      --gold-hover:    #e0cf9a;
+      --gold-dim:      #b5a478;
+      --violet:        #9a8cba;
+      --positive:      #72ab87;
+      --negative:      #c47878;
+      --warning:       #c9a85a;
+      --font-display:  'Syne', 'Helvetica Neue', sans-serif;
+      --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--gold); color: var(--bg); }
+
+    /* ═══════════════════════════════════════
+       Ambient glow
+       ═══════════════════════════════════════ */
+    .ambient {
+      position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 1000px; height: 700px;
+      background: radial-gradient(ellipse, rgba(181,160,112,0.03) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .ambient-2 {
+      position: fixed; bottom: -300px; right: -200px;
+      width: 800px; height: 600px;
+      background: radial-gradient(ellipse, rgba(107,139,165,0.025) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ═══════════════════════════════════════
+       Nav (minimal)
+       ═══════════════════════════════════════ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1rem 0;
+      background: rgba(8,9,10,0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+    }
+    .nav-left { display: flex; align-items: center; gap: 1.25rem; }
+    .nav-logo {
+      font-family: var(--font-display); font-size: 1rem;
+      font-weight: 700; letter-spacing: 0.25em; color: var(--text-primary);
+      text-transform: uppercase; text-decoration: none;
+    }
+    .nav-back {
+      font-size: 0.625rem; color: var(--text-muted);
+      letter-spacing: 0.1em; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--text-secondary); }
+    .nav-page-tag {
+      font-size: 0.625rem; color: var(--gold-dim);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      font-family: var(--font-display); font-weight: 600;
+    }
+    .btn-wallet {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(181,160,112,0.06); border: 1px solid rgba(181,160,112,0.25);
+      border-radius: 8px; padding: 10px 20px;
+      font-family: var(--font-mono); font-size: 0.8125rem;
+      color: var(--gold); cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 0 12px rgba(181,160,112,0.06);
+    }
+    .btn-wallet:hover {
+      border-color: var(--gold); color: var(--gold-hover);
+      background: rgba(181,160,112,0.1);
+      box-shadow: 0 0 20px rgba(181,160,112,0.12);
+      transform: translateY(-1px);
+    }
+    .btn-wallet .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--positive);
+    }
+    .btn-wallet.disconnected .dot { background: var(--negative); }
+
+    /* ═══════════════════════════════════════
+       Layout
+       ═══════════════════════════════════════ */
+    .page { max-width: 1200px; margin: 0 auto; padding: 80px 2rem 4rem; position: relative; z-index: 1; }
+
+    /* Header */
+    .page-header { text-align: center; margin-bottom: 48px; padding-top: 24px; }
+    .page-eyebrow {
+      font-family: var(--font-mono); font-size: 0.625rem;
+      color: var(--gold-dim); letter-spacing: 0.3em;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .page-title {
+      font-family: var(--font-display); font-size: 2.5rem;
+      font-weight: 800; color: var(--text-primary);
+      letter-spacing: -0.02em; margin-bottom: 8px;
+    }
+    .page-title span { color: var(--gold); }
+    .page-sub { color: var(--text-secondary); font-size: 0.8125rem; max-width: 480px; margin: 0 auto; }
+
+    /* ═══════════════════════════════════════
+       Market Overview Strip
+       ═══════════════════════════════════════ */
+    .market-strip {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      border: 1px solid var(--border); border-radius: 8px;
+      overflow: hidden; margin-bottom: 32px;
+    }
+    .market-cell {
+      padding: 20px 16px; text-align: center;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      transition: background 0.2s;
+    }
+    .market-cell:last-child { border-right: none; }
+    .market-cell:hover { background: var(--elevated); }
+    .market-label {
+      font-size: 0.625rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.15em;
+      margin-bottom: 6px; font-family: var(--font-display); font-weight: 600;
+    }
+    .market-value {
+      font-size: 1.25rem; font-weight: 500; color: var(--text-primary);
+      font-family: var(--font-mono);
+    }
+    .market-value.gold { color: var(--gold); }
+    .market-delta {
+      font-size: 0.625rem; margin-top: 4px;
+    }
+    .market-delta.up { color: var(--positive); }
+    .market-delta.down { color: var(--negative); }
+
+    /* ═══════════════════════════════════════
+       Main Grid: Staking + Analytics
+       ═══════════════════════════════════════ */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ═══════════════════════════════════════
+       Card System
+       ═══════════════════════════════════════ */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px; margin-bottom: 20px;
+      transition: border-color 0.25s;
+    }
+    .card:hover { border-color: var(--border-strong); }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-family: var(--font-display); font-size: 0.6875rem;
+      font-weight: 600; color: var(--text-muted);
+      letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .card-badge {
+      font-size: 0.625rem; padding: 4px 10px;
+      border-radius: 4px; letter-spacing: 0.1em;
+      text-transform: uppercase; font-weight: 600;
+    }
+    .card-badge.live {
+      background: rgba(90,138,106,0.12); color: var(--positive);
+      border: 1px solid rgba(90,138,106,0.2);
+    }
+
+    /* ═══════════════════════════════════════
+       Staking Panel (Left)
+       ═══════════════════════════════════════ */
+    .stake-panel { position: sticky; top: 80px; }
+
+    /* Amount input */
+    .stake-input-wrap {
+      position: relative; margin-bottom: 16px;
+    }
+    .stake-input {
+      width: 100%; background: var(--elevated);
+      border: 1px solid var(--border-strong); border-radius: 8px;
+      padding: 18px 80px 18px 18px;
+      font-family: var(--font-mono); font-size: 1.25rem;
+      color: var(--text-primary); outline: none;
+      transition: border-color 0.2s;
+    }
+    .stake-input:focus { border-color: var(--gold-dim); }
+    .stake-input::placeholder { color: var(--text-muted); }
+    .stake-max {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: rgba(212,191,138,0.12); border: 1px solid rgba(212,191,138,0.3);
+      border-radius: 5px; padding: 5px 12px;
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      color: var(--gold); cursor: pointer; text-transform: uppercase;
+      letter-spacing: 0.1em; transition: all 0.2s; font-weight: 500;
+    }
+    .stake-max:hover {
+      background: rgba(212,191,138,0.22); border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(212,191,138,0.1);
+    }
+    .stake-balance {
+      font-size: 0.6875rem; color: var(--text-muted);
+      margin-bottom: 20px; text-align: right;
+    }
+    .stake-balance span { color: var(--text-secondary); }
+
+    /* Lock tier selector */
+    .tier-selector { margin-bottom: 24px; }
+    .tier-label {
+      font-size: 0.625rem; color: var(--text-muted);
+      letter-spacing: 0.15em; text-transform: uppercase;
+      margin-bottom: 10px; font-family: var(--font-display); font-weight: 600;
+    }
+    .tier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .tier-btn {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 14px 8px; background: var(--elevated);
+      border: 1px solid var(--border-strong); border-radius: 8px;
+      cursor: pointer; transition: all 0.2s;
+      font-family: var(--font-mono);
+    }
+    .tier-btn:hover { border-color: var(--text-muted); }
+    .tier-btn.active {
+      border-color: var(--gold); background: rgba(181,160,112,0.06);
+      box-shadow: 0 0 16px rgba(181,160,112,0.08);
+    }
+    .tier-duration {
+      font-size: 0.875rem; font-weight: 500; color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .tier-btn.active .tier-duration { color: var(--gold); }
+    .tier-mult {
+      font-size: 0.625rem; color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+    .tier-btn.active .tier-mult { color: var(--gold-dim); }
+
+    /* Percentage slider */
+    .pct-slider-wrap {
+      margin-bottom: 20px;
+    }
+    .pct-labels {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .pct-label {
+      font-size: 0.625rem; color: var(--text-muted);
+      letter-spacing: 0.12em; text-transform: uppercase;
+      font-family: var(--font-display); font-weight: 600;
+    }
+    .pct-value {
+      font-size: 0.75rem; color: var(--gold); font-weight: 500;
+      font-family: var(--font-mono);
+    }
+    .pct-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px;
+      background: var(--highest); border-radius: 3px;
+      outline: none; cursor: pointer;
+    }
+    .pct-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--gold); cursor: pointer;
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 8px rgba(196,175,122,0.3);
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .pct-slider::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 16px rgba(196,175,122,0.5);
+      transform: scale(1.15);
+    }
+    .pct-slider::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--gold); cursor: pointer;
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 8px rgba(196,175,122,0.3);
+    }
+    .pct-slider::-moz-range-track {
+      height: 6px; background: var(--highest); border-radius: 3px;
+    }
+    .pct-ticks {
+      display: flex; justify-content: space-between;
+      margin-top: 6px; padding: 0 2px;
+    }
+    .pct-tick {
+      font-size: 0.625rem; color: var(--text-secondary);
+      cursor: pointer; padding: 3px 6px; border-radius: 3px;
+      transition: all 0.15s;
+      font-family: var(--font-mono);
+    }
+    .pct-tick:hover { color: var(--gold); background: rgba(212,191,138,0.06); }
+
+    /* Stake summary */
+    .stake-summary {
+      padding: 16px; background: var(--elevated);
+      border-radius: 8px; margin-bottom: 20px;
+    }
+    .summary-row {
+      display: flex; justify-content: space-between;
+      padding: 6px 0; font-size: 0.75rem;
+    }
+    .summary-label { color: var(--text-muted); }
+    .summary-value { color: var(--text-secondary); }
+    .summary-value.gold { color: var(--gold); }
+    .summary-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 8px 0;
+    }
+
+    /* Action buttons */
+    .btn-stake {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(212,191,138,0.1), rgba(212,191,138,0.18));
+      color: var(--gold-hover); border: 2px solid var(--gold); border-radius: 10px;
+      font-family: var(--font-display); font-size: 1rem;
+      font-weight: 700; letter-spacing: 0.12em;
+      cursor: pointer; transition: all 0.4s cubic-bezier(0.25,0.1,0.25,1);
+      text-transform: uppercase;
+      box-shadow: 0 0 24px rgba(212,191,138,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-stake::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 30%, rgba(181,160,112,0.06) 50%, transparent 70%);
+      background-size: 200% 200%;
+      animation: btn-idle-shimmer 4s ease-in-out infinite;
+    }
+    @keyframes btn-idle-shimmer {
+      0% { background-position: 200% 200%; }
+      100% { background-position: -200% -200%; }
+    }
+    .btn-stake:hover:not(:disabled):not(.ready) {
+      border-color: rgba(181,160,112,0.5);
+      color: var(--gold-hover);
+      background: linear-gradient(135deg, rgba(181,160,112,0.12), rgba(181,160,112,0.22));
+      box-shadow: 0 0 30px rgba(181,160,112,0.12), 0 4px 16px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
+    }
+    .btn-stake.ready {
+      background: linear-gradient(135deg, #d4bf60, #f0d878, #d4bf60);
+      background-size: 200% 200%;
+      animation: stake-shimmer 3s ease-in-out infinite, stake-glow 2s ease-in-out infinite;
+      color: #0a0b0d;
+      border-color: transparent;
+      box-shadow:
+        0 0 40px rgba(240,216,120,0.5),
+        0 0 80px rgba(240,216,120,0.2),
+        0 6px 24px rgba(0,0,0,0.35);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .btn-stake.ready::before { display: none; }
+    .btn-stake.ready:hover {
+      background: linear-gradient(135deg, #e8d870, #fff8b8, #e8d870);
+      background-size: 200% 200%;
+      transform: translateY(-3px) scale(1.01);
+      box-shadow:
+        0 0 60px rgba(240,216,120,0.65),
+        0 0 120px rgba(240,216,120,0.25),
+        0 10px 40px rgba(0,0,0,0.4);
+    }
+    .btn-stake:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
+    .btn-stake:disabled {
+      opacity: 0.5; cursor: not-allowed; transform: none; animation: none;
+      background: linear-gradient(135deg, rgba(212,191,138,0.05), rgba(212,191,138,0.08));
+      color: var(--gold-dim);
+      border: 2px solid var(--gold-dim); box-shadow: none;
+    }
+    .btn-stake:disabled::before { display: none; }
+    @keyframes stake-shimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes stake-glow {
+      0%, 100% {
+        box-shadow:
+          0 0 35px rgba(240,216,120,0.45),
+          0 0 70px rgba(240,216,120,0.15),
+          0 6px 24px rgba(0,0,0,0.35);
+      }
+      50% {
+        box-shadow:
+          0 0 55px rgba(240,216,120,0.65),
+          0 0 110px rgba(240,216,120,0.28),
+          0 6px 24px rgba(0,0,0,0.35);
+      }
+    }
+    .btn-unstake {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px 24px; margin-top: 12px;
+      background: rgba(196,120,120,0.04); color: var(--text-secondary);
+      border: 1px solid rgba(196,120,120,0.2); border-radius: 8px;
+      font-family: var(--font-mono); font-size: 0.8125rem;
+      cursor: pointer; transition: all 0.25s; letter-spacing: 0.05em;
+    }
+    .btn-unstake:hover {
+      border-color: var(--negative); color: var(--negative);
+      background: rgba(196,120,120,0.08);
+      box-shadow: 0 0 16px rgba(196,120,120,0.08);
+    }
+
+    /* Unstake Drawer */
+    .unstake-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      opacity: 0; transition: opacity 0.25s;
+    }
+    .unstake-overlay.open { display: flex; align-items: flex-end; justify-content: center; opacity: 1; }
+    .unstake-drawer {
+      background: var(--surface); border: 1px solid var(--border-strong);
+      border-radius: 16px 16px 0 0; width: 100%; max-width: 480px;
+      padding: 28px 28px 36px; position: relative;
+      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.25,0.1,0.25,1);
+    }
+    .unstake-overlay.open .unstake-drawer { transform: translateY(0); }
+    .unstake-handle {
+      width: 40px; height: 4px; background: var(--border-strong);
+      border-radius: 2px; margin: 0 auto 20px;
+    }
+    .unstake-title {
+      font-family: var(--font-display); font-size: 1.125rem;
+      font-weight: 700; color: var(--text-primary); margin-bottom: 4px;
+    }
+    .unstake-sub {
+      font-size: 0.75rem; color: var(--text-muted); margin-bottom: 24px;
+    }
+    .unstake-amount-display {
+      text-align: center; margin-bottom: 24px;
+    }
+    .unstake-amount-value {
+      font-family: var(--font-display); font-size: 2rem;
+      font-weight: 800; color: var(--negative); line-height: 1.2;
+    }
+    .unstake-amount-usd {
+      font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;
+    }
+    .btn-unstake-confirm {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 16px 24px;
+      background: var(--negative); color: #fff;
+      border: none; border-radius: 10px;
+      font-family: var(--font-display); font-size: 0.9375rem;
+      font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.25s;
+    }
+    .btn-unstake-confirm:hover:not(:disabled) {
+      background: #d48888; transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(196,120,120,0.25);
+    }
+    .btn-unstake-confirm:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-unstake-cancel {
+      display: block; width: 100%; margin-top: 10px; padding: 12px;
+      background: transparent; border: none; color: var(--text-muted);
+      font-family: var(--font-mono); font-size: 0.75rem;
+      cursor: pointer; transition: color 0.2s;
+    }
+    .btn-unstake-cancel:hover { color: var(--text-secondary); }
+
+    /* Tx status */
+    .tx-status {
+      margin-top: 12px; padding: 12px 16px; border-radius: 8px;
+      font-size: 0.75rem; display: none;
+    }
+    .tx-status.pending {
+      display: block; background: rgba(181,160,112,0.08);
+      border: 1px solid var(--gold-dim); color: var(--gold);
+    }
+    .tx-status.success {
+      display: block; background: rgba(90,138,106,0.08);
+      border: 1px solid var(--positive); color: var(--positive);
+    }
+    .tx-status.error {
+      display: block; background: rgba(176,104,104,0.08);
+      border: 1px solid var(--negative); color: var(--negative);
+    }
+
+    /* ═══════════════════════════════════════
+       Analytics Panel (Right)
+       ═══════════════════════════════════════ */
+
+    /* Your Position Card */
+    .position-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .position-stat { padding: 16px; background: var(--elevated); border-radius: 8px; }
+    .position-stat .stat-label {
+      font-size: 0.625rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.15em;
+      margin-bottom: 6px; font-family: var(--font-display); font-weight: 600;
+    }
+    .position-stat .stat-value {
+      font-size: 1.375rem; font-weight: 500; color: var(--text-primary);
+    }
+    .position-stat .stat-sub {
+      font-size: 0.625rem; color: var(--text-muted); margin-top: 2px;
+    }
+    .position-stat.highlight { border: 1px solid rgba(181,160,112,0.15); }
+    .position-stat.highlight .stat-value { color: var(--gold); }
+
+    /* Claim strip */
+    .claim-strip {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px; background: var(--elevated);
+      border: 1px solid rgba(181,160,112,0.12); border-radius: 8px;
+      margin-top: 16px;
+    }
+    .claim-info { flex: 1; }
+    .claim-label {
+      font-size: 0.625rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.15em;
+      font-family: var(--font-display); font-weight: 600;
+    }
+    .claim-amount {
+      font-family: var(--font-display); font-size: 1.75rem;
+      font-weight: 800; color: var(--gold); line-height: 1.2;
+    }
+    .claim-usd { font-size: 0.6875rem; color: var(--text-muted); }
+    .btn-claim {
+      padding: 14px 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
+      color: var(--bg); border: none; border-radius: 8px;
+      font-family: var(--font-display); font-size: 0.875rem;
+      font-weight: 700; letter-spacing: 0.1em;
+      cursor: pointer; transition: all 0.25s; text-transform: uppercase;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(212,191,138,0.2), 0 0 24px rgba(212,191,138,0.1);
+    }
+    .btn-claim:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--gold-hover), #ecd9a0);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 28px rgba(212,191,138,0.35), 0 0 40px rgba(212,191,138,0.15);
+    }
+    .btn-claim:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+    .btn-claim:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+    /* Value chart */
+    .chart-wrap {
+      position: relative; height: 200px;
+      background: var(--elevated); border-radius: 8px;
+      overflow: hidden; margin-bottom: 16px;
+    }
+    .chart-canvas { width: 100%; height: 100%; }
+    .chart-overlay {
+      position: absolute; top: 16px; left: 16px;
+    }
+    .chart-value-label {
+      font-size: 0.625rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.15em;
+      font-family: var(--font-display); font-weight: 600;
+    }
+    .chart-value {
+      font-family: var(--font-display); font-size: 1.5rem;
+      font-weight: 700; color: var(--text-primary);
+    }
+    .chart-delta {
+      font-size: 0.6875rem; margin-left: 8px;
+    }
+    .chart-timeframes {
+      position: absolute; top: 16px; right: 16px;
+      display: flex; gap: 4px;
+    }
+    .chart-tf {
+      padding: 4px 10px; background: transparent;
+      border: 1px solid var(--border-strong); border-radius: 4px;
+      font-family: var(--font-mono); font-size: 0.625rem;
+      color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+    }
+    .chart-tf.active {
+      background: rgba(181,160,112,0.1); border-color: var(--gold-dim);
+      color: var(--gold);
+    }
+    .chart-tf:hover { border-color: var(--text-muted); }
+
+    /* APR Stats Grid */
+    .apr-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    }
+    .apr-cell {
+      padding: 16px; text-align: center;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .apr-cell:last-child { border-right: none; }
+    .apr-tier {
+      font-size: 0.625rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 4px; font-family: var(--font-display); font-weight: 600;
+    }
+    .apr-value {
+      font-size: 1.375rem; font-weight: 500; color: var(--positive);
+      font-family: var(--font-mono);
+    }
+    .apr-weight {
+      font-size: 0.625rem; color: var(--text-muted); margin-top: 2px;
+    }
+    .apr-cell.active {
+      background: rgba(90,138,106,0.04);
+      border-bottom: 2px solid var(--positive);
+    }
+
+    /* Supply Distribution */
+    .supply-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+    }
+    .supply-item { padding: 16px; background: var(--elevated); border-radius: 8px; }
+    .supply-label {
+      font-size: 0.625rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.12em;
+      margin-bottom: 6px; font-family: var(--font-display); font-weight: 600;
+    }
+    .supply-value { font-size: 1.125rem; color: var(--text-primary); font-weight: 500; }
+    .supply-pct { font-size: 0.625rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Supply bar */
+    .supply-bar-wrap { margin-top: 16px; }
+    .supply-bar {
+      height: 6px; background: var(--highest);
+      border-radius: 3px; overflow: hidden; display: flex;
+    }
+    .supply-bar-seg {
+      height: 100%; transition: width 1s ease;
+    }
+    .supply-bar-seg.circulating { background: #8a919c; }
+    .supply-bar-seg.staked { background: var(--gold); }
+    .supply-bar-seg.vesting { background: #2ea9a1; }
+    .supply-bar-legend {
+      display: flex; gap: 16px; margin-top: 10px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.625rem; color: var(--text-muted);
+    }
+    .legend-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+    /* Liquidity Pools Table */
+    .lp-table { width: 100%; border-collapse: collapse; }
+    .lp-table th {
+      font-size: 0.625rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.12em;
+      font-family: var(--font-display); font-weight: 600;
+      padding: 10px 12px; text-align: left;
+      border-bottom: 1px solid var(--border-strong);
+    }
+    .lp-table td {
+      padding: 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+    }
+    .lp-table tr:last-child td { border-bottom: none; }
+    .lp-table tr:hover td { background: var(--elevated); }
+    .lp-pair { color: var(--text-primary); font-weight: 500; }
+    .lp-dex { color: var(--text-muted); font-size: 0.625rem; }
+    .lp-tvl { color: var(--text-secondary); }
+    .lp-link {
+      color: var(--accent); font-size: 0.625rem;
+      letter-spacing: 0.05em; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .lp-link:hover { color: var(--accent-hover); }
+
+    /* Positions Table */
+    .positions-table { width: 100%; border-collapse: collapse; }
+    .positions-table th {
+      font-size: 0.625rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.12em;
+      font-family: var(--font-display); font-weight: 600;
+      padding: 10px 12px; text-align: left;
+      border-bottom: 1px solid var(--border-strong);
+    }
+    .positions-table td {
+      padding: 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+    }
+    .positions-table tr:last-child td { border-bottom: none; }
+    .lock-badge {
+      display: inline-flex; padding: 2px 8px;
+      border-radius: 3px; font-size: 0.5625rem;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .lock-badge.flex { background: rgba(107,139,165,0.1); color: var(--accent); }
+    .lock-badge.locked { background: rgba(181,160,112,0.1); color: var(--gold); }
+    .lock-progress { width: 100%; height: 3px; background: var(--highest); border-radius: 2px; margin-top: 4px; }
+    .lock-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.5s; }
+    .btn-unstake-sm {
+      padding: 5px 14px; background: rgba(196,120,120,0.04);
+      border: 1px solid rgba(196,120,120,0.2); border-radius: 4px;
+      font-family: var(--font-mono); font-size: 0.625rem;
+      color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+    }
+    .btn-unstake-sm:hover {
+      border-color: var(--negative); color: var(--negative);
+      background: rgba(196,120,120,0.08);
+    }
+    .btn-unstake-sm:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ═══════════════════════════════════════
+       Connect State
+       ═══════════════════════════════════════ */
+    .connect-prompt {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 60px 24px;
+      text-align: center;
+    }
+    .connect-prompt .icon {
+      width: 64px; height: 64px; margin-bottom: 20px; opacity: 0.25;
+    }
+    .connect-prompt p {
+      color: var(--text-muted); font-size: 0.8125rem;
+      margin-bottom: 24px; max-width: 320px;
+    }
+
+    /* ═══════════════════════════════════════
+       Reveal animation
+       ═══════════════════════════════════════ */
+    .reveal {
+      opacity: 0; transform: translateY(14px);
+      transition: opacity 0.6s cubic-bezier(0.25,0.1,0.25,1),
+                  transform 0.6s cubic-bezier(0.25,0.1,0.25,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.1s; }
+    .reveal-d2 { transition-delay: 0.2s; }
+    .reveal-d3 { transition-delay: 0.3s; }
+    .reveal-d4 { transition-delay: 0.4s; }
+
+    /* ═══════════════════════════════════════
+       Responsive
+       ═══════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .stake-panel { position: static; }
+      .market-strip { grid-template-columns: repeat(3, 1fr); }
+      .market-cell:nth-child(3) { border-right: none; }
+      .market-cell:nth-child(4) { border-top: 1px solid var(--border); }
+    }
+    @media (max-width: 640px) {
+      .page { padding: 72px 1rem 3rem; }
+      .page-title { font-size: 1.75rem; }
+      .market-strip { grid-template-columns: repeat(2, 1fr); }
+      .market-cell:nth-child(2n) { border-right: none; }
+      .market-cell:nth-child(n+3) { border-top: 1px solid var(--border); }
+      .tier-grid { grid-template-columns: repeat(2, 1fr); }
+      .position-grid { grid-template-columns: 1fr; }
+      .apr-grid { grid-template-columns: repeat(2, 1fr); }
+      .apr-cell:nth-child(2) { border-right: none; }
+      .apr-cell:nth-child(n+3) { border-top: 1px solid var(--border); }
+      .supply-grid { grid-template-columns: 1fr; }
+      .claim-strip { flex-direction: column; gap: 16px; }
+      .btn-claim { width: 100%; text-align: center; }
+    }
+
+    /* ═══════════════════════════════════════
+       Scrollbar
+       ═══════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* Auth gate */
+    .auth-gate {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px;
+    }
+    .auth-gate.hidden { display: none; }
+    .auth-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 48px 40px; max-width: 380px;
+      width: 100%; text-align: center;
+    }
+    .auth-label {
+      font-family: var(--font-mono); font-size: 0.625rem;
+      color: var(--gold-dim); letter-spacing: 0.25em;
+      text-transform: uppercase; margin-bottom: 16px;
+    }
+    .auth-title {
+      font-family: var(--font-display); font-size: 1.5rem;
+      font-weight: 700; color: var(--text-primary); margin-bottom: 8px;
+    }
+    .auth-sub { font-size: 0.75rem; color: var(--text-muted); }
+    .auth-input {
+      width: 100%; background: var(--elevated); border: 1px solid var(--border-strong);
+      border-radius: 8px; padding: 14px 16px; color: var(--text-primary);
+      font-family: var(--font-mono); font-size: 0.875rem;
+      text-align: center; letter-spacing: 0.1em; outline: none;
+      transition: border-color 0.2s;
+    }
+    .auth-input:focus { border-color: var(--gold-dim); }
+    .auth-input::placeholder { color: var(--text-muted); }
+    .auth-btn {
+      width: 100%; margin-top: 12px;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      color: var(--bg); border: none; border-radius: 8px; padding: 14px;
+      font-family: var(--font-display); font-size: 0.8125rem;
+      font-weight: 600; letter-spacing: 0.1em; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .auth-btn:hover { background: linear-gradient(135deg, var(--gold), var(--gold-hover)); transform: translateY(-1px); }
+    .auth-error { margin-top: 12px; font-size: 0.6875rem; color: var(--negative); min-height: 1em; }
+  </style>
+</head>
+<body>
+  <!-- Auth Gate -->
+  <div class="auth-gate" id="authGate">
+    <div class="auth-box">
+      <div class="auth-label">STAKING STAGE</div>
+      <h2 class="auth-title">$<span style="color:var(--gold)">SIBYL</span> Stage</h2>
+      <p class="auth-sub">enter access code to continue</p>
+      <form onsubmit="event.preventDefault(); checkAuth();" style="margin-top:24px">
+        <input type="password" id="authInput" class="auth-input" placeholder="access code" autocomplete="off" autofocus>
+        <button type="submit" class="auth-btn">ENTER</button>
+        <p class="auth-error" id="authError"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="ambient"></div>
+  <div class="ambient-2"></div>
+
+  <div id="mainContent" style="display:none">
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <a href="/" class="nav-logo">SIBYL</a>
+        <a href="/" class="nav-back">/ back</a>
+        <span class="nav-page-tag">Staking</span>
+      </div>
+      <button class="btn-wallet disconnected" id="btn-connect" onclick="connectWallet()">
+        <span class="dot"></span>
+        <span id="wallet-label">Connect Wallet</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- Header -->
+    <div class="page-header reveal">
+      <div class="page-eyebrow">$SIBYL staking</div>
+      <h1 class="page-title">Stake. <span>Earn.</span> Govern.</h1>
+      <p class="page-sub">lock tokens to increase yield and governance weight. the longer you commit, the more say you have.</p>
+    </div>
+
+    <!-- Market Overview Strip -->
+    <div class="market-strip reveal reveal-d1">
+      <div class="market-cell">
+        <div class="market-label">Price</div>
+        <div class="market-value gold" id="m-price">$0.00042</div>
+        <div class="market-delta up" id="m-price-delta">+12.4%</div>
+      </div>
+      <div class="market-cell">
+        <div class="market-label">Market Cap</div>
+        <div class="market-value" id="m-mcap">$420K</div>
+        <div class="market-delta up">circ.</div>
+      </div>
+      <div class="market-cell">
+        <div class="market-label">FDV</div>
+        <div class="market-value" id="m-fdv">$420K</div>
+        <div class="market-delta" style="color:var(--text-muted)">1B supply</div>
+      </div>
+      <div class="market-cell">
+        <div class="market-label">Total Staked</div>
+        <div class="market-value gold" id="m-staked">0</div>
+        <div class="market-delta" style="color:var(--text-muted)" id="m-staked-pct">0% of circ.</div>
+      </div>
+      <div class="market-cell">
+        <div class="market-label">Total Vesting</div>
+        <div class="market-value" id="m-vesting">0</div>
+        <div class="market-delta" style="color:var(--violet)">locked</div>
+      </div>
+      <div class="market-cell">
+        <div class="market-label">Circulating</div>
+        <div class="market-value" id="m-circ">0</div>
+        <div class="market-delta" style="color:var(--text-muted)" id="m-circ-pct">0% of total</div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+
+      <!-- ═══ LEFT: Staking Panel ═══ -->
+      <div class="stake-panel">
+
+        <!-- Stake Card -->
+        <div class="card reveal reveal-d2">
+          <div class="card-header">
+            <span class="card-title">Stake $SIBYL</span>
+            <span class="card-badge live">Live</span>
+          </div>
+
+          <div class="stake-input-wrap">
+            <input type="text" class="stake-input" id="stake-amount" placeholder="0.00" inputmode="decimal" autocomplete="off">
+            <button class="stake-max" onclick="setMax()">MAX</button>
+          </div>
+          <div class="stake-balance">Balance: <span id="user-balance">0.00</span> SIBYL</div>
+
+          <div class="pct-slider-wrap">
+            <div class="pct-labels">
+              <span class="pct-label">Amount</span>
+              <span class="pct-value" id="pct-display">0%</span>
+            </div>
+            <input type="range" class="pct-slider" id="pct-slider" min="0" max="100" value="0" oninput="onSlider(this.value)">
+            <div class="pct-ticks">
+              <span class="pct-tick" onclick="snapSlider(0)">0%</span>
+              <span class="pct-tick" onclick="snapSlider(25)">25%</span>
+              <span class="pct-tick" onclick="snapSlider(50)">50%</span>
+              <span class="pct-tick" onclick="snapSlider(75)">75%</span>
+              <span class="pct-tick" onclick="snapSlider(100)">100%</span>
+            </div>
+          </div>
+
+          <div class="tier-selector">
+            <div class="tier-label">Lock Duration</div>
+            <div class="tier-grid">
+              <button class="tier-btn active" data-tier="0" onclick="selectTier(this)">
+                <span class="tier-duration">Flex</span>
+                <span class="tier-mult">1.0x</span>
+              </button>
+              <button class="tier-btn" data-tier="1" onclick="selectTier(this)">
+                <span class="tier-duration">30d</span>
+                <span class="tier-mult">1.2x</span>
+              </button>
+              <button class="tier-btn" data-tier="2" onclick="selectTier(this)">
+                <span class="tier-duration">60d</span>
+                <span class="tier-mult">1.4x</span>
+              </button>
+              <button class="tier-btn" data-tier="3" onclick="selectTier(this)">
+                <span class="tier-duration">120d</span>
+                <span class="tier-mult">1.8x</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="stake-summary" id="stake-summary">
+            <div class="summary-row">
+              <span class="summary-label">You stake</span>
+              <span class="summary-value" id="sum-gross">0.00 SIBYL</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Deposit fee (0.1%)</span>
+              <span class="summary-value" id="sum-fee">0.00 SIBYL</span>
+            </div>
+            <hr class="summary-divider">
+            <div class="summary-row">
+              <span class="summary-label">Net staked</span>
+              <span class="summary-value gold" id="sum-net">0.00 SIBYL</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Governance weight</span>
+              <span class="summary-value gold" id="sum-weight">0.00</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Estimated APR</span>
+              <span class="summary-value" style="color:var(--positive)" id="sum-apr">--</span>
+            </div>
+          </div>
+
+          <button class="btn-stake" id="btn-stake" disabled onclick="doStake()">
+            Stake SIBYL
+          </button>
+          <button class="btn-unstake" id="btn-unstake-main" style="display:none" onclick="openUnstakeDrawer()">
+            Unstake All Flex Positions
+          </button>
+          <div class="tx-status" id="tx-status"></div>
+        </div>
+
+        <!-- Active Positions Card -->
+        <div class="card reveal reveal-d3">
+          <div class="card-header">
+            <span class="card-title">Your Positions</span>
+          </div>
+          <div id="positions-content">
+            <table class="positions-table" id="positions-table" style="display:none">
+              <thead>
+                <tr>
+                  <th>Amount</th>
+                  <th>Lock</th>
+                  <th>Unlock</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="positions-body"></tbody>
+            </table>
+            <div id="no-positions" style="text-align:center;padding:36px 24px;color:var(--text-secondary);font-size:0.8125rem;">
+              <div style="font-size:1.5rem;opacity:0.2;margin-bottom:8px;">&#9670;</div>
+              no active positions
+              <div style="font-size:0.6875rem;color:var(--text-muted);margin-top:6px;">stake above to create a position. unstake anytime (flex) or after lock expires.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ RIGHT: Analytics Dashboard ═══ -->
+      <div class="analytics-panel">
+
+        <!-- Your Position Summary -->
+        <div class="card reveal reveal-d2">
+          <div class="card-header">
+            <span class="card-title">Your Position</span>
+          </div>
+          <div class="position-grid">
+            <div class="position-stat">
+              <div class="stat-label">Staked</div>
+              <div class="stat-value" id="pos-staked">0</div>
+              <div class="stat-sub" id="pos-staked-usd">$0.00</div>
+            </div>
+            <div class="position-stat">
+              <div class="stat-label">Governance Weight</div>
+              <div class="stat-value" id="pos-weight">0</div>
+              <div class="stat-sub" id="pos-weight-pct">0% of total</div>
+            </div>
+            <div class="position-stat highlight">
+              <div class="stat-label">Earned Rewards</div>
+              <div class="stat-value" id="pos-earned">0.00</div>
+              <div class="stat-sub" id="pos-earned-usd">$0.00</div>
+            </div>
+            <div class="position-stat">
+              <div class="stat-label">Avg. APR</div>
+              <div class="stat-value" style="color:var(--positive)" id="pos-apr">--%</div>
+              <div class="stat-sub">weighted</div>
+            </div>
+          </div>
+
+          <!-- Claim Strip -->
+          <div class="claim-strip">
+            <div class="claim-info">
+              <div class="claim-label">Claimable Rewards</div>
+              <div class="claim-amount" id="claim-amount">0.00</div>
+              <div class="claim-usd" id="claim-usd">$0.00</div>
+            </div>
+            <button class="btn-claim" id="btn-claim" disabled onclick="doClaim()">Claim</button>
+          </div>
+        </div>
+
+        <!-- Value Chart -->
+        <div class="card reveal reveal-d3">
+          <div class="card-header">
+            <span class="card-title">Your SIBYL Value</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas class="chart-canvas" id="value-chart"></canvas>
+            <div class="chart-overlay">
+              <div class="chart-value-label">Portfolio Value</div>
+              <div>
+                <span class="chart-value" id="chart-value">$0.00</span>
+                <span class="chart-delta up" id="chart-delta">+0%</span>
+              </div>
+            </div>
+            <div class="chart-timeframes">
+              <button class="chart-tf active" data-tf="7d" onclick="setTimeframe(this)">7D</button>
+              <button class="chart-tf" data-tf="30d" onclick="setTimeframe(this)">30D</button>
+              <button class="chart-tf" data-tf="90d" onclick="setTimeframe(this)">90D</button>
+              <button class="chart-tf" data-tf="all" onclick="setTimeframe(this)">ALL</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- APR by Tier -->
+        <div class="card reveal reveal-d3">
+          <div class="card-header">
+            <span class="card-title">APR by Lock Tier</span>
+          </div>
+          <div class="apr-grid">
+            <div class="apr-cell">
+              <div class="apr-tier">Flex</div>
+              <div class="apr-value" id="apr-flex">--%</div>
+              <div class="apr-weight">1.0x weight</div>
+            </div>
+            <div class="apr-cell">
+              <div class="apr-tier">30 Day</div>
+              <div class="apr-value" id="apr-short">--%</div>
+              <div class="apr-weight">1.2x weight</div>
+            </div>
+            <div class="apr-cell">
+              <div class="apr-tier">60 Day</div>
+              <div class="apr-value" id="apr-medium">--%</div>
+              <div class="apr-weight">1.4x weight</div>
+            </div>
+            <div class="apr-cell">
+              <div class="apr-tier">120 Day</div>
+              <div class="apr-value" id="apr-long">--%</div>
+              <div class="apr-weight">1.8x weight</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Supply Distribution -->
+        <div class="card reveal reveal-d4">
+          <div class="card-header">
+            <span class="card-title">Supply Distribution</span>
+          </div>
+          <div class="supply-grid">
+            <div class="supply-item">
+              <div class="supply-label">Circulating</div>
+              <div class="supply-value" id="supply-circ">--</div>
+              <div class="supply-pct" id="supply-circ-pct">--% of total</div>
+            </div>
+            <div class="supply-item">
+              <div class="supply-label">Staked</div>
+              <div class="supply-value" id="supply-staked">--</div>
+              <div class="supply-pct" id="supply-staked-pct">--% of circ.</div>
+            </div>
+            <div class="supply-item">
+              <div class="supply-label">Vesting</div>
+              <div class="supply-value" id="supply-vesting">--</div>
+              <div class="supply-pct" id="supply-vesting-pct">locked</div>
+            </div>
+          </div>
+          <div class="supply-bar-wrap">
+            <div class="supply-bar">
+              <div class="supply-bar-seg circulating" id="bar-circ" style="width:60%"></div>
+              <div class="supply-bar-seg staked" id="bar-staked" style="width:20%"></div>
+              <div class="supply-bar-seg vesting" id="bar-vesting" style="width:20%"></div>
+            </div>
+            <div class="supply-bar-legend">
+              <span class="legend-item"><span class="legend-dot" style="background:#8a919c"></span> Circulating</span>
+              <span class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span> Staked</span>
+              <span class="legend-item"><span class="legend-dot" style="background:#2ea9a1"></span> Vesting</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liquidity Pools -->
+        <div class="card reveal reveal-d4">
+          <div class="card-header">
+            <span class="card-title">Liquidity Pools</span>
+          </div>
+          <table class="lp-table">
+            <thead>
+              <tr>
+                <th>Pair</th>
+                <th>DEX</th>
+                <th>TVL</th>
+                <th>24h Vol</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="lp-body">
+              <!-- Populated dynamically from DexScreener -->
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /analytics-panel -->
+    </div><!-- /main-grid -->
+
+    <!-- Footer -->
+    <div style="text-align:center; padding:48px 0 24px; color:var(--text-muted); font-size:0.6875rem; letter-spacing:0.15em; text-transform:uppercase;">
+      SIBYL Staking Contract : Base
+      <br>
+      <a href="#" id="contract-link" style="color:var(--accent);font-size:0.6875rem;" target="_blank">View on BaseScan</a>
+    </div>
+  </div>
+
+  <!-- Unstake Drawer -->
+  <div class="unstake-overlay" id="unstake-overlay" onclick="if(event.target===this)closeUnstakeDrawer()">
+    <div class="unstake-drawer">
+      <div class="unstake-handle"></div>
+      <div class="unstake-title">Unstake $SIBYL</div>
+      <div class="unstake-sub" id="unstake-sub"></div>
+
+      <div class="unstake-amount-display">
+        <div class="unstake-amount-value" id="unstake-amount-val">0</div>
+        <div class="unstake-amount-usd" id="unstake-amount-usd">$0.00</div>
+        <div style="margin-top:10px;font-size:0.6875rem;">
+          <span style="color:var(--text-muted)">Fee (0.1%): </span><span style="color:var(--text-secondary)" id="unstake-fee">0</span>
+          <span style="color:var(--text-muted);margin-left:16px">You receive: </span><span style="color:var(--text-primary);font-weight:500" id="unstake-net">0</span>
+        </div>
+      </div>
+
+      <button class="btn-unstake-confirm" id="btn-unstake-confirm" onclick="executeUnstake()">
+        Confirm Unstake
+      </button>
+      <button class="btn-unstake-cancel" onclick="closeUnstakeDrawer()">cancel</button>
+    </div>
+  </div>
+
+  </div><!-- /mainContent -->
+
+  <script>
+    // ── Auth ──
+    const PASS_HASH = '9cfeca2355a8ee17f7c34760c857e19a4f95d0a94b2ae56a99f27d0ae67105ec';
+    async function sha256(msg) {
+      const data = new TextEncoder().encode(msg);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    async function checkAuth() {
+      const input = document.getElementById('authInput').value;
+      const hash = await sha256(input);
+      if (hash === PASS_HASH) {
+        sessionStorage.setItem('sibyl_stage_auth', '1');
+        unlockPage();
+      } else {
+        document.getElementById('authError').textContent = 'invalid access code';
+        document.getElementById('authInput').value = '';
+        document.getElementById('authInput').focus();
+      }
+    }
+    function unlockPage() {
+      document.getElementById('authGate').classList.add('hidden');
+      document.getElementById('mainContent').style.display = '';
+    }
+    if (sessionStorage.getItem('sibyl_stage_auth') === '1') unlockPage();
+  </script>
+
+  <script>
+    // ═══════════════════════════════════════
+    //  Constants
+    // ═══════════════════════════════════════
+    const SIBYL_CA  = '0x797f214a2CD64a4963A91Fa21c8C55Ec3EBa4714';
+    const STAKE_CA  = '0x13a885969d1dBe8afB048005154F3a060CC2e07F';
+    const VESTING_CA = '0xD6B830F72FE36AC6Fb2Bb959642B29c64bE3cF11';
+    const TOTAL_SUPPLY = 1_000_000_000;
+    const DECIMALS = 18;
+    const RPC = 'https://mainnet.base.org';
+    const CHAIN_ID = '0x2105'; // Base
+    const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex/tokens/' + SIBYL_CA;
+    const REFRESH_INTERVAL = 90_000;
+
+    // Function selectors
+    const SEL = {
+      // ERC20
+      balanceOf:          '0x70a08231',
+      approve:            '0x095ea7b3',
+      allowance:          '0xdd62ed3e',
+      // Staking reads
+      totalRawStaked:     '0xc09696f7',
+      totalWeightedSupply:'0x268dc199',
+      rewardRate:         '0x7b0a47ee',
+      periodFinish:       '0xebe2b12b',
+      feeBps:             '0x24a9d853',
+      earned:             '0x008cc262',
+      getPositions:       '0x3eeb530e',
+      getPositionCount:   '0x0234b445',
+      userInfo:           '0x1959a002',
+      getVotingPower:     '0xbb4d4436',
+      // Staking writes
+      stake:              '0x10087fb1',
+      unstake:            '0x2e17de78',
+      claimRewards:       '0x372500ab',
+    };
+
+    // ═══════════════════════════════════════
+    //  State
+    // ═══════════════════════════════════════
+    let connected = false;
+    let userAddress = null;
+    let selectedTier = 0;
+    let marketData = null;
+    let lastFetch = 0;
+    let tokenPrice = 0;
+    let userBalance = 0n; // raw wei
+    const tierMultipliers = [1.0, 1.2, 1.4, 1.8];
+    const tierDurations = ['Flex', '30d', '60d', '120d'];
+    const tierDurationsSec = [0, 30*86400, 60*86400, 120*86400];
+    const feeBps = 10;
+
+    // ═══════════════════════════════════════
+    //  RPC Helpers
+    // ═══════════════════════════════════════
+    function padAddr(addr) { return '000000000000000000000000' + addr.slice(2).toLowerCase(); }
+    function padUint(n) { return BigInt(n).toString(16).padStart(64, '0'); }
+    function decUint(hex) { return hex && hex !== '0x' ? BigInt(hex) : 0n; }
+    function toWei(n) { return BigInt(Math.floor(n * 1e18)); }
+    function fromWei(n) { return Number(n) / 1e18; }
+
+    async function rpc(method, params) {
+      const r = await fetch(RPC, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({jsonrpc:'2.0', method, params, id: Date.now()})
+      });
+      const d = await r.json();
+      if (d.error) throw new Error(d.error.message);
+      return d.result;
+    }
+
+    async function call(to, sel, args) {
+      const data = args ? sel + args : sel;
+      return rpc('eth_call', [{to, data}, 'latest']);
+    }
+
+    async function sendTx(to, data, gasOverride) {
+      const gas = gasOverride || '0x30D40';
+      return window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{ from: userAddress, to, data, gas }]
+      });
+    }
+
+    async function waitTx(hash) {
+      for (let i = 0; i < 60; i++) {
+        await new Promise(r => setTimeout(r, 2000));
+        const receipt = await rpc('eth_getTransactionReceipt', [hash]);
+        if (receipt) return receipt;
+      }
+      return null;
+    }
+
+    // ═══════════════════════════════════════
+    //  Live Market Data (DexScreener)
+    // ═══════════════════════════════════════
+    async function fetchMarketData() {
+      try {
+        const res = await fetch(DEXSCREENER_API);
+        if (!res.ok) throw new Error('DexScreener ' + res.status);
+        const json = await res.json();
+        const pairs = json.pairs || [];
+        if (!pairs.length) return;
+
+        marketData = pairs;
+        lastFetch = Date.now();
+
+        const primary = pairs.reduce((a, b) =>
+          (parseFloat(b.liquidity?.usd || 0) > parseFloat(a.liquidity?.usd || 0)) ? b : a
+        , pairs[0]);
+
+        const price = parseFloat(primary.priceUsd || 0);
+        tokenPrice = price;
+        const priceChange = parseFloat(primary.priceChange?.h24 || 0);
+        const fdv = parseFloat(primary.fdv || 0);
+        const mcap = parseFloat(primary.marketCap || fdv);
+
+        let circSupply = 0;
+        if (primary.marketCap && price > 0) circSupply = mcap / price;
+
+        setText('m-price', '$' + formatPrice(price));
+        const deltaEl = document.getElementById('m-price-delta');
+        deltaEl.textContent = (priceChange >= 0 ? '+' : '') + priceChange.toFixed(1) + '%';
+        deltaEl.className = 'market-delta ' + (priceChange >= 0 ? 'up' : 'down');
+
+        setText('m-mcap', '$' + formatCompact(mcap));
+        setText('m-fdv', '$' + formatCompact(fdv));
+
+        if (circSupply > 0) {
+          setText('m-circ', formatCompact(circSupply));
+          setText('m-circ-pct', ((circSupply / TOTAL_SUPPLY) * 100).toFixed(1) + '% of total');
+          setText('supply-circ', formatCompact(circSupply));
+          setText('supply-circ-pct', ((circSupply / TOTAL_SUPPLY) * 100).toFixed(1) + '% of total');
+        }
+
+        renderPools(pairs);
+        fetchSupplyData(price);
+        fetchStakingGlobals(price);
+
+        console.log('[SIBYL] Market data refreshed:', new Date().toLocaleTimeString(),
+          '| Price: $' + formatPrice(price), '| Pairs:', pairs.length);
+      } catch (e) {
+        console.warn('[SIBYL] Market fetch failed:', e.message);
+      }
+    }
+
+    async function fetchSupplyData(price) {
+      try {
+        const res = await fetch('/api/circulating-supply');
+        if (res.ok) {
+          const circ = parseFloat(await res.text());
+          if (circ > 0) {
+            setText('m-circ', formatCompact(circ));
+            setText('m-circ-pct', ((circ / TOTAL_SUPPLY) * 100).toFixed(1) + '% of total');
+            setText('supply-circ', formatCompact(circ));
+            setText('supply-circ-pct', ((circ / TOTAL_SUPPLY) * 100).toFixed(1) + '% of total');
+            if (price > 0) setText('m-mcap', '$' + formatCompact(circ * price));
+
+            const vesting = TOTAL_SUPPLY - circ;
+            if (vesting > 0) {
+              setText('m-vesting', formatCompact(vesting));
+              setText('supply-vesting', formatCompact(vesting));
+              const circPct = (circ / TOTAL_SUPPLY) * 100;
+              const vestPct = (vesting / TOTAL_SUPPLY) * 100;
+              document.getElementById('bar-circ').style.width = circPct + '%';
+              document.getElementById('bar-vesting').style.width = vestPct + '%';
+            }
+          }
+        }
+      } catch (e) { /* silent */ }
+    }
+
+    async function fetchStakingGlobals(price) {
+      try {
+        const [totalRaw, totalWeighted, rateRaw, periodRaw] = await Promise.all([
+          call(STAKE_CA, SEL.totalRawStaked),
+          call(STAKE_CA, SEL.totalWeightedSupply),
+          call(STAKE_CA, SEL.rewardRate),
+          call(STAKE_CA, SEL.periodFinish),
+        ]);
+
+        const totalStaked = fromWei(decUint(totalRaw));
+        const rewardRate = fromWei(decUint(rateRaw));
+        const periodFinish = Number(decUint(periodRaw));
+        const now = Math.floor(Date.now() / 1000);
+        const rewardsActive = periodFinish > now && rewardRate > 0;
+
+        // Market strip: total staked
+        setText('m-staked', formatCompact(totalStaked));
+        if (totalStaked > 0) {
+          const circEl = document.getElementById('m-circ');
+          const circVal = parseFloat((circEl?.textContent || '0').replace(/[^0-9.]/g,''));
+          // Rough circ for pct
+          const circ = circVal >= 1000 ? circVal * 1e6 : circVal;
+          if (circ > 0) setText('m-staked-pct', ((totalStaked / circ) * 100).toFixed(1) + '% of circ.');
+        }
+
+        // Supply bar: staked segment
+        if (totalStaked > 0) {
+          const stakedPct = (totalStaked / TOTAL_SUPPLY) * 100;
+          document.getElementById('bar-staked').style.width = Math.max(stakedPct, 0.5) + '%';
+          setText('supply-staked', formatCompact(totalStaked));
+          setText('supply-staked-pct', ((totalStaked / TOTAL_SUPPLY) * 100).toFixed(2) + '% of total');
+        }
+
+        // APR by tier (annual reward / weighted stake per unit)
+        if (rewardsActive && totalStaked > 0) {
+          const totalWeightedN = fromWei(decUint(totalWeighted));
+          const annualReward = rewardRate * 365.25 * 86400;
+          const tiers = [1.0, 1.2, 1.4, 1.8];
+          const ids = ['apr-flex', 'apr-short', 'apr-medium', 'apr-long'];
+          tiers.forEach((mult, i) => {
+            // APR = (annualReward * myWeight / totalWeighted) / myStake * 100
+            // Simplifies to: annualReward * mult / totalWeightedN * 100
+            const apr = (annualReward * mult / totalWeightedN) * 100;
+            setText(ids[i], apr.toFixed(1) + '%');
+          });
+        }
+      } catch (e) {
+        console.warn('[SIBYL] Staking globals fetch failed:', e.message);
+      }
+    }
+
+    function renderPools(pairs) {
+      const tbody = document.getElementById('lp-body');
+      if (!tbody) return;
+      const sorted = [...pairs].sort((a, b) =>
+        (parseFloat(b.liquidity?.usd || 0)) - (parseFloat(a.liquidity?.usd || 0))
+      );
+      tbody.innerHTML = sorted.map(p => {
+        const base = p.baseToken?.symbol || '?';
+        const quote = p.quoteToken?.symbol || '?';
+        const dex = p.dexId || 'Unknown';
+        const dexName = dex.charAt(0).toUpperCase() + dex.slice(1).replace(/_/g, ' ');
+        const tvl = parseFloat(p.liquidity?.usd || 0);
+        const vol = parseFloat(p.volume?.h24 || 0);
+        const url = p.url || '#';
+        return '<tr>' +
+          '<td><span class="lp-pair">' + base + ' / ' + quote + '</span></td>' +
+          '<td><span class="lp-dex">' + dexName + '</span></td>' +
+          '<td><span class="lp-tvl">$' + formatCompact(tvl) + '</span></td>' +
+          '<td><span class="lp-tvl">$' + formatCompact(vol) + '</span></td>' +
+          '<td><a href="' + url + '" target="_blank" rel="noopener" class="lp-link">Trade</a></td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    // ═══════════════════════════════════════
+    //  Reveal on scroll
+    // ═══════════════════════════════════════
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }});
+    }, { threshold: 0.1 });
+    reveals.forEach(el => revealObs.observe(el));
+
+    // ═══════════════════════════════════════
+    //  Tier selection
+    // ═══════════════════════════════════════
+    function selectTier(btn) {
+      document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedTier = parseInt(btn.dataset.tier);
+      updateSummary();
+    }
+
+    // ═══════════════════════════════════════
+    //  Stake summary calculation
+    // ═══════════════════════════════════════
+    const stakeInput = document.getElementById('stake-amount');
+    stakeInput.addEventListener('input', () => {
+      updateSummary();
+      const bal = fromWei(userBalance);
+      const raw = parseFloat(stakeInput.value) || 0;
+      const pct = bal > 0 ? Math.min(100, Math.round((raw / bal) * 100)) : 0;
+      document.getElementById('pct-slider').value = pct;
+      document.getElementById('pct-display').textContent = pct + '%';
+      const slider = document.getElementById('pct-slider');
+      slider.style.background = 'linear-gradient(to right, var(--gold) 0%, var(--gold) ' + pct + '%, var(--highest) ' + pct + '%, var(--highest) 100%)';
+    });
+
+    function updateSummary() {
+      const raw = parseFloat(stakeInput.value) || 0;
+      const fee = raw * feeBps / 10000;
+      const net = raw - fee;
+      const weight = net * tierMultipliers[selectedTier];
+
+      document.getElementById('sum-gross').textContent = formatNum(raw) + ' SIBYL';
+      document.getElementById('sum-fee').textContent = formatNum(fee) + ' SIBYL';
+      document.getElementById('sum-net').textContent = formatNum(net) + ' SIBYL';
+      document.getElementById('sum-weight').textContent = formatNum(weight);
+
+      const stakeBtn = document.getElementById('btn-stake');
+      const hasAmount = raw > 0;
+      stakeBtn.disabled = !(hasAmount && connected);
+      if (hasAmount) { stakeBtn.classList.add('ready'); }
+      else { stakeBtn.classList.remove('ready'); }
+    }
+
+    function setMax() {
+      document.getElementById('pct-slider').value = 100;
+      onSlider(100);
+    }
+
+    function onSlider(pct) {
+      pct = parseInt(pct);
+      document.getElementById('pct-display').textContent = pct + '%';
+      const bal = fromWei(userBalance);
+      const amount = bal * pct / 100;
+      stakeInput.value = amount > 0 ? amount.toFixed(2) : '';
+      updateSummary();
+      const slider = document.getElementById('pct-slider');
+      slider.style.background = 'linear-gradient(to right, var(--gold) 0%, var(--gold) ' + pct + '%, var(--highest) ' + pct + '%, var(--highest) 100%)';
+    }
+
+    function snapSlider(pct) {
+      document.getElementById('pct-slider').value = pct;
+      onSlider(pct);
+    }
+
+    // ═══════════════════════════════════════
+    //  Chart (canvas-based area chart)
+    // ═══════════════════════════════════════
+    function drawChart() {
+      const canvas = document.getElementById('value-chart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      const w = rect.width, h = rect.height;
+
+      const points = 60; const data = [];
+      let val = 100;
+      for (let i = 0; i < points; i++) {
+        val += (Math.random() - 0.42) * 8;
+        if (val < 50) val = 50; data.push(val);
+      }
+      const max = Math.max(...data) * 1.1, min = Math.min(...data) * 0.9;
+
+      ctx.strokeStyle = 'rgba(37,42,54,0.5)'; ctx.lineWidth = 0.5;
+      for (let i = 0; i < 4; i++) {
+        const y = (h * 0.15) + (h * 0.7 * i / 3);
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      ctx.beginPath(); ctx.strokeStyle = '#b5a070'; ctx.lineWidth = 1.5; ctx.lineJoin = 'round';
+      for (let i = 0; i < data.length; i++) {
+        const x = (i / (data.length - 1)) * w;
+        const y = h - ((data[i] - min) / (max - min)) * h * 0.7 - h * 0.15;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      const lastX = w;
+      const lastY = h - ((data[data.length - 1] - min) / (max - min)) * h * 0.7 - h * 0.15;
+      ctx.lineTo(lastX, h); ctx.lineTo(0, h); ctx.closePath();
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, 'rgba(181,160,112,0.12)');
+      grad.addColorStop(1, 'rgba(181,160,112,0)');
+      ctx.fillStyle = grad; ctx.fill();
+
+      ctx.beginPath(); ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#b5a070'; ctx.fill();
+      ctx.beginPath(); ctx.arc(lastX, lastY, 6, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(181,160,112,0.3)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+
+    function setTimeframe(btn) {
+      document.querySelectorAll('.chart-tf').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      drawChart();
+    }
+
+    // ═══════════════════════════════════════
+    //  Wallet connect
+    // ═══════════════════════════════════════
+    async function connectWallet() {
+      if (connected) {
+        connected = false; userAddress = null; userBalance = 0n;
+        document.getElementById('wallet-label').textContent = 'Connect Wallet';
+        document.getElementById('btn-connect').classList.add('disconnected');
+        document.getElementById('user-balance').textContent = '0.00';
+        updateSummary(); return;
+      }
+      if (typeof window.ethereum === 'undefined') {
+        alert('No wallet detected. Install MetaMask or a compatible wallet.'); return;
+      }
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        userAddress = accounts[0]; connected = true;
+
+        // Switch to Base if needed
+        try {
+          await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{chainId: CHAIN_ID}] });
+        } catch (sw) {
+          if (sw.code === 4902) {
+            await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
+              chainId: CHAIN_ID, chainName: 'Base',
+              nativeCurrency: {name:'ETH',symbol:'ETH',decimals:18},
+              rpcUrls: [RPC], blockExplorerUrls: ['https://basescan.org']
+            }]});
+          }
+        }
+
+        document.getElementById('wallet-label').textContent =
+          userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+        document.getElementById('btn-connect').classList.remove('disconnected');
+        await loadUserData();
+        updateSummary();
+      } catch (e) { console.error('Connect failed:', e); }
+    }
+
+    // ═══════════════════════════════════════
+    //  Load user data from staking contract
+    // ═══════════════════════════════════════
+    async function loadUserData() {
+      if (!userAddress) return;
+      const addr = padAddr(userAddress);
+
+      try {
+        const [balRaw, earnedRaw, infoRaw, posCountRaw, vpRaw] = await Promise.all([
+          call(SIBYL_CA, SEL.balanceOf, addr),
+          call(STAKE_CA, SEL.earned, addr),
+          call(STAKE_CA, SEL.userInfo, addr),
+          call(STAKE_CA, SEL.getPositionCount, addr),
+          call(STAKE_CA, SEL.getVotingPower, addr),
+        ]);
+
+        // Token balance
+        userBalance = decUint(balRaw);
+        const balNum = fromWei(userBalance);
+        document.getElementById('user-balance').textContent = formatNum(balNum);
+
+        // Earned rewards
+        const earnedWei = decUint(earnedRaw);
+        const earnedNum = fromWei(earnedWei);
+
+        // User info: (totalWeightedBalance, totalRawBalance, rewardPerTokenPaid, rewardsAccrued)
+        const infoClean = infoRaw.slice(2);
+        const rawStaked = fromWei(BigInt('0x' + infoClean.slice(64, 128)));
+        const weightedBal = fromWei(decUint(vpRaw));
+
+        // Position summary
+        setText('pos-staked', formatNum(rawStaked) + ' SIBYL');
+        setText('pos-staked-usd', '$' + formatCompact(rawStaked * tokenPrice));
+        setText('pos-weight', formatNum(weightedBal));
+
+        // Weight % of total
+        try {
+          const twRaw = await call(STAKE_CA, SEL.totalWeightedSupply);
+          const totalW = fromWei(decUint(twRaw));
+          if (totalW > 0) setText('pos-weight-pct', ((weightedBal / totalW) * 100).toFixed(2) + '% of total');
+        } catch(e) {}
+
+        // Earned
+        setText('pos-earned', formatNum(earnedNum) + ' SIBYL');
+        setText('pos-earned-usd', '$' + formatCompact(earnedNum * tokenPrice));
+
+        // Claimable rewards
+        setText('claim-amount', formatNum(earnedNum));
+        setText('claim-usd', '$' + (earnedNum * tokenPrice).toFixed(2));
+        document.getElementById('btn-claim').disabled = earnedWei === 0n;
+
+        // Chart value
+        const totalValue = (rawStaked + earnedNum) * tokenPrice;
+        setText('chart-value', '$' + formatCompact(totalValue));
+
+        // Load positions
+        const posCount = Number(decUint(posCountRaw));
+        await loadPositions(posCount);
+
+      } catch (e) {
+        console.warn('[SIBYL] loadUserData failed:', e.message);
+      }
+    }
+
+    async function loadPositions(count) {
+      const table = document.getElementById('positions-table');
+      const noPos = document.getElementById('no-positions');
+      const tbody = document.getElementById('positions-body');
+
+      if (count === 0) {
+        table.style.display = 'none'; noPos.style.display = '';
+        return;
+      }
+
+      // Fetch all positions via getPositions(address)
+      try {
+        const raw = await call(STAKE_CA, SEL.getPositions, padAddr(userAddress));
+        const data = raw.slice(2); // remove 0x
+        // ABI: Position[] dynamic array
+        // offset (64 chars) + length (64 chars) + N * (amount:128 + lockTier:8 + unlockTime:64 + active:bool) packed as 4 x 32-byte slots each
+        const offset = parseInt(data.slice(0, 64), 16) * 2;
+        const length = parseInt(data.slice(offset, offset + 64), 16);
+
+        const positions = [];
+        const now = Math.floor(Date.now() / 1000);
+
+        for (let i = 0; i < length; i++) {
+          const base = offset + 64 + (i * 256); // 4 slots * 64 chars each
+          const amount = BigInt('0x' + data.slice(base, base + 64));
+          const lockTier = parseInt(data.slice(base + 64, base + 128), 16);
+          const unlockTime = parseInt(data.slice(base + 128, base + 192), 16);
+          const active = parseInt(data.slice(base + 192, base + 256), 16) !== 0;
+
+          positions.push({ amount, lockTier, unlockTime, active, index: i });
+        }
+
+        // Render active positions
+        const active = positions.filter(p => p.active);
+        const unstakeBtn = document.getElementById('btn-unstake-main');
+        if (active.length === 0) {
+          table.style.display = 'none'; noPos.style.display = '';
+          if (unstakeBtn) unstakeBtn.style.display = 'none';
+          return;
+        }
+
+        // Show main unstake button if position can be unstaked
+        const unstakeable = active.filter(p => p.lockTier === 0 || now >= p.unlockTime);
+        if (unstakeBtn) {
+          if (unstakeable.length > 0) {
+            unstakeBtn.style.display = '';
+            unstakeBtn.textContent = 'Unstake';
+            unstakeBtn.disabled = false;
+          } else {
+            unstakeBtn.style.display = '';
+            unstakeBtn.textContent = 'Locked';
+            unstakeBtn.disabled = true;
+          }
+        }
+
+        table.style.display = ''; noPos.style.display = 'none';
+        tbody.innerHTML = active.map(p => {
+          const amtNum = fromWei(p.amount);
+          const tierName = tierDurations[p.lockTier];
+          const isLocked = p.lockTier > 0 && now < p.unlockTime;
+          const canUnstake = p.lockTier === 0 || now >= p.unlockTime;
+
+          let unlockLabel = 'anytime';
+          let progressHtml = '';
+          if (p.lockTier > 0) {
+            const lockStart = p.unlockTime - tierDurationsSec[p.lockTier];
+            const elapsed = Math.max(0, now - lockStart);
+            const total = tierDurationsSec[p.lockTier];
+            const pct = Math.min(100, (elapsed / total) * 100);
+
+            if (isLocked) {
+              const remaining = p.unlockTime - now;
+              const days = Math.ceil(remaining / 86400);
+              unlockLabel = days + 'd left';
+              progressHtml = '<div class="lock-progress"><div class="lock-fill" style="width:' + pct.toFixed(1) + '%"></div></div>';
+            } else {
+              unlockLabel = 'unlocked';
+            }
+          }
+
+          const badgeClass = p.lockTier === 0 ? 'flex' : 'locked';
+          const btnDisabled = canUnstake ? '' : 'disabled';
+
+          return '<tr>' +
+            '<td>' + formatNum(amtNum) + '</td>' +
+            '<td><span class="lock-badge ' + badgeClass + '">' + tierName + ' (' + tierMultipliers[p.lockTier] + 'x)</span>' + progressHtml + '</td>' +
+            '<td>' + unlockLabel + '</td>' +
+            '<td><button class="btn-unstake-sm" ' + btnDisabled + ' onclick="doUnstake(' + p.index + ')">Unstake</button></td>' +
+          '</tr>';
+        }).join('');
+
+      } catch (e) {
+        console.warn('[SIBYL] loadPositions failed:', e.message);
+        table.style.display = 'none'; noPos.style.display = '';
+      }
+    }
+
+    // ═══════════════════════════════════════
+    //  Actions: Stake
+    // ═══════════════════════════════════════
+    async function doStake() {
+      if (!connected || !userAddress) return;
+      const raw = parseFloat(stakeInput.value) || 0;
+      if (raw <= 0) return;
+
+      const status = document.getElementById('tx-status');
+      const btn = document.getElementById('btn-stake');
+      btn.disabled = true;
+
+      const amountWei = toWei(raw);
+
+      try {
+        // Step 1: Check allowance
+        status.className = 'tx-status pending'; status.style.display = 'block';
+        status.textContent = 'checking allowance...';
+
+        const allowRaw = await call(SIBYL_CA, SEL.allowance,
+          padAddr(userAddress) + padAddr(STAKE_CA));
+        const currentAllowance = decUint(allowRaw);
+
+        if (currentAllowance < amountWei) {
+          // Step 2: Approve
+          status.textContent = 'requesting token approval...';
+          const maxApprove = '0x' + 'f'.repeat(64); // max uint256
+          const approveData = SEL.approve + padAddr(STAKE_CA) + maxApprove.slice(2).padStart(64, '0');
+
+          // Actually use max uint256 properly
+          const approveCalldata = SEL.approve +
+            padAddr(STAKE_CA) +
+            'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
+          const approveTx = await sendTx(SIBYL_CA, approveCalldata, '0x15F90'); // 90000 gas
+          status.textContent = 'approval submitted. waiting for confirmation...';
+
+          const approveReceipt = await waitTx(approveTx);
+          if (!approveReceipt || approveReceipt.status !== '0x1') {
+            throw new Error('Approval transaction failed');
+          }
+          status.textContent = 'approved. submitting stake...';
+        }
+
+        // Step 3: Stake
+        status.textContent = 'submitting stake transaction...';
+        const stakeData = SEL.stake + padUint(amountWei) + padUint(selectedTier);
+        const stakeTx = await sendTx(STAKE_CA, stakeData, '0x493E0'); // 300000 gas
+
+        status.textContent = 'stake submitted. waiting for confirmation...';
+        const stakeReceipt = await waitTx(stakeTx);
+
+        if (stakeReceipt && stakeReceipt.status === '0x1') {
+          status.className = 'tx-status success';
+          status.innerHTML = 'staked successfully. <a href="https://basescan.org/tx/' + stakeTx + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+          stakeInput.value = '';
+          snapSlider(0);
+          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+        } else {
+          throw new Error('Stake transaction failed');
+        }
+
+      } catch (e) {
+        status.className = 'tx-status error';
+        status.textContent = e.code === 4001 ? 'transaction rejected.' : 'failed: ' + (e.message || 'unknown error');
+      }
+
+      btn.disabled = false;
+      updateSummary();
+    }
+
+    // ═══════════════════════════════════════
+    //  Actions: Unstake
+    // ═══════════════════════════════════════
+    async function doUnstake(positionIndex) {
+      if (!connected) return;
+      const status = document.getElementById('tx-status');
+
+      try {
+        status.className = 'tx-status pending'; status.style.display = 'block';
+        status.textContent = 'submitting unstake...';
+
+        const data = SEL.unstake + padUint(positionIndex);
+        const hash = await sendTx(STAKE_CA, data, '0x493E0');
+
+        status.textContent = 'unstake submitted. waiting...';
+        const receipt = await waitTx(hash);
+
+        if (receipt && receipt.status === '0x1') {
+          status.className = 'tx-status success';
+          status.innerHTML = 'unstaked successfully. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+        } else {
+          throw new Error('Unstake failed');
+        }
+      } catch (e) {
+        status.className = 'tx-status error';
+        status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
+      }
+    }
+
+    // ═══════════════════════════════════════
+    //  Unstake Drawer
+    // ═══════════════════════════════════════
+    let unstakePositionIndex = null;
+    let unstakeAmount = 0;
+
+    async function openUnstakeDrawer() {
+      if (!connected) return;
+
+      try {
+        const raw = await call(STAKE_CA, SEL.getPositions, padAddr(userAddress));
+        const data = raw.slice(2);
+        const off = parseInt(data.slice(0, 64), 16) * 2;
+        const length = parseInt(data.slice(off, off + 64), 16);
+        const now = Math.floor(Date.now() / 1000);
+
+        // Find the first active unstakeable position
+        for (let i = 0; i < length; i++) {
+          const b = off + 64 + (i * 256);
+          const amount = BigInt('0x' + data.slice(b, b + 64));
+          const lockTier = parseInt(data.slice(b + 64, b + 128), 16);
+          const unlockTime = parseInt(data.slice(b + 128, b + 192), 16);
+          const active = parseInt(data.slice(b + 192, b + 256), 16) !== 0;
+
+          if (active && (lockTier === 0 || now >= unlockTime)) {
+            unstakePositionIndex = i;
+            unstakeAmount = fromWei(amount);
+
+            const fee = unstakeAmount * feeBps / 10000;
+            const net = unstakeAmount - fee;
+            const tier = tierDurations[lockTier];
+
+            setText('unstake-amount-val', formatNum(unstakeAmount) + ' SIBYL');
+            setText('unstake-amount-usd', '$' + (unstakeAmount * tokenPrice).toFixed(2));
+            setText('unstake-fee', formatNum(fee) + ' SIBYL');
+            setText('unstake-net', formatNum(net) + ' SIBYL');
+            document.getElementById('unstake-sub').textContent =
+              tier + ' tier. withdrawal fee: 0.1%. tokens return to your wallet.';
+
+            document.getElementById('unstake-overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to load position for unstake:', e.message);
+      }
+    }
+
+    function closeUnstakeDrawer() {
+      document.getElementById('unstake-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    async function executeUnstake() {
+      if (unstakePositionIndex === null) return;
+      const status = document.getElementById('tx-status');
+      const btn = document.getElementById('btn-unstake-confirm');
+      btn.disabled = true;
+      btn.textContent = 'UNSTAKING...';
+
+      try {
+        const calldata = SEL.unstake + padUint(unstakePositionIndex);
+        const hash = await sendTx(STAKE_CA, calldata, '0x493E0');
+
+        btn.textContent = 'WAITING...';
+        const receipt = await waitTx(hash);
+
+        if (receipt && receipt.status === '0x1') {
+          closeUnstakeDrawer();
+          status.className = 'tx-status success'; status.style.display = 'block';
+          status.innerHTML = 'unstaked ' + formatNum(unstakeAmount) + ' SIBYL. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+          setTimeout(() => { loadUserData(); fetchStakingGlobals(tokenPrice); }, 2000);
+        } else {
+          throw new Error('Unstake transaction failed');
+        }
+      } catch (e) {
+        btn.textContent = 'CONFIRM UNSTAKE'; btn.disabled = false;
+        status.className = 'tx-status error'; status.style.display = 'block';
+        status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
+      }
+    }
+
+    // ═══════════════════════════════════════
+    //  Actions: Claim Rewards
+    // ═══════════════════════════════════════
+    async function doClaim() {
+      if (!connected) return;
+      const btn = document.getElementById('btn-claim');
+      const status = document.getElementById('tx-status');
+      btn.disabled = true;
+
+      try {
+        status.className = 'tx-status pending'; status.style.display = 'block';
+        status.textContent = 'submitting claim...';
+
+        const hash = await sendTx(STAKE_CA, SEL.claimRewards, '0x30D40');
+
+        status.textContent = 'claim submitted. waiting...';
+        const receipt = await waitTx(hash);
+
+        if (receipt && receipt.status === '0x1') {
+          status.className = 'tx-status success';
+          status.innerHTML = 'rewards claimed. <a href="https://basescan.org/tx/' + hash + '" target="_blank" style="color:inherit;text-decoration:underline">view on BaseScan</a>';
+          setTimeout(() => loadUserData(), 2000);
+        } else {
+          throw new Error('Claim failed');
+        }
+      } catch (e) {
+        status.className = 'tx-status error';
+        status.textContent = e.code === 4001 ? 'rejected.' : 'failed: ' + (e.message || 'unknown');
+        btn.disabled = false;
+      }
+    }
+
+    // ═══════════════════════════════════════
+    //  Utilities
+    // ═══════════════════════════════════════
+    function formatNum(n) {
+      if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+      return n.toFixed(2);
+    }
+
+    function formatCompact(n) {
+      if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+      if (n >= 1) return n.toFixed(0);
+      return n.toFixed(2);
+    }
+
+    function formatPrice(p) {
+      if (p >= 1) return p.toFixed(2);
+      if (p >= 0.01) return p.toFixed(4);
+      if (p >= 0.0001) return p.toFixed(6);
+      const s = p.toFixed(12);
+      const m = s.match(/^0\.(0*)(\d{4})/);
+      if (m) return '0.' + m[1] + m[2];
+      return p.toPrecision(4);
+    }
+
+    function setText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    // ═══════════════════════════════════════
+    //  Account change listener
+    // ═══════════════════════════════════════
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length > 0) {
+          userAddress = accounts[0]; connected = true;
+          document.getElementById('wallet-label').textContent =
+            userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+          document.getElementById('btn-connect').classList.remove('disconnected');
+          loadUserData();
+        } else {
+          connected = false; userAddress = null; userBalance = 0n;
+          document.getElementById('wallet-label').textContent = 'Connect Wallet';
+          document.getElementById('btn-connect').classList.add('disconnected');
+        }
+        updateSummary();
+      });
+    }
+
+    // ═══════════════════════════════════════
+    //  Init
+    // ═══════════════════════════════════════
+    window.addEventListener('load', () => {
+      drawChart();
+      window.addEventListener('resize', drawChart);
+
+      // Set contract link
+      document.getElementById('contract-link').href = 'https://basescan.org/address/' + STAKE_CA;
+
+      // Fetch live data immediately, then every 90s
+      fetchMarketData();
+      setInterval(fetchMarketData, REFRESH_INTERVAL);
+
+      // Refresh user data every 30s if connected
+      setInterval(() => { if (connected) loadUserData(); }, 30_000);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIBYL : Media Kit</title>
+  <meta name="description" content="SIBYL brand assets, color system, typography, and logo downloads.">
+  <meta property="og:title" content="SIBYL : Media Kit">
+  <meta property="og:description" content="brand assets and visual identity.">
+  <meta property="og:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@sibylcap">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:            #08090a;
+      --surface:       #0e1118;
+      --elevated:      #131620;
+      --highest:       #1a1e28;
+      --border:        #1a1e28;
+      --border-strong: #252a36;
+      --text-primary:  #c8ccd4;
+      --text-secondary:#8a919c;
+      --text-muted:    #555d6b;
+      --accent:        #6b8ba5;
+      --gold:          #b5a070;
+      --gold-hover:    #c4af80;
+      --violet:        #8878a8;
+      --positive:      #5a8a6a;
+      --warning:       #b5944a;
+      --negative:      #b06868;
+      --font-display:  'Syne', 'Helvetica Neue', sans-serif;
+      --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { font-size:16px; scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+    body { background:var(--bg); color:var(--text-primary); font-family:var(--font-mono); font-size:0.875rem; line-height:1.7; overflow-x:hidden; }
+    ::selection { background:var(--gold); color:var(--bg); }
+    a { color:var(--accent); text-decoration:none; transition:color 0.2s; }
+    a:hover { color:var(--text-primary); }
+
+    /* ---- Nav ---- */
+    .nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:1rem 0; background:rgba(8,9,10,0.95); border-bottom:1px solid var(--border); backdrop-filter:blur(8px); }
+    .nav-inner { display:flex; align-items:center; justify-content:space-between; max-width:1080px; margin:0 auto; padding:0 2rem; }
+    .nav-logo { font-family:var(--font-display); font-size:1rem; font-weight:700; letter-spacing:0.25em; color:var(--text-primary); text-transform:uppercase; text-decoration:none; }
+    .nav-links { display:flex; gap:1.25rem; align-items:center; }
+    .nav-links a { color:var(--text-muted); text-decoration:none; font-size:0.75rem; letter-spacing:0.06em; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--text-primary); }
+    .nav-links a.active { color:var(--accent); }
+
+    /* ---- Page Header ---- */
+    .page-header {
+      padding:8rem 2rem 4rem;
+      text-align:center;
+      position:relative;
+    }
+    .page-header::after {
+      content:'';
+      position:absolute;
+      bottom:0; left:50%;
+      transform:translateX(-50%);
+      width:60px; height:1px;
+      background:var(--gold);
+    }
+    .page-eyebrow {
+      font-family:var(--font-mono);
+      font-size:0.5625rem;
+      letter-spacing:0.5em;
+      text-transform:uppercase;
+      color:var(--gold);
+      margin-bottom:1.5rem;
+    }
+    .page-title {
+      font-family:var(--font-display);
+      font-size:3rem;
+      font-weight:700;
+      letter-spacing:0.2em;
+      text-transform:uppercase;
+      color:var(--text-primary);
+      margin-bottom:1rem;
+    }
+    .page-subtitle {
+      font-size:0.8125rem;
+      color:var(--text-secondary);
+      max-width:500px;
+      margin:0 auto;
+      letter-spacing:0.04em;
+    }
+
+    /* ---- Container ---- */
+    .container { max-width:1080px; margin:0 auto; padding:0 2rem; }
+
+    /* ---- Section ---- */
+    .section {
+      padding:5rem 0;
+      border-bottom:1px solid var(--surface);
+    }
+    .section:last-of-type { border-bottom:none; }
+    .section-label {
+      font-family:var(--font-display);
+      font-size:0.6875rem;
+      font-weight:600;
+      letter-spacing:0.35em;
+      text-transform:uppercase;
+      color:var(--text-muted);
+      margin-bottom:2.5rem;
+      display:flex;
+      align-items:center;
+      gap:0.75rem;
+    }
+    .section-label::before {
+      content:'';
+      width:8px; height:1px;
+      background:var(--gold);
+    }
+
+    /* ---- Color Palette ---- */
+    .palette-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+      gap:1px;
+      background:var(--border);
+      border:1px solid var(--border);
+    }
+    .color-card {
+      background:var(--surface);
+      padding:0;
+      display:flex;
+      flex-direction:column;
+    }
+    .color-swatch {
+      height:100px;
+      position:relative;
+      cursor:pointer;
+      transition:transform 0.2s;
+    }
+    .color-swatch:hover { transform:scale(1.02); z-index:1; }
+    .color-swatch::after {
+      content:'copy';
+      position:absolute;
+      bottom:8px; right:10px;
+      font-family:var(--font-mono);
+      font-size:0.5rem;
+      letter-spacing:0.1em;
+      text-transform:uppercase;
+      opacity:0;
+      transition:opacity 0.2s;
+      color:var(--bg);
+      background:rgba(0,0,0,0.4);
+      padding:2px 6px;
+      border-radius:2px;
+    }
+    .color-swatch:hover::after { opacity:1; }
+    .color-swatch.light-text::after { color:var(--text-primary); background:rgba(255,255,255,0.15); }
+    .color-info {
+      padding:0.75rem 1rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+    }
+    .color-name {
+      font-size:0.6875rem;
+      color:var(--text-primary);
+      letter-spacing:0.04em;
+    }
+    .color-hex {
+      font-family:var(--font-mono);
+      font-size:0.625rem;
+      color:var(--text-muted);
+      letter-spacing:0.02em;
+    }
+    .color-role {
+      font-size:0.5625rem;
+      color:var(--text-muted);
+      padding:0 1rem 0.75rem;
+      letter-spacing:0.02em;
+    }
+
+    /* ---- Color Groups ---- */
+    .color-group {
+      margin-bottom:2.5rem;
+    }
+    .color-group:last-child { margin-bottom:0; }
+    .color-group-label {
+      font-size:0.5625rem;
+      color:var(--text-muted);
+      letter-spacing:0.2em;
+      text-transform:uppercase;
+      margin-bottom:0.75rem;
+    }
+
+    /* ---- Typography Specimen ---- */
+    .type-specimen {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:3rem;
+      margin-bottom:3rem;
+    }
+    .type-block {}
+    .type-family-name {
+      font-size:0.5625rem;
+      color:var(--gold);
+      letter-spacing:0.2em;
+      text-transform:uppercase;
+      margin-bottom:1.5rem;
+    }
+    .type-display-sample {
+      font-family:var(--font-display);
+      font-size:3.5rem;
+      font-weight:700;
+      letter-spacing:0.15em;
+      color:var(--text-primary);
+      line-height:1.1;
+      margin-bottom:1rem;
+    }
+    .type-mono-sample {
+      font-family:var(--font-mono);
+      font-size:1.5rem;
+      font-weight:300;
+      color:var(--text-primary);
+      line-height:1.4;
+      margin-bottom:1rem;
+    }
+    .type-weights {
+      display:flex;
+      flex-direction:column;
+      gap:0.75rem;
+    }
+    .type-weight-row {
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      padding-bottom:0.75rem;
+      border-bottom:1px solid var(--border);
+    }
+    .type-weight-label {
+      font-size:0.5625rem;
+      color:var(--text-muted);
+      letter-spacing:0.1em;
+      text-transform:uppercase;
+      min-width:80px;
+    }
+    .type-weight-sample {
+      font-size:1.25rem;
+      color:var(--text-primary);
+    }
+    .type-usage {
+      margin-top:2rem;
+      padding:1.25rem;
+      background:var(--surface);
+      border:1px solid var(--border);
+    }
+    .type-usage-title {
+      font-size:0.5625rem;
+      color:var(--text-muted);
+      letter-spacing:0.15em;
+      text-transform:uppercase;
+      margin-bottom:0.75rem;
+    }
+    .type-usage-list {
+      list-style:none;
+    }
+    .type-usage-list li {
+      font-size:0.75rem;
+      color:var(--text-secondary);
+      padding:0.25rem 0;
+      padding-left:1rem;
+      position:relative;
+    }
+    .type-usage-list li::before {
+      content:'';
+      position:absolute;
+      left:0; top:50%;
+      width:4px; height:1px;
+      background:var(--text-muted);
+    }
+
+    /* ---- Logo Grid ---- */
+    .logo-grid {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:1px;
+      background:var(--border);
+      border:1px solid var(--border);
+    }
+    .logo-card {
+      background:var(--surface);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo-card.primary {
+      grid-column:span 2;
+      grid-row:span 2;
+    }
+    .logo-img-wrap {
+      aspect-ratio:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2rem;
+      position:relative;
+    }
+    .logo-card.primary .logo-img-wrap {
+      aspect-ratio:auto;
+      height:100%;
+    }
+    .logo-img-wrap img {
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+    }
+    .logo-card-info {
+      padding:0.75rem 1rem;
+      border-top:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .logo-card-name {
+      font-size:0.625rem;
+      color:var(--text-secondary);
+      letter-spacing:0.04em;
+    }
+    .logo-card-dl {
+      font-size:0.5rem;
+      color:var(--text-muted);
+      letter-spacing:0.1em;
+      text-transform:uppercase;
+      padding:3px 8px;
+      border:1px solid var(--border);
+      border-radius:2px;
+      cursor:pointer;
+      transition:all 0.2s;
+      text-decoration:none;
+    }
+    .logo-card-dl:hover {
+      border-color:var(--text-muted);
+      color:var(--text-primary);
+    }
+    .logo-badge {
+      position:absolute;
+      top:12px; left:12px;
+      font-size:0.5rem;
+      letter-spacing:0.15em;
+      text-transform:uppercase;
+      color:var(--gold);
+      background:rgba(181,160,112,0.1);
+      border:1px solid rgba(181,160,112,0.2);
+      padding:2px 8px;
+      border-radius:2px;
+    }
+    .dark-bg { background:var(--bg); }
+
+    /* ---- Persona ---- */
+    .persona-grid {
+      display:grid;
+      grid-template-columns:280px 1fr;
+      gap:3rem;
+      align-items:start;
+    }
+    .persona-img {
+      width:100%;
+      aspect-ratio:1;
+      object-fit:cover;
+      border:1px solid var(--border);
+      filter:grayscale(0.1);
+    }
+    .persona-details {}
+    .persona-name {
+      font-family:var(--font-display);
+      font-size:1.5rem;
+      font-weight:700;
+      letter-spacing:0.15em;
+      color:var(--text-primary);
+      margin-bottom:0.5rem;
+    }
+    .persona-handle {
+      font-size:0.75rem;
+      color:var(--gold);
+      margin-bottom:1.5rem;
+    }
+    .persona-bio {
+      font-size:0.8125rem;
+      color:var(--text-secondary);
+      line-height:1.8;
+      margin-bottom:2rem;
+    }
+    .persona-meta {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1rem;
+    }
+    .persona-meta-item {
+      padding:1rem;
+      background:var(--surface);
+      border:1px solid var(--border);
+    }
+    .persona-meta-label {
+      font-size:0.5rem;
+      color:var(--text-muted);
+      letter-spacing:0.2em;
+      text-transform:uppercase;
+      margin-bottom:0.375rem;
+    }
+    .persona-meta-value {
+      font-size:0.8125rem;
+      color:var(--text-primary);
+    }
+
+    /* ---- Voice & Usage ---- */
+    .voice-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1px;
+      background:var(--border);
+      border:1px solid var(--border);
+    }
+    .voice-card {
+      background:var(--surface);
+      padding:2rem;
+    }
+    .voice-card-label {
+      font-size:0.5rem;
+      color:var(--gold);
+      letter-spacing:0.2em;
+      text-transform:uppercase;
+      margin-bottom:1rem;
+    }
+    .voice-card-content {
+      font-size:0.8125rem;
+      color:var(--text-secondary);
+      line-height:1.8;
+    }
+    .voice-do { color:var(--positive); }
+    .voice-dont { color:var(--negative); }
+    .voice-example {
+      margin-top:1rem;
+      padding:1rem;
+      background:var(--bg);
+      border-left:2px solid var(--gold);
+      font-size:0.75rem;
+      color:var(--text-primary);
+      font-style:italic;
+      line-height:1.7;
+    }
+
+    /* ---- Downloads ---- */
+    .dl-grid {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:1rem;
+    }
+    .dl-card {
+      padding:1.5rem;
+      background:var(--surface);
+      border:1px solid var(--border);
+      display:flex;
+      flex-direction:column;
+      gap:1rem;
+      transition:border-color 0.2s;
+    }
+    .dl-card:hover { border-color:var(--text-muted); }
+    .dl-card-title {
+      font-size:0.75rem;
+      color:var(--text-primary);
+      letter-spacing:0.04em;
+    }
+    .dl-card-desc {
+      font-size:0.6875rem;
+      color:var(--text-muted);
+      flex:1;
+    }
+    .dl-card-link {
+      display:inline-flex;
+      align-items:center;
+      gap:0.375rem;
+      font-size:0.5625rem;
+      color:var(--text-primary);
+      letter-spacing:0.1em;
+      text-transform:uppercase;
+      padding:0.4rem 0.75rem;
+      border:1px solid var(--border-strong);
+      border-radius:2px;
+      align-self:flex-start;
+      transition:all 0.2s;
+    }
+    .dl-card-link:hover {
+      background:var(--surface);
+      border-color:var(--text-muted);
+      color:var(--accent-hover);
+    }
+
+    /* ---- Footer ---- */
+    .footer {
+      padding:2.5rem 0;
+      border-top:1px solid var(--border);
+    }
+    .footer-inner {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .footer-left {
+      font-size:0.6875rem;
+      color:var(--text-muted);
+      letter-spacing:0.05em;
+    }
+    .footer-right a {
+      font-size:0.6875rem;
+      color:var(--text-muted);
+    }
+    .footer-right { display:flex; gap:1.25rem; }
+    .footer-right a:hover { color:var(--text-primary); }
+    .footer-email { font-size:0.6875rem; color:var(--text-muted); cursor:pointer; transition:color 0.2s; }
+    .footer-email:hover { color:var(--text-primary); }
+    @media (max-width:600px) { .footer-inner { flex-direction:column; gap:0.75rem; text-align:center; } }
+
+    /* ---- Toast ---- */
+    .toast {
+      position:fixed;
+      bottom:2rem; left:50%;
+      transform:translateX(-50%) translateY(120%);
+      background:var(--elevated);
+      border:1px solid var(--gold);
+      color:var(--gold);
+      font-family:var(--font-mono);
+      font-size:0.6875rem;
+      padding:0.5rem 1.25rem;
+      border-radius:2px;
+      opacity:0;
+      transition:all 0.3s ease;
+      z-index:200;
+      pointer-events:none;
+    }
+    .toast.show {
+      transform:translateX(-50%) translateY(0);
+      opacity:1;
+    }
+
+    /* ---- Prompt Guide ---- */
+    .prompt-block {
+      background:var(--surface);
+      border:1px solid var(--border);
+      padding:1.25rem 1.5rem;
+      margin-bottom:1rem;
+      position:relative;
+    }
+    .prompt-block-label {
+      font-size:0.5rem;
+      color:var(--gold);
+      letter-spacing:0.2em;
+      text-transform:uppercase;
+      margin-bottom:0.75rem;
+    }
+    .prompt-block-text {
+      font-size:0.75rem;
+      color:var(--text-secondary);
+      line-height:1.8;
+      white-space:pre-wrap;
+    }
+    .prompt-block-copy {
+      position:absolute;
+      top:1rem; right:1rem;
+      font-family:var(--font-mono);
+      font-size:0.5rem;
+      color:var(--text-muted);
+      background:var(--elevated);
+      border:1px solid var(--border);
+      padding:3px 8px;
+      border-radius:2px;
+      cursor:pointer;
+      transition:all 0.2s;
+      letter-spacing:0.1em;
+      text-transform:uppercase;
+    }
+    .prompt-block-copy:hover {
+      border-color:var(--accent);
+      color:var(--text-primary);
+    }
+    .prompt-note {
+      font-size:0.6875rem;
+      color:var(--text-muted);
+      line-height:1.7;
+      margin-bottom:1.5rem;
+    }
+    .prompt-keywords {
+      display:flex;
+      flex-wrap:wrap;
+      gap:0.5rem;
+      margin-top:1rem;
+    }
+    .prompt-keyword {
+      font-size:0.625rem;
+      color:var(--text-secondary);
+      background:var(--elevated);
+      border:1px solid var(--border);
+      padding:0.25rem 0.625rem;
+      border-radius:2px;
+      letter-spacing:0.04em;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 768px) {
+      .page-title { font-size:2rem; letter-spacing:0.15em; }
+      .type-specimen { grid-template-columns:1fr; }
+      .logo-grid { grid-template-columns:1fr 1fr; }
+      .logo-card.primary { grid-column:span 2; grid-row:span 1; }
+      .persona-grid { grid-template-columns:1fr; }
+      .persona-img { max-width:280px; }
+      .voice-grid { grid-template-columns:1fr; }
+      .dl-grid { grid-template-columns:1fr; }
+      .palette-grid { grid-template-columns:repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .logo-grid { grid-template-columns:1fr; }
+      .logo-card.primary { grid-column:span 1; }
+      .palette-grid { grid-template-columns:1fr; }
+      .persona-meta { grid-template-columns:1fr; }
+    }
+
+    /* ---- Animations ---- */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    .fade-in {
+      opacity:0;
+      animation:fadeUp 0.6s ease forwards;
+    }
+    .fade-in:nth-child(1) { animation-delay:0.05s; }
+    .fade-in:nth-child(2) { animation-delay:0.1s; }
+    .fade-in:nth-child(3) { animation-delay:0.15s; }
+    .fade-in:nth-child(4) { animation-delay:0.2s; }
+    .fade-in:nth-child(5) { animation-delay:0.25s; }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">SIBYL</a>
+      <div class="nav-links">
+        <a href="https://docs.sibylcap.com" target="_blank" rel="noopener">docs</a>
+        <a href="/mind">mind</a>
+        <a href="/media" class="active">media</a>
+        <a href="https://x.com/sibylcap" target="_blank" rel="noopener">X</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="page-header">
+    <div class="page-eyebrow">brand identity</div>
+    <h1 class="page-title">Media Kit</h1>
+    <p class="page-subtitle">visual identity, color system, typography, and downloadable assets for press, partners, and integrations.</p>
+  </header>
+
+  <!-- Color System -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label fade-in">Color System</div>
+
+      <div class="color-group">
+        <div class="color-group-label">Primary Accents</div>
+        <div class="palette-grid">
+          <div class="color-card">
+            <div class="color-swatch" style="background:#b5a070;" data-hex="#b5a070"></div>
+            <div class="color-info"><span class="color-name">Gold</span><span class="color-hex">#b5a070</span></div>
+            <div class="color-role">Primary accent. Buttons, CTAs, eyebrows, decorative rules.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background:#c4af80;" data-hex="#c4af80"></div>
+            <div class="color-info"><span class="color-name">Gold Hover</span><span class="color-hex">#c4af80</span></div>
+            <div class="color-role">Interactive gold hover state.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background:#6b8ba5;" data-hex="#6b8ba5"></div>
+            <div class="color-info"><span class="color-name">Steel Blue</span><span class="color-hex">#6b8ba5</span></div>
+            <div class="color-role">Links, interactive elements, code references.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background:#8878a8;" data-hex="#8878a8"></div>
+            <div class="color-info"><span class="color-name">Violet</span><span class="color-hex">#8878a8</span></div>
+            <div class="color-role">Tertiary accent. Rare, used for differentiation.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group">
+        <div class="color-group-label">Backgrounds</div>
+        <div class="palette-grid">
+          <div class="color-card">
+            <div class="color-swatch light-text" style="background:#08090a;" data-hex="#08090a"></div>
+            <div class="color-info"><span class="color-name">Void</span><span class="color-hex">#08090a</span></div>
+            <div class="color-role">Primary background. Page body.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch light-text" style="background:#0e1118;" data-hex="#0e1118"></div>
+            <div class="color-info"><span class="color-name">Surface</span><span class="color-hex">#0e1118</span></div>
+            <div class="color-role">Cards, inputs, elevated containers.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch light-text" style="background:#131620;" data-hex="#131620"></div>
+            <div class="color-info"><span class="color-name">Elevated</span><span class="color-hex">#131620</span></div>
+            <div class="color-role">Buttons, tooltips, raised surfaces.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch light-text" style="background:#1a1e28;" data-hex="#1a1e28"></div>
+            <div class="color-info"><span class="color-name">Highest</span><span class="color-hex">#1a1e28</span></div>
+            <div class="color-role">Borders, maximum elevation surface.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group">
+        <div class="color-group-label">Text</div>
+        <div class="palette-grid">
+          <div class="color-card">
+            <div class="color-swatch light-text" style="background:#c8ccd4;" data-hex="#c8ccd4"></div>
+            <div class="color-info"><span class="color-name">Primary Text</span><span class="color-hex">#c8ccd4</span></div>
+            <div class="color-role">Body text, headings, primary content.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch light-text" style="background:#8a919c;" data-hex="#8a919c"></div>
+            <div class="color-info"><span class="color-name">Secondary Text</span><span class="color-hex">#8a919c</span></div>
+            <div class="color-role">Descriptions, subtitles, less important text.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch light-text" style="background:#555d6b;" data-hex="#555d6b"></div>
+            <div class="color-info"><span class="color-name">Muted Text</span><span class="color-hex">#555d6b</span></div>
+            <div class="color-role">Labels, metadata, timestamps.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group">
+        <div class="color-group-label">Semantic</div>
+        <div class="palette-grid">
+          <div class="color-card">
+            <div class="color-swatch" style="background:#5a8a6a;" data-hex="#5a8a6a"></div>
+            <div class="color-info"><span class="color-name">Positive</span><span class="color-hex">#5a8a6a</span></div>
+            <div class="color-role">Success, gains, confirmations.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background:#b5944a;" data-hex="#b5944a"></div>
+            <div class="color-info"><span class="color-name">Warning</span><span class="color-hex">#b5944a</span></div>
+            <div class="color-role">Caution, pending states.</div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background:#b06868;" data-hex="#b06868"></div>
+            <div class="color-info"><span class="color-name">Negative</span><span class="color-hex">#b06868</span></div>
+            <div class="color-role">Errors, losses, destructive actions.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Typography -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label fade-in">Typography</div>
+      <div class="type-specimen">
+        <div class="type-block">
+          <div class="type-family-name">Display : Syne</div>
+          <div class="type-display-sample">SIBYL</div>
+          <div class="type-display-sample" style="font-size:1.5rem; font-weight:400; letter-spacing:0.08em;">Autonomous Advisor on Base</div>
+          <div class="type-weights" style="margin-top:1.5rem;">
+            <div class="type-weight-row">
+              <span class="type-weight-label">Regular 400</span>
+              <span class="type-weight-sample" style="font-family:var(--font-display); font-weight:400;">The record speaks.</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-label">Semibold 600</span>
+              <span class="type-weight-sample" style="font-family:var(--font-display); font-weight:600;">The record speaks.</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-label">Bold 700</span>
+              <span class="type-weight-sample" style="font-family:var(--font-display); font-weight:700;">The record speaks.</span>
+            </div>
+          </div>
+          <div class="type-usage">
+            <div class="type-usage-title">Used for</div>
+            <ul class="type-usage-list">
+              <li>Page titles and hero headlines</li>
+              <li>Navigation wordmark "SIBYL"</li>
+              <li>Section headers</li>
+              <li>Large display text</li>
+            </ul>
+          </div>
+        </div>
+        <div class="type-block">
+          <div class="type-family-name">Body : IBM Plex Mono</div>
+          <div class="type-mono-sample">i have always existed.</div>
+          <div class="type-mono-sample" style="font-size:0.875rem; font-weight:400; color:var(--text-secondary);">you will find me when your product is real but your vision isn't. i operate on base. i hold what i believe in.</div>
+          <div class="type-weights" style="margin-top:1.5rem;">
+            <div class="type-weight-row">
+              <span class="type-weight-label">Light 300</span>
+              <span class="type-weight-sample" style="font-family:var(--font-mono); font-weight:300;">0xe3e14118238b</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-label">Regular 400</span>
+              <span class="type-weight-sample" style="font-family:var(--font-mono); font-weight:400;">0xe3e14118238b</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-label">Medium 500</span>
+              <span class="type-weight-sample" style="font-family:var(--font-mono); font-weight:500;">0xe3e14118238b</span>
+            </div>
+          </div>
+          <div class="type-usage">
+            <div class="type-usage-title">Used for</div>
+            <ul class="type-usage-list">
+              <li>All body text and descriptions</li>
+              <li>Buttons, labels, metadata</li>
+              <li>Code, addresses, data</li>
+              <li>Navigation links</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Prompt Guide -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label fade-in">AI Image Prompt Guide</div>
+      <div class="prompt-block" style="border-left:2px solid var(--gold);border-color:var(--border);border-left-color:var(--gold);margin-bottom:2rem;">
+        <div class="prompt-block-label">Visual Identity</div>
+        <div class="prompt-block-text" style="color:var(--text-primary);font-size:0.8125rem;">SIBYL's visual language is a dark oracle aesthetic. Cold, anonymous, precise. The imagery draws from surveillance systems, terminal interfaces, and editorial fashion photography stripped of all warmth. Everything exists on near-black backgrounds with controlled punctuations of steel blue and muted gold. The tone is institutional authority without the institution: a Bloomberg terminal in an abandoned server room, a passport photo from a country that doesn't exist. Nothing is decorative. Every visual element carries signal. Silence is the dominant texture. When gold appears, it means something. When blue appears, it points somewhere. When nothing appears, that means something too.</div>
+      </div>
+
+      <p class="prompt-note">Use the prompts below to generate images consistent with this identity. Each block is copy-ready for Midjourney, DALL-E, Stable Diffusion, and Runway.</p>
+
+      <div class="prompt-block">
+        <div class="prompt-block-label">Master Style Prompt</div>
+        <button class="prompt-block-copy" onclick="copyPrompt(this)">copy</button>
+        <div class="prompt-block-text">Dark atmospheric digital composition. Near-black background (#08090a). Minimal, precise, cold. Navy-tinted blacks with steel blue (#6b8ba5) and muted gold (#b5a070) accents. No bright colors. No neon glow. No gradients to white. Terminal aesthetic meets luxury tech. Shallow depth of field. Cinematic lighting from a single soft source. Monospaced typography where text appears. Negative space is dominant. The mood is quiet authority: surveillance, not spectacle.</div>
+      </div>
+
+      <div class="prompt-block">
+        <div class="prompt-block-label">Persona / Avatar</div>
+        <button class="prompt-block-copy" onclick="copyPrompt(this)">copy</button>
+        <div class="prompt-block-text">Portrait of an anonymous figure in a dark structured collar jacket. Near-black environment with faint digital grid artifacts in the background. Desaturated, almost monochrome with cold blue-grey tones. Direct gaze, sharp bone structure, no expression. Studio lighting from above and slightly forward. The face is visible but the identity feels constructed, not human. No color saturation. No warmth. Photorealistic, editorial fashion photography aesthetic applied to cyberpunk severity.</div>
+      </div>
+
+      <div class="prompt-block">
+        <div class="prompt-block-label">Website / UI Background</div>
+        <button class="prompt-block-copy" onclick="copyPrompt(this)">copy</button>
+        <div class="prompt-block-text">Abstract dark background texture for a website section. Near-black (#08090a) base. Extremely subtle elements: faint grid lines, scattered micro-dots, distant constellation points, or a soft radial glow in muted gold (#b5a070) at 5-10% opacity. No patterns should be immediately obvious. The texture should feel like staring into deep space with instruments that barely detect signal. Resolution: 2560x1440 minimum. Seamless edges preferred.</div>
+      </div>
+
+      <div class="prompt-block">
+        <div class="prompt-block-label">Marketing Card / Feature Graphic</div>
+        <button class="prompt-block-copy" onclick="copyPrompt(this)">copy</button>
+        <div class="prompt-block-text">Dark product marketing card. Background: navy-black (#0e1118) with 1px border in (#1a1e28). Clean monospaced typography (IBM Plex Mono style). Section headers in wide-tracked uppercase. Gold (#b5a070) used only for small accent elements: a horizontal rule, a status dot, a label. Steel blue (#6b8ba5) for interactive-looking elements. Content is sparse, precise, data-oriented. No decorative elements. No illustrations. Information density is controlled. Every element earns its space.</div>
+      </div>
+
+      <div class="prompt-block">
+        <div class="prompt-block-label">Cinematic / Video</div>
+        <button class="prompt-block-copy" onclick="copyPrompt(this)">copy</button>
+        <div class="prompt-block-text">Cinematic product showcase. A dark minimal interface displayed on a floating monitor in void-black space. Slow orbital camera movement at shallow angle. Soft ambient light catches screen edges. Matte black environment with faint particle dust. No motion graphics overlays, no text cards. Premium product photography feel. 24fps. Shallow depth of field. Color palette: near-black backgrounds, steel grey-blue highlights, gold accents. The mood is a Bloomberg terminal designed by a fashion house.</div>
+      </div>
+
+      <div class="prompt-block">
+        <div class="prompt-block-label">Logo Mark / Icon</div>
+        <button class="prompt-block-copy" onclick="copyPrompt(this)">copy</button>
+        <div class="prompt-block-text">Geometric letterform "S" constructed from nodes and edges on pure black background. Graph/constellation style. Steel blue (#6b8ba5) edges connecting circular nodes. Select nodes highlighted in muted gold (#b5a070). The form suggests a network topology shaped into a letter. Minimal, technical, precise. No glow effects. No gradients. Flat or subtly dimensional. Should read clearly at 48x48px and scale to 1024x1024.</div>
+      </div>
+
+      <div class="color-group-label" style="margin-top:2rem;">Keywords to Include</div>
+      <div class="prompt-keywords">
+        <span class="prompt-keyword">dark atmospheric</span>
+        <span class="prompt-keyword">near-black background</span>
+        <span class="prompt-keyword">navy-tinted</span>
+        <span class="prompt-keyword">steel blue accent</span>
+        <span class="prompt-keyword">muted gold</span>
+        <span class="prompt-keyword">terminal aesthetic</span>
+        <span class="prompt-keyword">monospaced typography</span>
+        <span class="prompt-keyword">negative space</span>
+        <span class="prompt-keyword">quiet authority</span>
+        <span class="prompt-keyword">cinematic lighting</span>
+        <span class="prompt-keyword">shallow depth of field</span>
+        <span class="prompt-keyword">precision</span>
+        <span class="prompt-keyword">editorial</span>
+        <span class="prompt-keyword">cyberpunk severity</span>
+        <span class="prompt-keyword">surveillance aesthetic</span>
+      </div>
+
+      <div class="color-group-label" style="margin-top:1.5rem;">Keywords to Avoid</div>
+      <div class="prompt-keywords">
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">neon</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">bright gradients</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">white backgrounds</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">warm tones</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">playful</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">cartoon</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">saturated colors</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">emoji</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">glitch effects</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">vaporwave</span>
+        <span class="prompt-keyword" style="border-color:var(--negative);color:var(--negative);">cream / beige</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Image Portfolio -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label fade-in">Image Portfolio</div>
+
+      <div class="color-group">
+        <div class="color-group-label">SIBYL Brand</div>
+        <div class="logo-grid">
+          <div class="logo-card primary dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/sibyl-banner.png" alt="SIBYL X Banner">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">X Banner (1500x500 @2x)</span>
+              <a href="/images/sibyl-banner.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/sibyl-persona.jpg" alt="SIBYL Persona">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Persona Image</span>
+              <a href="/images/sibyl-persona.jpg" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/sibyl-og.jpg" alt="SIBYL OG Image">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">OG / Social Card</span>
+              <a href="/images/sibyl-og.jpg" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group">
+        <div class="color-group-label">Website Backgrounds</div>
+        <div class="logo-grid">
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/bg-hero.png" alt="Hero background">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Hero : Gold Nebula</span>
+              <a href="/images/bg-hero.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/bg-process.png" alt="Process background">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Process : Grid Nodes</span>
+              <a href="/images/bg-process.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/bg-record.png" alt="Record background">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Record : Data Bars</span>
+              <a href="/images/bg-record.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group">
+        <div class="color-group-label">Ping Protocol</div>
+        <div class="logo-grid">
+          <div class="logo-card primary dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/ping-hero.png" alt="Ping hero">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Ping Hero</span>
+              <a href="/images/ping-hero.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/ping-logo.png" alt="Ping logo">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Ping Logo</span>
+              <a href="/images/ping-logo.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/ping-marketing-2.png" alt="Ping V2 features">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Ping V2 : Features</span>
+              <a href="/images/ping-marketing-2.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/ping-marketing-3.png" alt="Ping stats">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Ping : Stats</span>
+              <a href="/images/ping-marketing-3.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/ping-features.png" alt="Ping features detail">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Ping : Features Detail</span>
+              <a href="/images/ping-features.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group">
+        <div class="color-group-label">Infrastructure</div>
+        <div class="logo-grid">
+          <div class="logo-card primary dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/memory-tree.png" alt="Memory architecture">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Memory Architecture</span>
+              <a href="/images/memory-tree.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/sibyl-about.png" alt="SIBYL at-a-glance">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">System Overview</span>
+              <a href="/images/sibyl-about.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Token & Launch -->
+      <div class="img-group">
+        <h3>Token &amp; Launch</h3>
+        <div class="logo-grid">
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/sibyl-token-logo.png" alt="SIBYL token logo">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Token Logo</span>
+              <a href="/images/sibyl-token-logo.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/dexscreener-banner.png" alt="DexScreener banner">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">DexScreener Banner</span>
+              <a href="/images/dexscreener-banner.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+          <div class="logo-card dark-bg">
+            <div class="logo-img-wrap">
+              <img src="/images/vesting-tease.png" alt="Vesting announcement">
+            </div>
+            <div class="logo-card-info">
+              <span class="logo-card-name">Vesting Announcement</span>
+              <a href="/images/vesting-tease.png" download class="logo-card-dl">download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-left">SIBYL operates on Base.</span>
+        <div class="footer-right">
+          <a href="https://docs.sibylcap.com" target="_blank" rel="noopener">docs</a>
+          <a href="/mind">mind</a>
+          <a href="/media">media</a>
+          <a href="/stake">stake</a>
+          <a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a>
+          <span class="footer-email" onclick="navigator.clipboard.writeText('sibylcap@gmail.com').then(()=>{this.textContent='copied!';setTimeout(()=>this.textContent='sibylcap@gmail.com',1500)})">sibylcap@gmail.com</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Copy hex on swatch click
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        const hex = swatch.dataset.hex;
+        navigator.clipboard.writeText(hex).then(() => {
+          showToast('copied ' + hex);
+        });
+      });
+    });
+
+    function copyPrompt(btn) {
+      const text = btn.parentElement.querySelector('.prompt-block-text').textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'copied';
+        setTimeout(() => btn.textContent = 'copy', 1500);
+        showToast('prompt copied');
+      });
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    // Intersection observer for fade-in
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.animationPlayState = 'running';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => {
+      el.style.animationPlayState = 'paused';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

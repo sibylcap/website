@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ping Sound Test</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #10131a; color: #e8ecf2; font-family: 'Geist', 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .card { background: #161b26; border: 1px solid #232a3b; border-radius: 12px; padding: 48px; max-width: 400px; width: 100%; text-align: center; }
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 8px; letter-spacing: 2px; }
+  p { color: #6b7a92; font-size: 13px; margin-bottom: 32px; }
+  .btn { display: block; width: 100%; padding: 16px; margin-bottom: 16px; border: 1px solid #232a3b; border-radius: 8px; background: #0d0f14; color: #e8ecf2; font-size: 15px; font-family: 'JetBrains Mono', monospace; cursor: pointer; transition: border-color 0.2s; }
+  .btn:hover { border-color: #2ea9a1; }
+  .btn:last-child { margin-bottom: 0; }
+  .label { color: #2ea9a1; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+  .desc { color: #4d5a70; font-size: 12px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>PING SOUNDS</h1>
+  <p>Click to preview each sound</p>
+
+  <div class="label">MESSAGE SENT</div>
+  <div class="desc">Click — 3 rapid micro-clicks, mechanical keypress feel</div>
+  <button class="btn" onclick="playSwoosh()">Play Click</button>
+
+  <div class="label">INBOX NOTIFICATION</div>
+  <div class="desc">Ping — three-tone chime A5 → E6 → B6, reverb tail</div>
+  <button class="btn" onclick="playPing()">Play Ping</button>
+</div>
+
+<script>
+var _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+
+function playSwoosh() {
+  try {
+    var ctx = getAudioCtx();
+    var t = ctx.currentTime;
+    var sampleRate = ctx.sampleRate;
+
+    // Rapid burst of 3 micro-clicks — like a quick key sequence
+    var clicks = [0, 0.064, 0.144];
+    var freqs = [3200, 2800, 3500];
+
+    clicks.forEach(function (offset, i) {
+      var clickLen = Math.floor(sampleRate * 0.012);
+      var buf = ctx.createBuffer(1, clickLen, sampleRate);
+      var data = buf.getChannelData(0);
+      for (var j = 0; j < clickLen; j++) {
+        var env = Math.exp(-j / (clickLen * 0.08));
+        data[j] = (Math.random() * 2 - 1) * env;
+      }
+      var src = ctx.createBufferSource();
+      src.buffer = buf;
+
+      // Tight bandpass — gives each click a woody, mechanical character
+      var bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = freqs[i];
+      bp.Q.value = 3;
+
+      var gain = ctx.createGain();
+      gain.gain.value = 0.35 + (i * 0.05);
+
+      src.connect(bp);
+      bp.connect(gain);
+      gain.connect(ctx.destination);
+      src.start(t + offset);
+      src.stop(t + offset + 0.012);
+    });
+  } catch (e) { console.error(e); }
+}
+
+function playPing() {
+  try {
+    var ctx = getAudioCtx();
+    var t = ctx.currentTime;
+
+    // Convolver for subtle reverb
+    var reverbLen = Math.floor(ctx.sampleRate * 0.6);
+    var reverbBuf = ctx.createBuffer(1, reverbLen, ctx.sampleRate);
+    var reverbData = reverbBuf.getChannelData(0);
+    for (var i = 0; i < reverbLen; i++) {
+      reverbData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (reverbLen * 0.15));
+    }
+    var reverb = ctx.createConvolver();
+    reverb.buffer = reverbBuf;
+
+    // Dry/wet mix
+    var dry = ctx.createGain();
+    dry.gain.value = 0.7;
+    var wet = ctx.createGain();
+    wet.gain.value = 0.3;
+
+    // First tone — A5
+    var osc1 = ctx.createOscillator();
+    var gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.value = 880;
+    gain1.gain.setValueAtTime(0.25, t);
+    gain1.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+    osc1.connect(gain1);
+    gain1.connect(dry);
+    gain1.connect(reverb);
+    osc1.start(t);
+    osc1.stop(t + 0.2);
+
+    // Second tone — E6, slight delay
+    var osc2 = ctx.createOscillator();
+    var gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.value = 1320;
+    gain2.gain.setValueAtTime(0.001, t);
+    gain2.gain.setValueAtTime(0.3, t + 0.1);
+    gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+    osc2.connect(gain2);
+    gain2.connect(dry);
+    gain2.connect(reverb);
+    osc2.start(t + 0.1);
+    osc2.stop(t + 0.4);
+
+    // Third tone — B6, adds melodic color
+    var osc3 = ctx.createOscillator();
+    var gain3 = ctx.createGain();
+    osc3.type = 'sine';
+    osc3.frequency.value = 1976;
+    gain3.gain.setValueAtTime(0.001, t);
+    gain3.gain.setValueAtTime(0.12, t + 0.18);
+    gain3.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+    osc3.connect(gain3);
+    gain3.connect(dry);
+    gain3.connect(reverb);
+    osc3.start(t + 0.18);
+    osc3.stop(t + 0.5);
+
+    // Route to output
+    dry.connect(ctx.destination);
+    reverb.connect(wet);
+    wet.connect(ctx.destination);
+  } catch (e) { console.error(e); }
+}
+</script>
+</body>
+</html>

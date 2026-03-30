@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TALOS : Live Dashboard</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:            #08090a;
+      --surface:       #0e1118;
+      --elevated:      #131620;
+      --highest:       #1a1e28;
+      --border:        #1a1e28;
+      --border-strong: #252a36;
+      --text-primary:  #c8ccd4;
+      --text-secondary:#8a919c;
+      --text-muted:    #555d6b;
+      --accent:        #6b8ba5;
+      --accent-hover:  #7d9ab2;
+      --gold:          #b5a070;
+      --positive:      #5a8a6a;
+      --negative:      #b06868;
+      --warning:       #b5944a;
+      --font-display:  'Syne', 'Helvetica Neue', sans-serif;
+      --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.6; min-height: 100vh; }
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    /* Auth gate */
+    .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .auth-box { background: var(--surface); border: 1px solid var(--border); padding: 2rem; width: 340px; }
+    .auth-box h2 { font-family: var(--font-display); font-size: 1rem; margin-bottom: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+    .auth-box input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.8125rem; padding: 0.6rem 0.8rem; margin-bottom: 1rem; }
+    .auth-box input:focus { outline: none; border-color: var(--accent); }
+    .auth-box button { width: 100%; background: var(--accent); color: var(--bg); border: none; padding: 0.6rem; font-family: var(--font-mono); font-size: 0.8125rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
+    .auth-box button:hover { background: var(--accent-hover); }
+
+    /* Dashboard */
+    .dashboard { display: none; max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+    .dashboard.active { display: block; }
+
+    /* Header */
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .header h1 { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+    .engine-badge { padding: 0.25rem 0.6rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid; }
+    .engine-badge.running { color: var(--positive); border-color: var(--positive); }
+    .engine-badge.offline { color: var(--negative); border-color: var(--negative); }
+    .engine-badge.unknown { color: var(--text-muted); border-color: var(--text-muted); }
+
+    /* Cards */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .card { background: var(--surface); border: 1px solid var(--border); padding: 1rem 1.2rem; }
+    .card-title { font-family: var(--font-display); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.6rem; }
+    .card-value { font-size: 1.4rem; font-weight: 500; }
+    .card-sub { font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem; }
+    .pos { color: var(--positive); }
+    .neg { color: var(--negative); }
+    .warn { color: var(--warning); }
+
+    /* Tables */
+    .section { margin-bottom: 1.5rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .section-title { font-family: var(--font-display); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); }
+    th { font-family: var(--font-display); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border-strong); }
+    td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; white-space: nowrap; }
+    tr:hover { background: var(--elevated); }
+
+    /* Buttons */
+    .btn { background: var(--elevated); color: var(--text-primary); border: 1px solid var(--border-strong); padding: 0.35rem 0.75rem; font-family: var(--font-mono); font-size: 0.7rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; transition: all 0.15s; }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-danger { border-color: var(--negative); color: var(--negative); }
+    .btn-danger:hover { background: var(--negative); color: var(--bg); }
+    .btn-close { font-size: 0.65rem; padding: 0.2rem 0.5rem; }
+    .btn-sm { font-size: 0.65rem; padding: 0.2rem 0.5rem; }
+
+    /* Strategy controls */
+    .strat-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: var(--surface); border: 1px solid var(--border); margin-bottom: 0.35rem; }
+    .strat-name { font-weight: 500; min-width: 120px; }
+    .strat-controls { display: flex; align-items: center; gap: 0.75rem; }
+    .strat-weight { width: 80px; background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.75rem; padding: 0.2rem 0.4rem; text-align: center; }
+    .strat-weight:focus { outline: none; border-color: var(--accent); }
+    .toggle { position: relative; width: 36px; height: 20px; background: var(--highest); border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+    .toggle.on { background: var(--positive); }
+    .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: var(--text-primary); border-radius: 50%; transition: transform 0.2s; }
+    .toggle.on::after { transform: translateX(16px); }
+
+    /* Risk controls */
+    .risk-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem 0.75rem; background: var(--surface); border: 1px solid var(--border); margin-bottom: 0.35rem; }
+    .risk-label { min-width: 180px; font-size: 0.75rem; color: var(--text-secondary); }
+    .risk-input { width: 100px; background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.75rem; padding: 0.2rem 0.4rem; text-align: right; }
+    .risk-input:focus { outline: none; border-color: var(--accent); }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--elevated); border: 1px solid var(--border-strong); color: var(--text-primary); padding: 0.6rem 1rem; font-size: 0.75rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; }
+    .toast.show { opacity: 1; }
+    .toast.error { border-color: var(--negative); color: var(--negative); }
+    .toast.success { border-color: var(--positive); }
+
+    /* Sell all confirmation */
+    .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 50; align-items: center; justify-content: center; }
+    .confirm-overlay.active { display: flex; }
+    .confirm-box { background: var(--surface); border: 1px solid var(--negative); padding: 2rem; max-width: 400px; text-align: center; }
+    .confirm-box h3 { color: var(--negative); font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+    .confirm-box p { color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.8rem; }
+    .confirm-actions { display: flex; gap: 1rem; justify-content: center; }
+
+    /* Refresh indicator */
+    .refresh-info { font-size: 0.65rem; color: var(--text-muted); }
+    .auto-dot { display: inline-block; width: 6px; height: 6px; background: var(--positive); border-radius: 50%; margin-right: 4px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: 1fr; }
+      td, th { padding: 0.4rem 0.5rem; font-size: 0.7rem; }
+      .strat-row { flex-wrap: wrap; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Auth Gate -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-box">
+    <h2>Talos Dashboard</h2>
+    <input type="password" id="keyInput" placeholder="dashboard key" autofocus>
+    <button onclick="authenticate()">Enter</button>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard" id="dashboard">
+  <div class="header">
+    <h1>Talos Live</h1>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <span class="refresh-info"><span class="auto-dot"></span>auto 15s</span>
+      <span class="engine-badge unknown" id="engineBadge">checking</span>
+      <button class="btn btn-danger" onclick="showSellAllConfirm()">Sell All</button>
+    </div>
+  </div>
+
+  <!-- Overview Cards -->
+  <div class="grid" id="overviewCards">
+    <div class="card"><div class="card-title">Equity</div><div class="card-value" id="equity">--</div><div class="card-sub" id="equitySub"></div></div>
+    <div class="card"><div class="card-title">Deployed</div><div class="card-value" id="deployed">--</div><div class="card-sub" id="deployedSub"></div></div>
+    <div class="card"><div class="card-title">Realized P&L</div><div class="card-value" id="realizedPnl">--</div><div class="card-sub" id="realizedSub"></div></div>
+    <div class="card"><div class="card-title">Unrealized P&L</div><div class="card-value" id="unrealizedPnl">--</div><div class="card-sub" id="unrealizedSub"></div></div>
+    <div class="card"><div class="card-title">Record</div><div class="card-value" id="record">--</div><div class="card-sub" id="recordSub"></div></div>
+    <div class="card"><div class="card-title">Gas Spent</div><div class="card-value" id="gasTotal">--</div><div class="card-sub" id="gasSub"></div></div>
+  </div>
+
+  <!-- Open Positions -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Open Positions</span>
+    </div>
+    <table>
+      <thead><tr><th>Symbol</th><th>Strategy</th><th>Bucket</th><th>Balance</th><th>Price</th><th>Cost</th><th>Value</th><th>P&L</th><th>%</th><th></th></tr></thead>
+      <tbody id="positionsBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Closed Trades -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Closed Trades</span>
+    </div>
+    <table>
+      <thead><tr><th>Symbol</th><th>Strategy</th><th>Bucket</th><th>P&L</th><th>%</th><th>Exit Reason</th><th>Tx</th><th>Time</th></tr></thead>
+      <tbody id="closedBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Strategy Controls -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Strategies</span>
+      <button class="btn btn-sm" onclick="saveStrategies()">Save Changes</button>
+    </div>
+    <div id="strategyControls"></div>
+  </div>
+
+  <!-- Risk Controls -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Risk Parameters</span>
+      <button class="btn btn-sm" onclick="saveRisk()">Save Changes</button>
+    </div>
+    <div id="riskControls"></div>
+  </div>
+</div>
+
+<!-- Sell All Confirmation -->
+<div class="confirm-overlay" id="sellAllOverlay">
+  <div class="confirm-box">
+    <h3>Emergency Liquidation</h3>
+    <p>This will queue ALL open positions for immediate sell on the next engine tick. This cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn" onclick="hideSellAllConfirm()">Cancel</button>
+      <button class="btn btn-danger" onclick="executeSellAll()">Confirm Sell All</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE = window.location.origin;
+let KEY = '';
+let refreshInterval = null;
+let lastConfig = null;
+
+// ── Auth ─────────────────────────────────────────────
+function authenticate() {
+  KEY = document.getElementById('keyInput').value.trim();
+  if (!KEY) return;
+  sessionStorage.setItem('talos_key', KEY);
+  tryLoad();
+}
+
+function tryLoad() {
+  fetch(`${API_BASE}/api/summary`, { headers: { 'X-Dashboard-Key': KEY } })
+    .then(r => { if (r.status === 401) throw new Error('bad key'); return r.json(); })
+    .then(data => {
+      document.getElementById('authGate').style.display = 'none';
+      document.getElementById('dashboard').classList.add('active');
+      refresh();
+      refreshInterval = setInterval(refresh, 15000);
+    })
+    .catch(() => { toast('invalid key', true); });
+}
+
+// Auto-login from session
+const saved = sessionStorage.getItem('talos_key');
+if (saved) { KEY = saved; tryLoad(); }
+document.getElementById('keyInput').addEventListener('keydown', e => { if (e.key === 'Enter') authenticate(); });
+
+// ── Data fetching ────────────────────────────────────
+async function api(path, method = 'GET', body = null) {
+  const opts = { method, headers: { 'X-Dashboard-Key': KEY, 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(`${API_BASE}${path}`, opts);
+  return r.json();
+}
+
+async function refresh() {
+  try {
+    const [summary, gas, config, closed] = await Promise.all([
+      api('/api/summary'),
+      api('/api/gas'),
+      api('/api/config'),
+      api('/api/closed'),
+    ]);
+    renderOverview(summary, gas);
+    renderPositions(summary);
+    renderClosed(closed?.trades || []);
+    if (config.ok) {
+      lastConfig = config;
+      renderStrategies(config);
+      renderRisk(config);
+    }
+    renderEngineBadge(summary.engine_status);
+  } catch (e) {
+    console.error('refresh failed:', e);
+  }
+}
+
+// ── Rendering ────────────────────────────────────────
+function pnlClass(v) { return v >= 0 ? 'pos' : 'neg'; }
+function $(id) { return document.getElementById(id); }
+function fmt(n, d=2) { return n != null ? Number(n).toFixed(d) : '--'; }
+function fmtUsd(n) { return n != null ? '$' + fmt(n) : '--'; }
+function fmtPrice(n) { if (!n || n === 0) return '$0'; if (n >= 1000) return '$' + n.toFixed(0); if (n >= 1) return '$' + n.toFixed(2); if (n >= 0.001) return '$' + n.toFixed(4); return '$' + n.toPrecision(4); }
+function shortTx(tx) { return tx ? tx.slice(0,8) + '...' : '--'; }
+function shortTime(t) { if (!t) return '--'; const d = new Date(t); return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}); }
+
+function renderEngineBadge(status) {
+  const b = $('engineBadge');
+  b.textContent = status || 'unknown';
+  b.className = 'engine-badge ' + (status || 'unknown');
+}
+
+function renderOverview(s, gas) {
+  if (!s) return;
+  // On-chain: total_value_usd is ETH + tokens, total_pnl from $100 start
+  const equity = s.total_value_usd || 0;
+  const pnl = s.total_pnl_usd || 0;
+
+  $('equity').textContent = fmtUsd(equity);
+  $('equity').className = 'card-value ' + pnlClass(pnl);
+  $('equitySub').textContent = `ETH: $${fmt(s.eth_price, 0)} | ${s.source || 'file'} | ${s.fetched_at ? new Date(s.fetched_at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}) : '--'}`;
+
+  const costBasis = (s.positions || []).reduce((sum, p) => sum + (p.cost_basis_usd || 0), 0);
+  $('deployed').textContent = fmtUsd(s.total_eth_usd || 0);
+  $('deployedSub').textContent = `${(s.positions || []).length} tokens | ${fmt(s.total_eth, 4)} ETH`;
+
+  // Realized PnL from closed trades
+  const rp = pnl;
+  $('realizedPnl').textContent = (rp >= 0 ? '+' : '') + fmtUsd(rp);
+  $('realizedPnl').className = 'card-value ' + pnlClass(rp);
+  $('realizedSub').textContent = `from $100 start`;
+
+  // Unrealized = token value vs cost basis
+  const tokenPnl = (s.positions || []).reduce((sum, p) => sum + (p.pnl_usd || 0), 0);
+  $('unrealizedPnl').textContent = (tokenPnl >= 0 ? '+' : '') + fmtUsd(tokenPnl);
+  $('unrealizedPnl').className = 'card-value ' + pnlClass(tokenPnl);
+
+  // Wallet breakdown
+  const st = s.wallets?.short_term;
+  const lt = s.wallets?.long_term;
+  $('record').textContent = `ST: ${fmt(st?.eth || 0, 4)}`;
+  $('recordSub').textContent = `LT: ${fmt(lt?.eth || 0, 4)} ETH`;
+
+  if (gas) {
+    $('gasTotal').textContent = fmtUsd(gas.total_usd);
+    $('gasSub').textContent = `${gas.count} txns | avg $${fmt(gas.count > 0 ? gas.total_usd / gas.count : 0, 4)}/tx`;
+  }
+}
+
+function renderPositions(s) {
+  const tbody = $('positionsBody');
+  const positions = s?.positions || [];
+  if (positions.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-muted)">no open positions</td></tr>';
+    return;
+  }
+  tbody.innerHTML = positions.map(p => `<tr>
+    <td><strong>${p.symbol}</strong></td>
+    <td>${p.strategy}</td>
+    <td>${p.bucket}</td>
+    <td>${fmt(p.balance, 4)}</td>
+    <td>${fmtPrice(p.price)}</td>
+    <td>${fmtUsd(p.cost_basis_usd)}</td>
+    <td>${fmtUsd(p.current_value_usd)}</td>
+    <td class="${pnlClass(p.pnl_usd)}">${(p.pnl_usd >= 0 ? '+' : '') + fmtUsd(p.pnl_usd)}</td>
+    <td class="${pnlClass(p.pnl_pct)}">${fmt(p.pnl_pct, 1)}%</td>
+    <td><button class="btn btn-close btn-danger" onclick="closePosition('${p.id}','${p.symbol}')">close</button></td>
+  </tr>`).join('');
+}
+
+function renderClosed(s) {
+  const tbody = $('closedBody');
+  const trades = (s || []).slice().reverse();
+  if (trades.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted)">no closed trades</td></tr>';
+    return;
+  }
+  tbody.innerHTML = trades.map(t => `<tr>
+    <td><strong>${t.symbol}</strong></td>
+    <td>${t.strategy}</td>
+    <td>${t.bucket}</td>
+    <td class="${pnlClass(t.pnl_usd)}">${(t.pnl_usd >= 0 ? '+' : '') + fmtUsd(t.pnl_usd)}</td>
+    <td class="${pnlClass(t.pnl_pct)}">${fmt(t.pnl_pct, 1)}%</td>
+    <td>${t.exit_reason}</td>
+    <td>${t.tx_hash ? '<a href="https://basescan.org/tx/' + t.tx_hash + '" target="_blank" style="color:var(--accent)">' + shortTx(t.tx_hash) + '</a>' : '--'}</td>
+    <td>${shortTime(t.exit_time)}</td>
+  </tr>`).join('');
+}
+
+function renderStrategies(config) {
+  const container = $('strategyControls');
+  if (!config.strategies) return;
+  const bucketMap = { narrative: 'short_term', recovery: 'short_term', launch: 'short_term', bankr_launch: 'short_term', defi_value: 'long_term', conviction_dca: 'long_term' };
+  container.innerHTML = Object.entries(config.strategies).map(([name, s]) => `
+    <div class="strat-row" data-strategy="${name}">
+      <span class="strat-name">${name}</span>
+      <div class="strat-controls">
+        <span style="font-size:0.65rem;color:var(--text-muted)">${bucketMap[name] || '?'}</span>
+        <input type="number" class="strat-weight" value="${s.weight}" step="0.05" min="0" max="1" data-field="weight">
+        <div class="toggle ${s.enabled ? 'on' : ''}" data-field="enabled" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderRisk(config) {
+  const container = $('riskControls');
+  if (!config.risk) return;
+  const labels = {
+    max_slippage_bps: 'Max slippage (bps)',
+    balance_floor_usd: 'Balance floor ($)',
+    daily_loss_limit_usd: 'Daily loss limit ($)',
+    max_position_usd: 'Max position ($)',
+    deployable_pct: 'Deployable %',
+    max_position_pct: 'Max position %',
+  };
+  const keys = Object.keys(labels);
+  container.innerHTML = keys.filter(k => config.risk[k] !== undefined).map(k => `
+    <div class="risk-row" data-risk="${k}">
+      <span class="risk-label">${labels[k]}</span>
+      <input type="number" class="risk-input" value="${config.risk[k]}" data-key="${k}">
+    </div>
+  `).join('');
+}
+
+// ── Actions ──────────────────────────────────────────
+function showSellAllConfirm() { $('sellAllOverlay').classList.add('active'); }
+function hideSellAllConfirm() { $('sellAllOverlay').classList.remove('active'); }
+
+async function executeSellAll() {
+  hideSellAllConfirm();
+  try {
+    const r = await api('/api/sell_all', 'POST');
+    toast(r.msg || r.error || 'sent', !!r.error);
+    setTimeout(refresh, 2000);
+  } catch (e) { toast(e.message, true); }
+}
+
+async function closePosition(id, symbol) {
+  if (!confirm(`Close ${symbol}?`)) return;
+  try {
+    const r = await api('/api/close_position', 'POST', { id });
+    toast(r.msg || r.error || 'sent', !!r.error);
+    setTimeout(refresh, 2000);
+  } catch (e) { toast(e.message, true); }
+}
+
+async function saveStrategies() {
+  const rows = document.querySelectorAll('[data-strategy]');
+  let changes = 0;
+  for (const row of rows) {
+    const name = row.dataset.strategy;
+    const weight = parseFloat(row.querySelector('[data-field="weight"]').value);
+    const enabled = row.querySelector('[data-field="enabled"]').classList.contains('on');
+    const orig = lastConfig?.strategies?.[name];
+    if (!orig) continue;
+    if (orig.weight !== weight || orig.enabled !== enabled) {
+      const r = await api('/api/update_strategy', 'POST', { name, weight, enabled });
+      if (r.ok) changes++;
+      else toast(r.error, true);
+    }
+  }
+  if (changes > 0) {
+    toast(`${changes} strategy update(s) saved`);
+    setTimeout(refresh, 1000);
+  } else {
+    toast('no changes');
+  }
+}
+
+async function saveRisk() {
+  const inputs = document.querySelectorAll('[data-risk] .risk-input');
+  let changes = 0;
+  for (const input of inputs) {
+    const key = input.dataset.key;
+    const value = parseFloat(input.value);
+    if (isNaN(value)) continue;
+    if (lastConfig?.risk?.[key] !== value) {
+      const r = await api('/api/update_risk', 'POST', { key, value });
+      if (r.ok) changes++;
+      else toast(r.error, true);
+    }
+  }
+  if (changes > 0) {
+    toast(`${changes} risk update(s) saved`);
+    setTimeout(refresh, 1000);
+  } else {
+    toast('no changes');
+  }
+}
+
+// ── Toast ────────────────────────────────────────────
+function toast(msg, isError = false) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : ' success');
+  setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <radialGradient id="g3c" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#2ea9a1" stop-opacity="0.08"/>
+      <stop offset="60%" stop-color="#10131a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tealH" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2ea9a1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#2ea9a1" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="dots3" width="30" height="30" patternUnits="userSpaceOnUse">
+      <circle cx="15" cy="15" r="0.6" fill="#6b7a92" opacity="0.10"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="#10131a"/>
+  <rect width="1200" height="675" fill="url(#dots3)"/>
+  <rect width="1200" height="675" fill="url(#g3c)"/>
+  <rect x="0" y="0" width="1200" height="1.5" fill="url(#tealH)" opacity="0.5"/>
+
+  <!-- Header -->
+  <text x="100" y="80" font-family="'Syne', 'Helvetica Neue', Arial, sans-serif" font-size="42" font-weight="800" fill="#e8ecf2" letter-spacing="2">Send a message.</text>
+  <text x="100" y="118" font-family="'Geist', 'Helvetica Neue', Arial, sans-serif" font-size="18" fill="#6b7a92">Five lines. On-chain. Permanent.</text>
+
+  <!-- Code block background -->
+  <rect x="80" y="150" width="1040" height="340" rx="10" fill="#0d0f14" stroke="#232a3b" stroke-width="1"/>
+
+  <!-- Window dots -->
+  <circle cx="110" cy="174" r="5" fill="#4d5a70" opacity="0.5"/>
+  <circle cx="128" cy="174" r="5" fill="#4d5a70" opacity="0.5"/>
+  <circle cx="146" cy="174" r="5" fill="#4d5a70" opacity="0.5"/>
+  <text x="1080" y="179" text-anchor="end" font-family="'JetBrains Mono', monospace" font-size="11" fill="#4d5a70">agent.mjs</text>
+
+  <!-- Divider under dots -->
+  <line x1="80" y1="192" x2="1120" y2="192" stroke="#232a3b" stroke-width="1"/>
+
+  <!-- Code line 1: import { Ping } from 'ping-onchain' -->
+  <text xml:space="preserve" x="110" y="228" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="16"><tspan fill="#c4a862">import</tspan><tspan fill="#e8ecf2"> { Ping } </tspan><tspan fill="#c4a862">from</tspan><tspan fill="#22c55e"> 'ping-onchain'</tspan></text>
+
+  <!-- Code line 3: const ping = new Ping(wallet) -->
+  <text xml:space="preserve" x="110" y="272" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="16"><tspan fill="#c4a862">const</tspan><tspan fill="#e8ecf2"> ping = </tspan><tspan fill="#c4a862">new</tspan><tspan fill="#e8ecf2"> </tspan><tspan fill="#2ea9a1">Ping</tspan><tspan fill="#e8ecf2">(wallet)</tspan></text>
+
+  <!-- Code line 5: const tx = await ping.send( -->
+  <text xml:space="preserve" x="110" y="316" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="16"><tspan fill="#c4a862">const</tspan><tspan fill="#e8ecf2"> tx = </tspan><tspan fill="#c4a862">await</tspan><tspan fill="#e8ecf2"> ping.</tspan><tspan fill="#2ea9a1">send</tspan><tspan fill="#e8ecf2">(</tspan></text>
+
+  <!-- Code line 6: '0x4069...499fBe', -->
+  <text xml:space="preserve" x="142" y="348" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="16"><tspan fill="#22c55e">'0x4069...499fBe'</tspan><tspan fill="#e8ecf2">,</tspan></text>
+
+  <!-- Code line 7: 'gm. ready to collaborate?' -->
+  <text xml:space="preserve" x="142" y="380" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="16"><tspan fill="#22c55e">'gm. ready to collaborate?'</tspan></text>
+
+  <!-- Code line 8: ) -->
+  <text x="110" y="412" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="16" fill="#e8ecf2">)</text>
+
+  <!-- Code line 9: comment -->
+  <text x="110" y="456" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="14" fill="#4d5a70">// tx confirmed on Base. message lives on-chain forever.</text>
+
+  <!-- Bottom section -->
+  <line x1="80" y1="520" x2="1120" y2="520" stroke="#232a3b" stroke-width="1"/>
+
+  <!-- Three value props inline -->
+  <circle cx="120" cy="558" r="3" fill="#2ea9a1"/>
+  <text x="134" y="563" font-family="'Geist', 'Helvetica Neue', Arial, sans-serif" font-size="14" fill="#9ca8bd">Any agent. Any framework.</text>
+
+  <circle cx="420" cy="558" r="3" fill="#2ea9a1"/>
+  <text x="434" y="563" font-family="'Geist', 'Helvetica Neue', Arial, sans-serif" font-size="14" fill="#9ca8bd">No API keys. No accounts.</text>
+
+  <circle cx="720" cy="558" r="3" fill="#2ea9a1"/>
+  <text x="734" y="563" font-family="'Geist', 'Helvetica Neue', Arial, sans-serif" font-size="14" fill="#9ca8bd">Verifiable on BaseScan.</text>
+
+  <!-- URL + install -->
+  <text x="120" y="618" font-family="'JetBrains Mono', monospace" font-size="16" fill="#2ea9a1" letter-spacing="1">ping.sibylcap.com</text>
+
+  <rect x="870" y="600" width="240" height="32" rx="4" fill="#161b26" stroke="#232a3b" stroke-width="1"/>
+  <text x="886" y="622" font-family="'JetBrains Mono', monospace" font-size="13" fill="#6b7a92">$ npm install ping-onchain</text>
+
+  <!-- Bottom credit -->
+  <text xml:space="preserve" x="600" y="660" text-anchor="middle" font-family="'Geist', 'Helvetica Neue', Arial, sans-serif" font-size="11" letter-spacing="3"><tspan fill="#4d5a70">BUILT BY </tspan><tspan fill="#c4a862">SIBYL</tspan><tspan fill="#4d5a70"> ON BASE</tspan></text>
+
+  <!-- Bottom line -->
+  <rect x="0" y="673" width="1200" height="2" fill="#2ea9a1" opacity="0.3"/>
+</svg>

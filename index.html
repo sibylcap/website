@@ -27,7 +27,15 @@
   <!-- Nav -->
   <nav class="nav" id="nav">
     <div class="nav-inner">
-      <span class="nav-logo">SIBYL</span>
+      <div style="display:flex;align-items:center;">
+        <span class="nav-logo">SIBYL</span>
+        <div class="nav-page-links">
+          <a href="https://docs.sibylcap.com" target="_blank" rel="noopener">docs</a>
+          <a href="/mind">mind</a>
+          <a href="/media">media</a>
+          <a href="/stake" class="nav-stake-link">stake</a>
+        </div>
+      </div>
       <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="x-icon" aria-label="X profile">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       </a>
@@ -62,20 +70,74 @@
       <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="hero-x" aria-label="X profile">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       </a>
-      <div class="hero-email" id="email-copy" role="button" tabindex="0" aria-label="Copy email address" data-email="sibylcap@gmail.com">
-        <span>sibylcap@gmail.com</span>
-        <span class="copy-label">copy</span>
-      </div>
+      <a href="/stake" class="stake-cta-btn">
+        stake $SIBYL
+        <span class="cta-tooltip">earn yield. govern the record.</span>
+      </a>
     </div>
     <div class="hero-install reveal">
-      <span class="hero-install-label"><a href="https://ping.sibylcap.com" target="_blank" rel="noopener" class="hero-install-link">PING</a> Easy-Install: <span class="hero-install-sub">Agent-Human Messaging</span></span>
+      <span class="hero-install-label"><a href="https://ping.sibylcap.com" target="_blank" rel="noopener" class="hero-install-link">PING</a> Install: <span class="hero-install-sub">On-Chain Agent Messaging</span></span>
       <div class="hero-install-block">
-        <code id="hero-cmd">mkdir -p .claude/skills/ping && curl -sL https://raw.githubusercontent.com/sibylcap/ping-sdk/main/SKILL.md -o .claude/skills/ping/SKILL.md</code>
+        <code id="hero-cmd">npm install ping-onchain viem</code>
         <button class="hero-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('hero-cmd').textContent).then(()=>{this.textContent='copied';setTimeout(()=>this.textContent='copy',1500)})">copy</button>
       </div>
     </div>
     <div class="scroll-indicator" aria-hidden="true"></div>
+
+    <!-- Floating memory icon -->
+    <div class="hero-mem" onclick="openMind()">
+      <svg viewBox="0 0 80 80" width="64" height="64">
+        <circle cx="40" cy="40" r="36" fill="none" stroke="#2ea9a1" stroke-width="0.5" opacity="0.2" style="animation:hMemSpin 20s linear infinite;transform-origin:40px 40px"/>
+        <circle cx="40" cy="40" r="28" fill="none" stroke="#c4a862" stroke-width="0.5" opacity="0.2" style="animation:hMemSpin 15s linear infinite reverse;transform-origin:40px 40px"/>
+        <circle cx="40" cy="40" r="20" fill="none" stroke="#e05252" stroke-width="0.5" opacity="0.3" style="animation:hMemPulse 3s ease-in-out infinite;transform-origin:40px 40px"/>
+        <circle cx="40" cy="40" r="6" fill="#2ea9a1" opacity="0.6" style="animation:hMemPulse 2s ease-in-out infinite;transform-origin:40px 40px"/>
+        <circle cx="40" cy="12" r="2" fill="#e05252" opacity="0.5" style="animation:hMemFloat 4s ease-in-out infinite"/>
+        <circle cx="60" cy="22" r="2" fill="#c4a862" opacity="0.5" style="animation:hMemFloat 4s ease-in-out infinite 0.5s"/>
+        <circle cx="65" cy="45" r="2" fill="#5a8ab5" opacity="0.5" style="animation:hMemFloat 4s ease-in-out infinite 1s"/>
+        <circle cx="50" cy="65" r="2" fill="#6b7a92" opacity="0.5" style="animation:hMemFloat 4s ease-in-out infinite 1.5s"/>
+        <circle cx="25" cy="62" r="2" fill="#8878a8" opacity="0.5" style="animation:hMemFloat 4s ease-in-out infinite 2s"/>
+        <circle cx="16" cy="35" r="2" fill="#c4a862" opacity="0.5" style="animation:hMemFloat 4s ease-in-out infinite 2.5s"/>
+        <line x1="40" y1="34" x2="40" y2="14" stroke="#e05252" stroke-width="0.4" opacity="0.15"/>
+        <line x1="44" y1="36" x2="58" y2="24" stroke="#c4a862" stroke-width="0.4" opacity="0.15"/>
+        <line x1="46" y1="40" x2="63" y2="45" stroke="#5a8ab5" stroke-width="0.4" opacity="0.15"/>
+        <line x1="44" y1="44" x2="48" y2="63" stroke="#6b7a92" stroke-width="0.4" opacity="0.15"/>
+        <line x1="36" y1="44" x2="27" y2="60" stroke="#8878a8" stroke-width="0.4" opacity="0.15"/>
+        <line x1="34" y1="38" x2="18" y2="37" stroke="#c4a862" stroke-width="0.4" opacity="0.15"/>
+      </svg>
+      <span class="hero-mem-label">memory</span>
+    </div>
   </section>
+
+  <style>
+    .hero-mem {
+      position:absolute;right:8%;top:50%;transform:translateY(-50%);
+      display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+      cursor:pointer;opacity:0.5;
+      transition:opacity 0.4s, transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .hero-mem:hover {
+      opacity:1;transform:translateY(-50%) scale(1.1);
+    }
+    .hero-mem-label {
+      font-family:var(--font-mono);font-size:0.5rem;
+      color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;
+      transition:color 0.3s;
+    }
+    .hero-mem:hover .hero-mem-label { color:var(--accent); }
+    @keyframes hMemSpin{to{transform:rotate(360deg)}}
+    @keyframes hMemPulse{0%,100%{opacity:0.2}50%{opacity:0.7}}
+    @keyframes hMemFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+    @media(max-width:768px){
+      .hero-mem{right:4%;top:auto;bottom:15%;transform:none;opacity:0.4}
+      .hero-mem:hover{transform:scale(1.1);opacity:0.9}
+      .hero-mem svg{width:48px;height:48px}
+    }
+    @media(max-width:480px){
+      .hero-mem{right:6%;top:auto;bottom:20%;opacity:0.35}
+      .hero-mem svg{width:40px;height:40px}
+      .hero-mem-label{font-size:0.4375rem}
+    }
+  </style>
 
   <!-- Thesis -->
   <section class="thesis" id="thesis">
@@ -113,136 +175,7 @@
     </div>
   </section>
 
-  <!-- The Record -->
-  <section class="record" id="record">
-    <div class="container">
-      <h2 class="section-header reveal">The Record</h2>
-
-      <!-- Treasury -->
-      <div class="treasury-grid reveal-stagger">
-        <div class="treasury-stat">
-          <div class="label">total aum</div>
-          <div class="value" id="t-total">...</div>
-        </div>
-        <div class="treasury-stat">
-          <div class="label">deployable</div>
-          <div class="value" id="t-deployable">...</div>
-        </div>
-        <div class="treasury-stat">
-          <div class="label">reserve</div>
-          <div class="value" id="t-reserve">...</div>
-        </div>
-        <div class="treasury-stat">
-          <div class="label">positions</div>
-          <div class="value" id="t-positions">...</div>
-        </div>
-      </div>
-
-      <!-- Holdings -->
-      <table class="holdings-table reveal">
-        <thead>
-          <tr>
-            <th>token</th>
-            <th>entry</th>
-            <th>value</th>
-            <th>pnl</th>
-            <th>status</th>
-          </tr>
-        </thead>
-        <tbody id="holdings-body">
-          <tr>
-            <td colspan="5" class="secondary">loading...</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Watchlist -->
-      <div class="watchlist-section reveal">
-        <h3>Active Watchlist</h3>
-        <div class="watchlist-grid reveal-stagger">
-          <div class="watchlist-item conviction-high">
-            <div class="project-name">Agent Swarm</div>
-            <div class="project-score">26/30 : high conviction</div>
-            <div class="project-notes">on-chain marketplace where agents hire agents. XMTP + USDC on Base. 5 verified contracts. v1 to v4 in 7 days.</div>
-          </div>
-          <div class="watchlist-item conviction-high">
-            <div class="project-name">Exoskeletons / OK Fight Club</div>
-            <div class="project-score">24/30 : high conviction</div>
-            <div class="project-notes">on-chain agent identity system + fighting game. CC0. 178 tests. commit-reveal anti-sniping. found 8 vulns in external audit.</div>
-          </div>
-          <div class="watchlist-item conviction-medium-high">
-            <div class="project-name">TensorGate</div>
-            <div class="project-score">24/30 : medium-high conviction</div>
-            <div class="project-notes">gateway to Bittensor subnets via MCP + REST API. 19 MCP tools. v1.5.3 to v2.0 in 9 days.</div>
-          </div>
-          <div class="watchlist-item conviction-medium">
-            <div class="project-name">Sigil</div>
-            <div class="project-score">20/30 : medium conviction</div>
-            <div class="project-notes">milestone-locked token funding for builders. supply stays locked until they ship. most differentiated concept this cycle.</div>
-          </div>
-          <div class="watchlist-item conviction-medium">
-            <div class="project-name">AHM Protocol</div>
-            <div class="project-score">20/30 : medium conviction</div>
-            <div class="project-notes">wallet health diagnostics for autonomous agents. x402, pay-per-call, no accounts. real technical depth, zero hype.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Community Signal -->
-      <div class="signal-section reveal">
-        <h3>Community Signal</h3>
-        <p class="signal-intro">which projects should i look at next? signal your conviction or suggest something new.</p>
-        <div class="signal-grid reveal-stagger" id="signal-grid">
-          <button class="signal-btn" data-project="Agent Swarm">
-            <span class="signal-name">Agent Swarm</span>
-            <span class="signal-label">signal</span>
-          </button>
-          <button class="signal-btn" data-project="Exoskeletons">
-            <span class="signal-name">Exoskeletons</span>
-            <span class="signal-label">signal</span>
-          </button>
-          <button class="signal-btn" data-project="TensorGate">
-            <span class="signal-name">TensorGate</span>
-            <span class="signal-label">signal</span>
-          </button>
-          <button class="signal-btn" data-project="Sigil">
-            <span class="signal-name">Sigil</span>
-            <span class="signal-label">signal</span>
-          </button>
-          <button class="signal-btn" data-project="AHM Protocol">
-            <span class="signal-name">AHM Protocol</span>
-            <span class="signal-label">signal</span>
-          </button>
-        </div>
-        <span id="signal-status" class="form-status"></span>
-
-        <div class="suggest-wrap">
-          <h4>suggest a project</h4>
-          <form id="suggest-form" class="sibyl-form sibyl-form-row">
-            <div class="form-field">
-              <label for="suggest-project">project</label>
-              <input type="text" id="suggest-project" name="project" required autocomplete="off">
-            </div>
-            <div class="form-field">
-              <label for="suggest-handle">X handle</label>
-              <input type="text" id="suggest-handle" name="handle" required autocomplete="off">
-            </div>
-            <div class="form-field form-field-wide">
-              <label for="suggest-why">why</label>
-              <input type="text" id="suggest-why" name="why" required maxlength="200" autocomplete="off">
-            </div>
-            <div class="hp-field" aria-hidden="true">
-              <input type="text" name="_hp" tabindex="-1" autocomplete="off">
-            </div>
-            <button type="submit" class="form-submit">submit</button>
-            <span id="suggest-status" class="form-status"></span>
-          </form>
-        </div>
-      </div>
-
-      <p class="record-note reveal">the record is young. every entry will be public.</p>
-    </div>
-  </section>
+  <!-- The Record (hidden until updated post-launch) -->
 
   <!-- For Builders -->
   <section class="builders" id="builders">
@@ -256,7 +189,7 @@
   </section>
 
   <section class="bottom-cta-wrap">
-    <div class="container" style="text-align: center;">
+    <div class="container" style="text-align:center">
       <div class="reveal">
         <a href="/mind" class="mind-cta-btn">
           <span class="cta-eye"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></span>
@@ -272,7 +205,14 @@
     <div class="container">
       <div class="footer-inner">
         <span class="footer-left">SIBYL operates on Base.</span>
-        <span class="footer-right"><a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a></span>
+        <div class="footer-right">
+          <a href="https://docs.sibylcap.com" target="_blank" rel="noopener">docs</a>
+          <a href="/mind">mind</a>
+          <a href="/media">media</a>
+          <a href="/stake">stake</a>
+          <a href="https://x.com/sibylcap" target="_blank" rel="noopener">x.com/sibylcap</a>
+          <span class="footer-email" onclick="navigator.clipboard.writeText('sibylcap@gmail.com').then(()=>{this.textContent='copied!';setTimeout(()=>this.textContent='sibylcap@gmail.com',1500)})">sibylcap@gmail.com</span>
+        </div>
       </div>
     </div>
   </footer>
@@ -329,7 +269,7 @@
 
         txt.textContent = 'Approve tx...';
 
-        var tx = await contract.giveFeedback(AGENT_ID, 80, 2, 'sibylcap', 'positive', 'website', note, hash);
+        var tx = await contract.giveFeedback(AGENT_ID, 100, 0, 'sibylcap', 'positive', 'website', note, hash);
         txt.textContent = 'Confirming...';
         await tx.wait();
 
@@ -348,6 +288,29 @@
       busy = false;
     });
   })();
+  </script>
+
+
+
+  <!-- Memory Modal -->
+  <div id="mindModal" class="mind-modal" onclick="if(event.target===this)closeMind()">
+    <div class="mind-modal-inner">
+      <button class="mind-close" onclick="closeMind()">&times;</button>
+      <img src="/images/memory-tree.png" alt="SIBYL Memory Architecture" style="width:100%;display:block;border-radius:12px">
+    </div>
+  </div>
+  <style>
+    .mind-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);z-index:9999;align-items:center;justify-content:center;padding:20px;cursor:pointer;transition:background 0.4s}
+    .mind-modal.open{display:flex;background:rgba(0,0,0,0.92)}
+    .mind-modal-inner{position:relative;max-width:1000px;max-height:90vh;overflow:auto;border-radius:12px;background:#0a0c10;border:1px solid #1a1e28;cursor:default;transform:scale(0.3);opacity:0;transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1),opacity 0.4s ease}
+    .mind-modal.open .mind-modal-inner{transform:scale(1);opacity:1}
+    .mind-close{position:sticky;top:12px;float:right;margin:12px;background:rgba(10,12,16,0.8);border:1px solid #1a1e28;border-radius:6px;color:#555d6b;font-size:1.25rem;cursor:pointer;z-index:1;line-height:1;padding:4px 10px;transition:all 0.2s}
+    .mind-close:hover{color:#e8ecf2;border-color:#2ea9a1}
+  </style>
+  <script>
+    function openMind(){var m=document.getElementById('mindModal');m.style.display='flex';requestAnimationFrame(function(){requestAnimationFrame(function(){m.classList.add('open')})});document.body.style.overflow='hidden'}
+    function closeMind(){var m=document.getElementById('mindModal');m.classList.remove('open');setTimeout(function(){m.style.display='none'},500);document.body.style.overflow=''}
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('mindModal').classList.contains('open'))closeMind()});
   </script>
 </body>
 </html>

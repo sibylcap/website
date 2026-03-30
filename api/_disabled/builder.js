@@ -116,17 +116,19 @@ function computeScore(tokenAddr, dexData, xData, ghData, twitter, github, isDemo
     };
   }
 
-  // ── 2. GITHUB ACTIVITY (0-25) ──
+  // ── 2. GITHUB ACTIVITY (0-15) ──
+  // Reduced from 25: GitHub Events API data is consistently unreliable
+  // (org repos report differently, private repos invisible, force pushes distort counts)
   var ghOk = ghData && !ghData.error;
   if (ghOk) {
-    maxPossible += 25;
+    maxPossible += 15;
     var gs = scoreGitHubActivity(ghData);
     components.github_activity = gs.component;
     rawTotal += gs.score;
     flags = flags.concat(gs.flags);
   } else {
     components.github_activity = {
-      score: null, max: 25,
+      score: null, max: 15,
       signals: [ghData ? 'unavailable: ' + ghData.error : 'not provided']
     };
   }
@@ -155,10 +157,10 @@ function computeScore(tokenAddr, dexData, xData, ghData, twitter, github, isDemo
     maxPossible += 30;
     // Normalize activity to 0-100 scale
     var activityNorm = 0;
-    if (xOk) activityNorm += (components.x_activity.score / 25) * 50;
-    if (ghOk) activityNorm += (components.github_activity.score / 25) * 50;
-    // If only one source available, scale to full range
-    if (activitySources === 1) activityNorm = Math.min(100, activityNorm * 2);
+    if (xOk) activityNorm += (components.x_activity.score / 25) * 62.5;
+    if (ghOk) activityNorm += (components.github_activity.score / 15) * 37.5;
+    // If only one source available, cap at 60% of max (not 100%) to reflect incomplete data
+    if (activitySources === 1) activityNorm = Math.min(60, activityNorm * 1.2);
 
     var vr = scoreValueRatio(activityNorm, mc);
     components.value_ratio = vr.component;
@@ -224,6 +226,7 @@ function computeScore(tokenAddr, dexData, xData, ghData, twitter, github, isDemo
     flags: flags,
     recommendation: rec,
     summary: summary,
+    data_completeness: (xOk && ghOk) ? 'full' : (activitySources === 1 ? 'partial' : 'minimal'),
     data_sources: ['dexscreener', twitter ? 'x-api' : null, github ? 'github-api' : null].filter(Boolean),
     demo: isDemo,
     feedback: ERC8004_FEEDBACK
@@ -267,30 +270,29 @@ function scoreGitHubActivity(d) {
   var days = d.active_days || 0;
   var repos = d.repos_active || 0;
 
-  // Commit velocity (0-12)
-  if (cpw >= 20)       { score += 12; signals.push(cpw + ' commits/week (prolific)'); }
-  else if (cpw >= 10)  { score += 10; signals.push(cpw + ' commits/week (strong)'); }
-  else if (cpw >= 5)   { score += 8;  signals.push(cpw + ' commits/week (steady)'); }
-  else if (cpw >= 2)   { score += 5;  signals.push(cpw + ' commits/week (moderate)'); }
-  else if (cpw > 0)    { score += 3;  signals.push(cpw + ' commits/week (minimal)'); }
-  else                  { score += 0;  signals.push('no commits in 30 days'); flags.push('WARNING: zero GitHub commits in past 30 days.'); }
+  // Commit velocity (0-7)
+  if (cpw >= 20)       { score += 7; signals.push(cpw + ' commits/week (prolific)'); }
+  else if (cpw >= 10)  { score += 6; signals.push(cpw + ' commits/week (strong)'); }
+  else if (cpw >= 5)   { score += 5; signals.push(cpw + ' commits/week (steady)'); }
+  else if (cpw >= 2)   { score += 3; signals.push(cpw + ' commits/week (moderate)'); }
+  else if (cpw > 0)    { score += 2; signals.push(cpw + ' commits/week (minimal)'); }
+  else                  { score += 0; signals.push('no commits in 30 days'); flags.push('WARNING: zero GitHub commits in past 30 days.'); }
 
-  // Consistency: active days out of 30 (0-8)
+  // Consistency: active days out of 30 (0-5)
   var pct = Math.round(days / 30 * 100);
-  if (days >= 20)      { score += 8; signals.push(days + '/30 active days (' + pct + '%)'); }
-  else if (days >= 12) { score += 6; signals.push(days + '/30 active days (' + pct + '%)'); }
-  else if (days >= 5)  { score += 4; signals.push(days + '/30 active days (' + pct + '%)'); }
-  else if (days > 0)   { score += 2; signals.push(days + '/30 active days (' + pct + '%)'); }
+  if (days >= 20)      { score += 5; signals.push(days + '/30 active days (' + pct + '%)'); }
+  else if (days >= 12) { score += 4; signals.push(days + '/30 active days (' + pct + '%)'); }
+  else if (days >= 5)  { score += 3; signals.push(days + '/30 active days (' + pct + '%)'); }
+  else if (days > 0)   { score += 1; signals.push(days + '/30 active days (' + pct + '%)'); }
   else                  { score += 0; }
 
-  // Repo breadth (0-5)
-  if (repos >= 5)      { score += 5; signals.push(repos + ' active repos'); }
-  else if (repos >= 3) { score += 4; signals.push(repos + ' active repos'); }
-  else if (repos >= 2) { score += 3; signals.push(repos + ' active repos'); }
-  else if (repos >= 1) { score += 2; signals.push(repos + ' active repo'); }
+  // Repo breadth (0-3)
+  if (repos >= 5)      { score += 3; signals.push(repos + ' active repos'); }
+  else if (repos >= 3) { score += 2; signals.push(repos + ' active repos'); }
+  else if (repos >= 1) { score += 1; signals.push(repos + ' active repo' + (repos > 1 ? 's' : '')); }
   else                  { score += 0; }
 
-  return { score: score, component: { score: score, max: 25, signals: signals }, flags: flags };
+  return { score: score, component: { score: score, max: 15, signals: signals }, flags: flags };
 }
 
 function scoreMarket(mc, liq, vol) {
@@ -326,19 +328,20 @@ function scoreValueRatio(activityNorm, mc) {
   var score = 0;
   var rating = 'insufficient_data';
 
-  // Log-scaled MC: $100K=5, $1M=6, $10M=7
+  // Use log10(mc)^1.5 for better differentiation across MC range
+  // $50K=7.0, $100K=8.3, $500K=11.3, $1M=13.4, $5M=18.2, $10M=21.7
   var mcLog = mc > 0 ? Math.log10(mc) : 0;
-  // Value ratio: builder activity per log-unit of market cap
-  // High activity + low MC = high ratio = undervalued
-  var ratio = mcLog > 0 ? activityNorm / mcLog : 0;
+  var mcFactor = mcLog > 0 ? Math.pow(mcLog, 1.5) : 0;
+  // Value ratio: builder activity per scaled-log-unit of market cap
+  var ratio = mcFactor > 0 ? activityNorm / mcFactor : 0;
 
   signals.push('activity index: ' + Math.round(activityNorm) + '/100');
   signals.push('market cap: $' + fmt(mc));
   signals.push('value ratio: ' + ratio.toFixed(1));
 
-  if (ratio >= 14)       { score = 30; rating = 'deeply_undervalued'; signals.push('shipping velocity far exceeds market recognition'); }
-  else if (ratio >= 11)  { score = 25; rating = 'undervalued'; signals.push('strong builder output relative to market cap'); }
-  else if (ratio >= 8)   { score = 20; rating = 'slightly_undervalued'; signals.push('builder activity ahead of market pricing'); }
+  if (ratio >= 20)       { score = 30; rating = 'deeply_undervalued'; signals.push('shipping velocity far exceeds market recognition'); }
+  else if (ratio >= 14)  { score = 25; rating = 'undervalued'; signals.push('strong builder output relative to market cap'); }
+  else if (ratio >= 9)   { score = 20; rating = 'slightly_undervalued'; signals.push('builder activity ahead of market pricing'); }
   else if (ratio >= 6)   { score = 15; rating = 'fair'; signals.push('market roughly reflects builder output'); }
   else if (ratio >= 4)   { score = 10; rating = 'slightly_overvalued'; signals.push('market pricing ahead of visible output'); }
   else if (ratio >= 2)   { score = 5;  rating = 'overvalued'; signals.push('limited visible output for this valuation'); flags.push('WARNING: builder activity does not justify current market cap.'); }
@@ -417,7 +420,7 @@ async function fetchXActivityV1(handle, bearer) {
     var cutoff = Date.now() - 7 * 86400000;
     var recent = tweets.filter(function(t) { return new Date(t.created_at).getTime() > cutoff; });
 
-    var SHIP_RE = /deploy|ship|launch|release|update|commit|push|build|fix|refactor|merge|v\d|beta|alpha|testnet|mainnet|live|audit|contract|integrat/i;
+    var SHIP_RE = /deploy|shipped|shipping|ship\s|push.*prod|commit\s*[a-f0-9]|merge.*PR|merged.*pull|v\d+\.\d|testnet|mainnet|smart.?contract|audit|refactor|integrat.*api|open.?source|changelog|patch|hotfix|bug.?fix|migrat/i;
     var shipCount = recent.filter(function(t) { return SHIP_RE.test(t.text || t.full_text || ''); }).length;
 
     var engagement = 0;
@@ -440,7 +443,7 @@ async function fetchXActivityV1(handle, bearer) {
 }
 
 function classifyTweets(tweets, handle, source) {
-  var SHIP_RE = /deploy|ship|launch|release|update|commit|push|build|fix|refactor|merge|v\d|beta|alpha|testnet|mainnet|live|audit|contract|integrat/i;
+  var SHIP_RE = /deploy|shipped|shipping|ship\s|push.*prod|commit\s*[a-f0-9]|merge.*PR|merged.*pull|v\d+\.\d|testnet|mainnet|smart.?contract|audit|refactor|integrat.*api|open.?source|changelog|patch|hotfix|bug.?fix|migrat/i;
 
   var shipCount = tweets.filter(function(t) { return SHIP_RE.test(t.text || ''); }).length;
   var engagement = 0;
@@ -474,7 +477,7 @@ async function fetchGitHubActivity(username) {
       var controller = new AbortController();
       var timeout = setTimeout(function() { controller.abort(); }, 5000);
       var resp = await fetch(url, {
-        headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' },
+        headers: Object.assign({ 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' }, process.env.GITHUB_TOKEN ? { 'Authorization': 'token ' + process.env.GITHUB_TOKEN } : {}),
         signal: controller.signal
       });
       clearTimeout(timeout);
@@ -505,7 +508,7 @@ async function fetchGitHubOrgActivity(orgName) {
     var resp = await fetch(
       'https://api.github.com/orgs/' + encodeURIComponent(orgName) + '/events?per_page=100',
       {
-        headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' },
+        headers: Object.assign({ 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'SIBYL-Agent-20880' }, process.env.GITHUB_TOKEN ? { 'Authorization': 'token ' + process.env.GITHUB_TOKEN } : {}),
         signal: controller.signal
       }
     );
