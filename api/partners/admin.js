@@ -81,6 +81,12 @@ module.exports = async function handler(req, res) {
         return res.json({ task: task });
       }
 
+      if (action === 'update-project') {
+        if (!body.id) return res.status(400).json({ error: 'project id is required' });
+        var updated = await db.updateProject(body.id, body);
+        return res.json({ project: updated });
+      }
+
       if (action === 'update-task') {
         if (!body.id) return res.status(400).json({ error: 'task id is required' });
         var updated = await db.adminUpdateTask(body.id, body);
