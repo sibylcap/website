@@ -115,6 +115,17 @@ async function createProject({ id, name, wallet, token_ca, conviction, score }) 
   return getProjectById(id);
 }
 
+async function updateProject(id, fields) {
+  await ensureSchema();
+  if (fields.wallet) await sql`UPDATE partner_projects SET wallet = LOWER(${fields.wallet}), updated_at = NOW() WHERE id = ${id}`;
+  if (fields.name) await sql`UPDATE partner_projects SET name = ${fields.name}, updated_at = NOW() WHERE id = ${id}`;
+  if (fields.token_ca) await sql`UPDATE partner_projects SET token_ca = ${fields.token_ca}, updated_at = NOW() WHERE id = ${id}`;
+  if (fields.conviction) await sql`UPDATE partner_projects SET conviction = ${fields.conviction}, updated_at = NOW() WHERE id = ${id}`;
+  if (fields.score) await sql`UPDATE partner_projects SET score = ${fields.score}, updated_at = NOW() WHERE id = ${id}`;
+  if (fields.status) await sql`UPDATE partner_projects SET status = ${fields.status}, updated_at = NOW() WHERE id = ${id}`;
+  return getProjectById(id);
+}
+
 // ── Sessions ────────────────────────────────────────────────────────────────
 
 async function getSessionsByProject(projectId) {
@@ -287,7 +298,7 @@ async function getAttachmentById(id) {
 }
 
 module.exports = {
-  getProjectByWallet, getProjectById, getAllProjects, createProject,
+  getProjectByWallet, getProjectById, getAllProjects, createProject, updateProject,
   getSessionsByProject, getSessionById, createSession, updateSession,
   getTasksByProject, getTaskById, createTask, updateTaskStatus, updateTaskNotes, adminUpdateTask, getTaskCountsByProject,
   getMessages, createMessage,
