@@ -623,6 +623,66 @@
       display: none;
     }
 
+    /* Session report */
+    .report-panel {
+      flex-shrink: 0;
+      padding: 0 1.2rem;
+    }
+    .report-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .report-header {
+      padding: 0.7rem 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .report-header:hover { background: var(--elevated); }
+    .report-title {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+    .report-toggle {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .report-toggle.open { transform: rotate(180deg); }
+    .report-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.6rem;
+      color: var(--text-muted);
+    }
+    .report-meta span { color: var(--text-secondary); }
+    .report-body {
+      display: none;
+      border-top: 1px solid var(--border);
+    }
+    .report-body.open { display: block; }
+    .report-iframe {
+      width: 100%;
+      height: 80vh;
+      border: none;
+      background: #0a0a0a;
+    }
+    .report-empty {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 2rem;
+    }
+
     .loading { color: var(--text-muted); text-align: center; padding: 3rem; }
 
     /* Toast */
@@ -684,6 +744,20 @@
           <span><span class="legend-dot start"></span>Advisory Start</span>
           <span><span class="legend-dot session"></span>Session</span>
           <span><span class="legend-dot task"></span>Task Completed</span>
+        </div>
+      </div>
+    </div>
+    <div class="report-panel" id="reportPanel" style="display:none">
+      <div class="report-card">
+        <div class="report-header" onclick="toggleReport()">
+          <div>
+            <span class="report-title">Session Report</span>
+            <span class="report-meta" id="reportMeta"></span>
+          </div>
+          <span class="report-toggle" id="reportToggle">&#9660;</span>
+        </div>
+        <div class="report-body" id="reportBody">
+          <iframe class="report-iframe" id="reportIframe"></iframe>
         </div>
       </div>
     </div>
@@ -761,6 +835,17 @@
       var p = projData.project;
       document.getElementById('projectName').textContent = p.name;
       document.getElementById('walletDisplay').textContent = p.wallet.slice(0, 6) + '...' + p.wallet.slice(-4);
+
+      // Check sessions for document_url
+      if (projData.sessions) {
+        var docSession = projData.sessions.find(function(s) { return s.document_url; });
+        if (docSession) {
+          var rp = document.getElementById('reportPanel');
+          rp.style.display = '';
+          document.getElementById('reportMeta').innerHTML = '<span>' + esc(docSession.title) + '</span>';
+          document.getElementById('reportIframe').src = docSession.document_url;
+        }
+      }
 
       allTasks = taskData.tasks;
       var grouped = {};
@@ -1321,6 +1406,21 @@
       if (p < 1) return p.toFixed(6);
       if (p < 100) return p.toFixed(4);
       return p.toFixed(2);
+    }
+
+    // ── Report panel ─────────────────────────────────────────────────
+
+    function toggleReport() {
+      var body = document.getElementById('reportBody');
+      var toggle = document.getElementById('reportToggle');
+      var isOpen = body.classList.contains('open');
+      if (isOpen) {
+        body.classList.remove('open');
+        toggle.classList.remove('open');
+      } else {
+        body.classList.add('open');
+        toggle.classList.add('open');
+      }
     }
 
     // ── Init ────────────────────────────────────────────────────────
