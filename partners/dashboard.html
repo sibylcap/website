@@ -623,10 +623,10 @@
       display: none;
     }
 
-    /* Session report */
+    /* Session report (mirrors timeline-panel pattern) */
     .report-panel {
       flex-shrink: 0;
-      padding: 0 1.2rem;
+      padding: 0 1.2rem 0;
     }
     .report-card {
       background: var(--surface);
@@ -639,11 +639,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border);
       cursor: pointer;
       transition: background 0.15s;
     }
     .report-header:hover { background: var(--elevated); }
+    .report-left {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
     .report-title {
       font-family: var(--font-display);
       font-size: 0.65rem;
@@ -652,35 +656,31 @@
       letter-spacing: 0.12em;
       color: var(--text-muted);
     }
+    .report-session-name {
+      font-size: 0.62rem;
+      color: var(--text-secondary);
+    }
     .report-toggle {
-      font-size: 0.65rem;
+      font-size: 0.55rem;
       color: var(--text-muted);
       transition: transform 0.2s;
+      user-select: none;
     }
     .report-toggle.open { transform: rotate(180deg); }
-    .report-meta {
-      display: flex;
-      gap: 1rem;
-      font-size: 0.6rem;
-      color: var(--text-muted);
-    }
-    .report-meta span { color: var(--text-secondary); }
     .report-body {
-      display: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
       border-top: 1px solid var(--border);
     }
-    .report-body.open { display: block; }
+    .report-body.open {
+      max-height: 85vh;
+    }
     .report-iframe {
       width: 100%;
       height: 80vh;
       border: none;
-      background: #0a0a0a;
-    }
-    .report-empty {
-      color: var(--text-muted);
-      font-size: 0.7rem;
-      text-align: center;
-      padding: 2rem;
+      background: var(--bg);
     }
 
     .loading { color: var(--text-muted); text-align: center; padding: 3rem; }
@@ -750,9 +750,9 @@
     <div class="report-panel" id="reportPanel" style="display:none">
       <div class="report-card">
         <div class="report-header" onclick="toggleReport()">
-          <div>
+          <div class="report-left">
             <span class="report-title">Session Report</span>
-            <span class="report-meta" id="reportMeta"></span>
+            <span class="report-session-name" id="reportSessionName"></span>
           </div>
           <span class="report-toggle" id="reportToggle">&#9660;</span>
         </div>
@@ -842,7 +842,7 @@
         if (docSession) {
           var rp = document.getElementById('reportPanel');
           rp.style.display = '';
-          document.getElementById('reportMeta').innerHTML = '<span>' + esc(docSession.title) + '</span>';
+          document.getElementById('reportSessionName').textContent = docSession.title;
           document.getElementById('reportIframe').src = docSession.document_url;
         }
       }
