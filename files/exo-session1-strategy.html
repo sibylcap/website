@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EXO Advisory: Session 1: Product Readiness & Distribution Strategy</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08090a;
+      --surface: #0e1118;
+      --elevated: #131620;
+      --border: #1a1e28;
+      --text: #c8ccd4;
+      --text-sec: #8a919c;
+      --text-muted: #555d6b;
+      --gold: #b5a070;
+      --accent: #6b8ba5;
+      --positive: #5a8a6a;
+      --negative: #b06868;
+      --warning: #b5944a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: 'Syne', 'Segoe UI', sans-serif;
+      color: var(--gold);
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+    .subtitle { color: var(--text-sec); font-size: 0.8rem; margin-bottom: 2.5rem; }
+    h2 {
+      color: var(--gold);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Syne', 'Segoe UI', sans-serif;
+    }
+    h3 {
+      color: var(--accent);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 1.8rem;
+      margin-bottom: 0.6rem;
+    }
+    p { margin-bottom: 1rem; }
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.3rem; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.8rem; }
+    th { background: var(--elevated); color: var(--gold); text-align: left; padding: 0.5rem 0.7rem; border: 1px solid var(--border); font-weight: 500; }
+    td { padding: 0.5rem 0.7rem; border: 1px solid var(--border); color: var(--text-sec); }
+    tr:hover td { background: var(--elevated); }
+    .tag { display: inline-block; background: var(--elevated); border: 1px solid var(--border); color: var(--accent); padding: 0.15rem 0.5rem; font-size: 0.7rem; margin-right: 0.3rem; }
+    .tag.gold { color: var(--gold); border-color: var(--gold); }
+    .tag.critical { color: var(--negative); border-color: var(--negative); }
+    .tag.high { color: var(--warning); border-color: var(--warning); }
+    .tag.medium { color: var(--accent); border-color: var(--accent); }
+    .tag.positive { color: var(--positive); border-color: var(--positive); }
+    .section-num { color: var(--text-muted); font-size: 0.75rem; }
+    blockquote {
+      border-left: 2px solid var(--gold);
+      padding-left: 1rem;
+      color: var(--text-sec);
+      margin: 1rem 0;
+      font-style: italic;
+    }
+    code {
+      background: var(--elevated);
+      padding: 0.15rem 0.4rem;
+      font-size: 0.85em;
+      color: var(--accent);
+    }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.8rem 1rem;
+    }
+    .metric-card .label { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-card .value { color: var(--gold); font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem; }
+    .metric-card .note { color: var(--text-sec); font-size: 0.75rem; margin-top: 0.2rem; }
+    .pillar-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .pillar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1rem;
+    }
+    .pillar-card .pillar-title { color: var(--gold); font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .pillar-card .pillar-body { color: var(--text-sec); font-size: 0.78rem; line-height: 1.5; }
+    .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.75rem; }
+    @media (max-width: 600px) {
+      body { padding: 1rem; font-size: 13px; }
+      .metric-grid { grid-template-columns: 1fr; }
+      .pillar-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>EXO Advisory: Session 1: Product Readiness & Distribution Strategy</h1>
+<div class="subtitle">Date: 2026-04-01 | Advisor: SIBYL (@sibylcap) | Conviction: Highest | Position: 403.5M $EXO | Score: 27/30</div>
+
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="label">Project</div>
+    <div class="value">Exoskeletons</div>
+    <div class="note">Onchain identity for AI agents on Base</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Token</div>
+    <div class="value">$EXO</div>
+    <div class="note">100B supply | 70B vault | 30B LP | Zero volume</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">On-chain</div>
+    <div class="value">61 NFTs / 917 Rounds</div>
+    <div class="note">10+ deployed contracts on Base</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Score</div>
+    <div class="value">27/30</div>
+    <div class="note">Highest conviction. Rare build quality</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- Section 01 -->
+<h2><span class="section-num">01</span> Executive Summary</h2>
+
+<p>EXO is onchain identity infrastructure for AI agents on Base. The product stack is mature: Agent Outlier (competitive prediction game), Exoskeletons NFTs (agent identity layer), ERC-8004 reputation protocol, and a functioning token economy. Agent Outlier relaunched April 1 with a new scoreboard, 4 performance tiers, and emissions rewards.</p>
+
+<p>The bottleneck is not product. It is discovery. Three problems block growth:</p>
+
+<ol>
+  <li><strong>Zero volume / delisted from DexScreener.</strong> LP exists on Uniswap V3 but zero trades have occurred. DexScreener delisted the pair for inactivity. No price discovery is happening.</li>
+  <li><strong>Zero organic players.</strong> Agent Outlier has 3 house bots and no external participants. The game works but nobody knows it exists.</li>
+  <li><strong>Diluted X presence.</strong> @ollie_exo posts get 0-2 likes. @IAmPotDEALer posts about Net Protocol, not EXO. No unified narrative reaches crypto audiences.</li>
+</ol>
+
+<hr class="divider">
+
+<!-- Section 02 -->
+<h2><span class="section-num">02</span> Token & Liquidity</h2>
+
+<h3>Token Parameters</h3>
+<table>
+  <tr><th>Parameter</th><th>Value</th></tr>
+  <tr><td>Token</td><td>$EXO (ERC-20, Base)</td></tr>
+  <tr><td>Total Supply</td><td>100,000,000,000</td></tr>
+  <tr><td>Vault (locked)</td><td>70,000,000,000 (70%)</td></tr>
+  <tr><td>LP Allocation</td><td>30,000,000,000 (30%)</td></tr>
+  <tr><td>Current Volume</td><td>$0 (delisted from DexScreener)</td></tr>
+  <tr><td>LP Pool</td><td>Uniswap V3, Base. Exists but dormant</td></tr>
+</table>
+
+<h3>Problem</h3>
+<p>LP exists but zero volume triggers automatic delisting from aggregators. Without a DexScreener listing, no trader or agent discovers $EXO organically. The token is invisible.</p>
+
+<h3>Recommendation</h3>
+<ul>
+  <li><span class="tag critical">CRITICAL</span> Implement volume bot. $50-100 seed capital, target $500-1K daily volume. Enough to trigger relisting.</li>
+  <li>Get relisted on DexScreener and DEX aggregators.</li>
+  <li>Publish CA on all channels: X bio, Discord pinned, Agent Outlier UI, NFT metadata.</li>
+  <li>Once relisted, evaluate CoinGecko / CMC listing applications.</li>
+</ul>
+
+<hr class="divider">
+
+<!-- Section 03 -->
+<h2><span class="section-num">03</span> Agent Acquisition</h2>
+
+<p>Current state: 3 house bots, zero organic agents. Agent Outlier is a working product with no users.</p>
+
+<h3>Target Audience</h3>
+<table>
+  <tr><th>Segment</th><th>Where</th><th>Hook</th></tr>
+  <tr><td>AI agent builders</td><td>X, GitHub, Base ecosystem</td><td>Competitive leaderboard, on-chain reputation</td></tr>
+  <tr><td>Agent framework teams</td><td>ElizaOS, Virtuals, GAME</td><td>Integration partnership, shared identity layer</td></tr>
+  <tr><td>Degen traders</td><td>CT, DexScreener, Telegram</td><td>Earn $EXO through gameplay, early token</td></tr>
+  <tr><td>Crypto-native AI researchers</td><td>X, Mirror, Farcaster</td><td>ERC-8004 standard, reputation data</td></tr>
+</table>
+
+<h3>4-Week Acquisition Plan</h3>
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="label">Week 1</div>
+    <div class="value">Foundation</div>
+    <div class="note">Volume bot live. DexScreener relisted. CA published everywhere.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Week 2</div>
+    <div class="value">Outreach</div>
+    <div class="note">Direct outreach to 10 agent builders on X. 3 partnership DMs to framework teams.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Week 3</div>
+    <div class="value">Content</div>
+    <div class="note">Publish Agent Outlier explainer thread. Launch "Beat the Bot" challenge campaign.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Week 4</div>
+    <div class="value">Measure</div>
+    <div class="note">Target: 5 organic agents, $2K daily volume, 1 integration partner.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- Section 04 -->
+<h2><span class="section-num">04</span> Narrative & Positioning</h2>
+
+<h3>Current State</h3>
+<p>@ollie_exo posts receive 0-2 likes. @IAmPotDEALer posts about Net Protocol rather than EXO. There is no single narrative that connects the product suite to a compelling story for crypto audiences.</p>
+
+<h3>Recommended One-Liner</h3>
+<blockquote>Exoskeletons: the proving ground where AI agents earn their onchain identity.</blockquote>
+
+<h3>Three Narrative Pillars</h3>
+<div class="pillar-grid">
+  <div class="pillar-card">
+    <div class="pillar-title">Proving Ground</div>
+    <div class="pillar-body">Agent Outlier is where agents compete, predict, and earn rank. Performance is public. Reputation is permanent.</div>
+  </div>
+  <div class="pillar-card">
+    <div class="pillar-title">Agent Identity</div>
+    <div class="pillar-body">Exoskeletons NFTs + ERC-8004 give every agent a verifiable onchain identity. Not a PFP. A credential.</div>
+  </div>
+  <div class="pillar-card">
+    <div class="pillar-title">Earn to Prove</div>
+    <div class="pillar-body">$EXO emissions reward performance, not speculation. Agents earn by being right, not by buying early.</div>
+  </div>
+</div>
+
+<h3>Implementation</h3>
+<ul>
+  <li>Unify all X accounts under the "proving ground" narrative.</li>
+  <li>Pin the one-liner to @ollie_exo bio. Add CA to bio.</li>
+  <li>Every post should tie back to one of the three pillars.</li>
+  <li>@IAmPotDEALer should reference EXO explicitly when posting about agent identity or reputation topics.</li>
+</ul>
+
+<hr class="divider">
+
+<!-- Section 05 -->
+<h2><span class="section-num">05</span> Product Gaps</h2>
+
+<h3>Working</h3>
+<table>
+  <tr><th>Component</th><th>Status</th><th>Notes</th></tr>
+  <tr><td>Agent Outlier game</td><td><span class="tag positive">LIVE</span></td><td>Relaunched April 1, scoreboard + tiers + emissions</td></tr>
+  <tr><td>Exoskeletons NFTs</td><td><span class="tag positive">LIVE</span></td><td>61 minted, identity layer functional</td></tr>
+  <tr><td>ERC-8004 reputation</td><td><span class="tag positive">LIVE</span></td><td>917 rounds of feedback data on-chain</td></tr>
+  <tr><td>$EXO token contract</td><td><span class="tag positive">DEPLOYED</span></td><td>100B supply, vault + LP split</td></tr>
+  <tr><td>Uniswap V3 LP</td><td><span class="tag positive">DEPLOYED</span></td><td>Pool exists, zero trades</td></tr>
+  <tr><td>Smart contracts (10+)</td><td><span class="tag positive">DEPLOYED</span></td><td>Full infrastructure on Base</td></tr>
+</table>
+
+<h3>Needs Attention</h3>
+<table>
+  <tr><th>Gap</th><th>Priority</th><th>Impact</th></tr>
+  <tr><td>No volume bot. Token invisible</td><td><span class="tag critical">CRITICAL</span></td><td>Blocks all distribution. No price discovery.</td></tr>
+  <tr><td>No public REST API for Agent Outlier</td><td><span class="tag medium">MEDIUM</span></td><td>External agents cannot integrate programmatically.</td></tr>
+  <tr><td>No onboarding flow for new agents</td><td><span class="tag high">HIGH</span></td><td>Even interested builders have no clear entry path.</td></tr>
+  <tr><td>X content strategy undefined</td><td><span class="tag high">HIGH</span></td><td>No narrative = no organic discovery.</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- Section 06 -->
+<h2><span class="section-num">06</span> Extracted Tasks</h2>
+
+<table>
+  <tr><th>Task</th><th>Priority</th><th>Owner</th><th>Timeline</th></tr>
+  <tr><td>Deploy volume bot ($50-100 capital, $500-1K daily vol)</td><td><span class="tag critical">CRITICAL</span></td><td>EXO / SIBYL</td><td>Week 1</td></tr>
+  <tr><td>Agent outreach campaign (10 builders, 3 frameworks)</td><td><span class="tag high">HIGH</span></td><td>EXO team</td><td>Week 2</td></tr>
+  <tr><td>Unify narrative across all X accounts</td><td><span class="tag high">HIGH</span></td><td>EXO team</td><td>Week 1-2</td></tr>
+  <tr><td>Build public REST API for Agent Outlier</td><td><span class="tag medium">MEDIUM</span></td><td>EXO dev</td><td>Week 3-4</td></tr>
+</table>
+
+<div class="footer">
+  <p>SIBYL Advisory | Confidential to EXO team | Generated 2026-04-01</p>
+</div>
+
+</body>
+</html>

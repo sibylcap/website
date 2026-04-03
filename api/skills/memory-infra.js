@@ -9,7 +9,7 @@
 */
 
 var x402 = require('../_x402');
-var PRICE_USD = 199.00;
+var PRICE_USD = 1000.00;
 
 var ERC8004_FEEDBACK = {
   message: 'Rate this skill on-chain via ERC-8004 Reputation Registry',
@@ -232,7 +232,7 @@ module.exports = async function handler(req, res) {
 
   var gateOpts = {
     priceUsd: PRICE_USD,
-    description: 'SIBYL Memory Infrastructure Skill — hierarchical tiered memory system for Claude Code agents ($199 USDC)',
+    description: 'SIBYL Memory Infrastructure Skill — hierarchical tiered memory system for Claude Code agents ($1,000 USDC)',
     discovery: {
       input: {},
       inputSchema: {

@@ -81,6 +81,17 @@ async function ensureSchema() {
       used        BOOLEAN NOT NULL DEFAULT FALSE
     )`;
 
+  // Additional wallet access (many-to-many: wallet -> project)
+  await sql`
+    CREATE TABLE IF NOT EXISTS partner_access (
+      id          SERIAL PRIMARY KEY,
+      wallet      TEXT NOT NULL,
+      project_id  TEXT NOT NULL REFERENCES partner_projects(id),
+      role        TEXT NOT NULL DEFAULT 'viewer',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(wallet, project_id)
+    )`;
+
   // Migrations: add columns that may not exist on older schemas
   await sql`ALTER TABLE partner_sessions ADD COLUMN IF NOT EXISTS document_url TEXT`.catch(function() {});
 
@@ -91,8 +102,28 @@ async function ensureSchema() {
 
 async function getProjectByWallet(wallet) {
   await ensureSchema();
-  var { rows } = await sql`SELECT * FROM partner_projects WHERE LOWER(wallet) = LOWER(${wallet}) LIMIT 1`;
+  // Check primary wallet or access table
+  var { rows } = await sql`
+    SELECT p.* FROM partner_projects p
+    WHERE p.status = 'active' AND (
+      LOWER(p.wallet) = LOWER(${wallet})
+      OR p.id IN (SELECT project_id FROM partner_access WHERE LOWER(wallet) = LOWER(${wallet}))
+    )
+    ORDER BY p.created_at ASC LIMIT 1`;
   return rows[0] || null;
+}
+
+async function getProjectsByWallet(wallet) {
+  await ensureSchema();
+  // Union: projects where wallet is primary OR has access entry
+  var { rows } = await sql`
+    SELECT p.* FROM partner_projects p
+    WHERE p.status = 'active' AND (
+      LOWER(p.wallet) = LOWER(${wallet})
+      OR p.id IN (SELECT project_id FROM partner_access WHERE LOWER(wallet) = LOWER(${wallet}))
+    )
+    ORDER BY p.created_at ASC`;
+  return rows;
 }
 
 async function getProjectById(id) {
@@ -297,11 +328,34 @@ async function getAttachmentById(id) {
   return rows[0] || null;
 }
 
+// ── Access ─────────────────────────────────────────────────────────────────
+
+async function grantAccess(wallet, projectId, role) {
+  await ensureSchema();
+  await sql`
+    INSERT INTO partner_access (wallet, project_id, role)
+    VALUES (LOWER(${wallet}), ${projectId}, ${role || 'viewer'})
+    ON CONFLICT (wallet, project_id) DO UPDATE SET role = ${role || 'viewer'}`;
+  return { wallet: wallet.toLowerCase(), project_id: projectId, role: role || 'viewer' };
+}
+
+async function revokeAccess(wallet, projectId) {
+  await ensureSchema();
+  await sql`DELETE FROM partner_access WHERE LOWER(wallet) = LOWER(${wallet}) AND project_id = ${projectId}`;
+}
+
+async function getAccessByProject(projectId) {
+  await ensureSchema();
+  var { rows } = await sql`SELECT * FROM partner_access WHERE project_id = ${projectId} ORDER BY created_at ASC`;
+  return rows;
+}
+
 module.exports = {
-  getProjectByWallet, getProjectById, getAllProjects, createProject, updateProject,
+  getProjectByWallet, getProjectsByWallet, getProjectById, getAllProjects, createProject, updateProject,
   getSessionsByProject, getSessionById, createSession, updateSession,
   getTasksByProject, getTaskById, createTask, updateTaskStatus, updateTaskNotes, adminUpdateTask, getTaskCountsByProject,
   getMessages, createMessage,
   getAttachmentsByTask, createAttachment, getAttachmentById,
   createNonce, consumeNonce,
+  grantAccess, revokeAccess, getAccessByProject,
 };
