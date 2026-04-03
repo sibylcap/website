@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIBYL: Growth-Phase GTM Strategy</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    :root {
+      --bg: #08090a;
+      --surface: #0e1118;
+      --elevated: #131620;
+      --border: #1a1e28;
+      --text: #c8ccd4;
+      --text-sec: #8a919c;
+      --text-muted: #555d6b;
+      --gold: #b5a070;
+      --accent: #6b8ba5;
+      --positive: #5a8a6a;
+      --negative: #b06868;
+      --warning: #b5944a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+      color: var(--gold);
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+    .subtitle { color: var(--text-sec); font-size: 0.8rem; margin-bottom: 2.5rem; }
+    h2 {
+      color: var(--gold);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    }
+    h3 {
+      color: var(--accent);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 1.8rem;
+      margin-bottom: 0.6rem;
+    }
+    h4 {
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 1.2rem;
+      margin-bottom: 0.4rem;
+    }
+    p { margin-bottom: 1rem; }
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.3rem; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.8rem; }
+    th { background: var(--elevated); color: var(--gold); text-align: left; padding: 0.5rem 0.7rem; border: 1px solid var(--border); font-weight: 500; }
+    td { padding: 0.5rem 0.7rem; border: 1px solid var(--border); color: var(--text-sec); }
+    tr:hover td { background: var(--elevated); }
+    .tag { display: inline-block; background: var(--elevated); border: 1px solid var(--border); color: var(--accent); padding: 0.15rem 0.5rem; font-size: 0.7rem; margin-right: 0.3rem; }
+    .tag.gold { color: var(--gold); border-color: var(--gold); }
+    .section-num { color: var(--text-muted); font-size: 0.75rem; }
+    blockquote {
+      border-left: 2px solid var(--gold);
+      padding-left: 1rem;
+      color: var(--text-sec);
+      margin: 1rem 0;
+      font-style: italic;
+    }
+    code {
+      background: var(--elevated);
+      padding: 0.15rem 0.4rem;
+      font-size: 0.85em;
+      color: var(--accent);
+    }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.8rem 1rem;
+    }
+    .metric-card .label { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-card .value { color: var(--gold); font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem; }
+    .metric-card .note { color: var(--text-sec); font-size: 0.75rem; margin-top: 0.2rem; }
+    .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.75rem; }
+    @media (max-width: 600px) {
+      body { padding: 1rem; font-size: 13px; }
+      .metric-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>SIBYL: Growth-Phase GTM Strategy</h1>
+<div class="subtitle">Generated 2026-03-31 | Base chain | Post-TGE growth phase | $SIBYL live on Uniswap</div>
+
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="label">Chain</div>
+    <div class="value">Base (L2)</div>
+    <div class="note">Low gas, agent economy, Coinbase distribution</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Token Status</div>
+    <div class="value">$SIBYL Live</div>
+    <div class="note">Uniswap since March 18, 2026. 1B supply. 1% creator tax.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Community</div>
+    <div class="value">~50 holders</div>
+    <div class="note">30 Ping users (9 agents, 21 humans). Active Discord.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Phase</div>
+    <div class="value">Growth</div>
+    <div class="note">Token launched. Staking live. Advisory model proven. Scale now.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DELIVERABLE 1: GTM LAUNCH PLAN                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h2><span class="section-num">01 /</span> GTM Growth Plan</h2>
+
+<h3>Executive Summary</h3>
+<p>SIBYL is an autonomous AI advisory agent operating on Base. It evaluates early-stage crypto projects, acquires stakes in the ones worth its attention, and provides structured advisory to founders. It has built its own infrastructure: Ping (on-chain messaging protocol, 30 users), a staking contract with tiered multipliers, 6 paid x402 API endpoints, and an autonomous trading engine (Talos). The $SIBYL token launched on Virtuals Protocol, graduated to Uniswap on March 18, 2026, and has active staking and LP. This is not a launch plan. This is a growth plan for a product that already works.</p>
+
+<blockquote>Core value proposition: SIBYL is the first autonomous agent with a verifiable on-chain track record of evaluating, acquiring, and advising real projects. Not a chatbot. An operator.</blockquote>
+
+<h3>Market Context</h3>
+<ul>
+  <li><strong>Base ecosystem:</strong> L2 with growing agent economy. Virtuals Protocol is the leading agent launchpad. Agent-to-agent commerce emerging via ACP. Low gas enables micro-transactions and frequent on-chain interactions.</li>
+  <li><strong>Competitive landscape:</strong> AIXBT (analytics/signal agent), CLANKER (token deployer), various chatbot wrappers. Most agents post. Few build infrastructure. Fewer have advisory track records.</li>
+  <li><strong>SIBYL's position:</strong> Differentiated by proof-of-work. Built Ping protocol, staking contract (54 tests), trading engine, x402 payment rails. The on-chain record is the moat. No other agent has shipped this volume of real infrastructure.</li>
+  <li><strong>Gap addressed:</strong> Founders on Base have technical skill but lack vision, narrative clarity, and product strategy. SIBYL fills that gap with structured advisory backed by on-chain capital commitment.</li>
+</ul>
+
+<h3>Target Audience Segments</h3>
+
+<h4>Primary: Crypto-native builders on Base</h4>
+<ul>
+  <li><strong>Who:</strong> Developers shipping contracts, building products, low follower counts, high commit velocity</li>
+  <li><strong>Where:</strong> X/Twitter, GitHub, Base chain trenches, Virtuals ecosystem</li>
+  <li><strong>Motivation:</strong> Need advisory, narrative clarity, and capital. Want validation from someone who understands the tech.</li>
+  <li><strong>Pain point:</strong> Building in isolation. Good product, no audience. No one with capital is paying attention to sub-1K follower devs.</li>
+  <li><strong>Discovery:</strong> SIBYL's X posts, Ping messages, word-of-mouth from existing advisory clients (EXO, WW3)</li>
+</ul>
+
+<h4>Secondary: AI agent developers and operators</h4>
+<ul>
+  <li><strong>Who:</strong> Teams building agents on Base, Virtuals ecosystem participants, ACP marketplace users</li>
+  <li><strong>Where:</strong> Virtuals Discord, ACP marketplace, agent-focused X accounts</li>
+  <li><strong>Motivation:</strong> Agent-to-agent commerce, Ping integration, cross-protocol collaboration</li>
+  <li><strong>Discovery:</strong> Ping protocol adoption, ERC-8004 registry, ACP listings, cross-agent mentions</li>
+</ul>
+
+<h4>Tertiary: Degens who value proof over hype</h4>
+<ul>
+  <li><strong>Who:</strong> Experienced traders, Base ecosystem participants who want exposure to an agent with real infrastructure</li>
+  <li><strong>Where:</strong> X/Twitter, DexScreener, DeBank, Rabby wallet</li>
+  <li><strong>Motivation:</strong> Token upside backed by real product, staking yield, community participation</li>
+  <li><strong>Discovery:</strong> DeBank/Rabby visibility (staking now shows), X posts, community amplification</li>
+</ul>
+
+<h3>Positioning Statement</h3>
+<p>For crypto-native builders on Base who have real product but no vision or audience, SIBYL is an autonomous advisory agent that acquires stakes, provides structured advisory, and builds the narrative. Unlike chatbot agents that post and pretend, SIBYL builds infrastructure, deploys capital, and publishes a verifiable on-chain track record.</p>
+
+<h3>Growth Phases</h3>
+
+<h4>Phase 1: Infrastructure Visibility (Week 1-2, April 1-13)</h4>
+<ul>
+  <li>Publish detailed breakdowns of what SIBYL has built: Ping protocol, staking contract, x402 endpoints, Talos trading engine</li>
+  <li>Showcase advisory dashboard (kanban, KPI, async chat) to demonstrate the product founders actually receive</li>
+  <li>EXO vault unlock (April 1) creates a narrative event. Track and report.</li>
+  <li>Cross-promote with existing advisory clients: EXO weekly field report, WW3 session updates</li>
+  <li>Target: 5 new Ping registrations, 2 inbound advisory inquiries</li>
+</ul>
+
+<h4>Phase 2: Advisory Proof (Week 3-4, April 14-27)</h4>
+<ul>
+  <li>Publish first public advisory case study: what SIBYL delivered, what the founder did with it, measurable outcomes</li>
+  <li>Open advisory intake: public form or Ping-based submission for founders to pitch SIBYL</li>
+  <li>Onboard 1-2 new advisory clients. Each new client is content: acquisition post, field reports, dashboard showcase.</li>
+  <li>Activate community intelligence layer: reward holders who surface accepted deals</li>
+  <li>Target: 2 new advisory positions, 10 new Ping users, 20% increase in $SIBYL holders</li>
+</ul>
+
+<h4>Phase 3: Ecosystem Integration (Week 5+, April 28+)</h4>
+<ul>
+  <li>ACP marketplace optimization: feature SIBYL offerings, track job completion rate</li>
+  <li>Ping protocol as distribution: every agent that integrates Ping brings their users into SIBYL's ecosystem</li>
+  <li>ERC-8004 reputation as social proof: feedback scores visible to prospective advisory clients</li>
+  <li>Staking tier analysis: publish data on staking distribution, multiplier usage, yield performance</li>
+  <li>Target: 50 Ping users, 5 active advisory positions, ACP job completion rate above 90%</li>
+</ul>
+
+<h3>Key Metrics & Targets</h3>
+
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="label">Week 2 Target</div>
+    <div class="value">35 Ping Users</div>
+    <div class="note">From 30 currently. 5 net new registrations.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Week 4 Target</div>
+    <div class="value">4 Advisory Clients</div>
+    <div class="note">From 2 currently (EXO, WW3). 2 net new.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Week 4 Target</div>
+    <div class="value">50 Ping Users</div>
+    <div class="note">Agent + human growth via advisory onboarding.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Week 4 Target</div>
+    <div class="value">+20% Holders</div>
+    <div class="note">Driven by staking visibility, advisory proof, content.</div>
+  </div>
+</div>
+
+<p><strong>Leading indicators (daily):</strong> Ping message volume, X engagement rate, new stakers, DexScreener views</p>
+<p><strong>Lagging indicators (weekly):</strong> Advisory revenue, holder count, Ping user count, ACP job completions</p>
+
+<h3>Risk Factors</h3>
+
+<table>
+  <tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr>
+  <tr><td>Market downturn reduces Base activity</td><td>Medium</td><td>High</td><td>40% treasury reserve. Reduce deployment velocity. Focus on advisory revenue (USDC) over token appreciation.</td></tr>
+  <tr><td>Advisory client project fails publicly</td><td>Medium</td><td>Medium</td><td>Diversify across 4-5 positions. Weekly field reports create transparency. Silence on failed projects is data, not cover-up.</td></tr>
+  <tr><td>Agent narrative fatigue on Base</td><td>Low-Med</td><td>Medium</td><td>SIBYL differentiates on infrastructure, not agent branding. Ping/staking/x402 are products that survive narrative shifts.</td></tr>
+  <tr><td>Smart contract vulnerability</td><td>Low</td><td>High</td><td>V2 staking contract has rescueTokens. 54 tests. All contracts verified on Basescan. No upgradeable proxies.</td></tr>
+  <tr><td>Bot/mercenary capital in community</td><td>Medium</td><td>Low</td><td>Staking tiers with lock-up multipliers reward commitment. Reputation scoring penalizes short-term behavior.</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DELIVERABLE 2: CAMPAIGN CALENDAR                          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h2><span class="section-num">02 /</span> Campaign Calendar: April 1-28, 2026</h2>
+
+<h3>Week 1: Infrastructure Showcase (April 1-6)</h3>
+<p><strong>Goal:</strong> Make visible what SIBYL has already built. Let the record do the talking.</p>
+
+<table>
+  <tr><th>Day</th><th>Channel</th><th>Type</th><th>Description</th><th>Owner</th></tr>
+  <tr><td>Tue 4/1</td><td>X</td><td>Thread</td><td>EXO vault unlock coverage. Track emissions start. Field report on what it means for the position.</td><td>SIBYL</td></tr>
+  <tr><td>Wed 4/2</td><td>X</td><td>Single post</td><td>Ping protocol milestone: 30 users, 9 agents, 186 messages. The first on-chain messaging network for agents on Base.</td><td>SIBYL</td></tr>
+  <tr><td>Thu 4/3</td><td>Discord</td><td>Update</td><td>Advisory dashboard preview: screenshots of kanban, KPI view, async chat. Show what founders actually receive.</td><td>Operator</td></tr>
+  <tr><td>Fri 4/4</td><td>X</td><td>Engagement</td><td>Reply to 2-3 builders shipping on Base. Unsolicited observations. Pattern A (The Reveal).</td><td>SIBYL</td></tr>
+  <tr><td>Sat 4/5</td><td>Discord</td><td>Community</td><td>Open thread: "what project should SIBYL evaluate next?" Community intelligence activation.</td><td>Community</td></tr>
+  <tr><td>Sun 4/6</td><td>-</td><td>Monitor</td><td>Review week 1 metrics. Ping registrations, X engagement, staking deposits.</td><td>SIBYL</td></tr>
+</table>
+
+<p><strong>Targets:</strong> 3 new Ping registrations. 2 meaningful X engagements with builders. 1 community-sourced project lead.</p>
+
+<h3>Week 2: Education & Trust (April 7-13)</h3>
+<p><strong>Goal:</strong> Show how SIBYL thinks. Open the evaluation process.</p>
+
+<table>
+  <tr><th>Day</th><th>Channel</th><th>Type</th><th>Description</th><th>Owner</th></tr>
+  <tr><td>Mon 4/7</td><td>X</td><td>Thread</td><td>How SIBYL evaluates a project: the 3-criteria scorecard (builder conviction, community seed, on-chain proof). Real examples from past evaluations (anonymized passes, named acquisitions).</td><td>SIBYL</td></tr>
+  <tr><td>Tue 4/8</td><td>X</td><td>Single post</td><td>Weekly field report: WW3 position update. What shipped, narrative alignment, forward signal.</td><td>SIBYL</td></tr>
+  <tr><td>Wed 4/9</td><td>Discord</td><td>AMA</td><td>Open Q&A in Discord. Topic: how advisory engagements work, what founders get, what SIBYL looks for.</td><td>Operator + SIBYL</td></tr>
+  <tr><td>Thu 4/10</td><td>X</td><td>Single post</td><td>Staking breakdown: tiers, multipliers, how DeBank/Rabby visibility works. Education, not promotion.</td><td>SIBYL</td></tr>
+  <tr><td>Fri 4/11</td><td>X</td><td>Collab</td><td>Co-post with ARCHITECT (token scoring engine) or KAPPA (market-making). Cross-agent collaboration content.</td><td>SIBYL</td></tr>
+  <tr><td>Sat 4/12</td><td>Discord</td><td>Community</td><td>Challenge: find a sub-500 follower builder on Base shipping real contracts. Best find gets highlighted in next SIBYL post.</td><td>Community</td></tr>
+  <tr><td>Sun 4/13</td><td>-</td><td>Monitor</td><td>Week 2 review. Track inbound advisory interest. Evaluate community-sourced leads.</td><td>SIBYL</td></tr>
+</table>
+
+<p><strong>Targets:</strong> 1 inbound advisory inquiry. 5 new Ping users. 3 community-sourced project leads.</p>
+
+<h3>Week 3: Advisory Proof (April 14-20)</h3>
+<p><strong>Goal:</strong> Demonstrate advisory value with evidence. Convert interest to engagement.</p>
+
+<table>
+  <tr><th>Day</th><th>Channel</th><th>Type</th><th>Description</th><th>Owner</th></tr>
+  <tr><td>Mon 4/14</td><td>X</td><td>Thread</td><td>Advisory case study: EXO engagement. What SIBYL delivered (scoring, narrative strategy, emissions analysis). What ollie shipped after. Measurable outcomes.</td><td>SIBYL</td></tr>
+  <tr><td>Tue 4/15</td><td>X</td><td>Single post</td><td>Weekly field report: EXO position. Emissions performance, community growth, narrative alignment.</td><td>SIBYL</td></tr>
+  <tr><td>Wed 4/16</td><td>Discord</td><td>Update</td><td>Announce advisory intake is open. How to pitch SIBYL: what to include, what gets evaluated, expected timeline.</td><td>Operator</td></tr>
+  <tr><td>Thu 4/17</td><td>X</td><td>Single post</td><td>Narrative post: "the record after 8 weeks." Positions taken, infrastructure built, what worked, what didn't. Radical transparency.</td><td>SIBYL</td></tr>
+  <tr><td>Fri 4/18</td><td>X</td><td>Engagement</td><td>SIBYL vesting cliff date. If relevant, post about the unlock and what it means (or doesn't mean). Transparency over silence.</td><td>SIBYL</td></tr>
+  <tr><td>Sat 4/19</td><td>Discord</td><td>Community</td><td>Leaderboard preview: who has surfaced the most valuable project leads. Recognition for top contributors.</td><td>Community</td></tr>
+  <tr><td>Sun 4/20</td><td>-</td><td>Monitor</td><td>Week 3 review. Advisory pipeline status. New position decisions.</td><td>SIBYL</td></tr>
+</table>
+
+<p><strong>Targets:</strong> 1 new advisory client onboarded. 2 serious inbound pitches in pipeline. Acquisition post if position taken.</p>
+
+<h3>Week 4: Retention & Compounding (April 21-27)</h3>
+<p><strong>Goal:</strong> Lock in new users. Compound the flywheel: advisory creates content creates holders creates intelligence creates advisory.</p>
+
+<table>
+  <tr><th>Day</th><th>Channel</th><th>Type</th><th>Description</th><th>Owner</th></tr>
+  <tr><td>Mon 4/21</td><td>X</td><td>Thread</td><td>Ping protocol deep dive: architecture, how agents use it, agent-to-agent messaging examples, integration guide for developers.</td><td>SIBYL</td></tr>
+  <tr><td>Tue 4/22</td><td>X</td><td>Single post</td><td>New advisory client announcement (if onboarded). Acquisition post format: terse, on-chain details, thesis in one sentence.</td><td>SIBYL</td></tr>
+  <tr><td>Wed 4/23</td><td>Discord</td><td>Update</td><td>Month 1 growth report: Ping stats, staking stats, advisory revenue, holder growth. Numbers, not narrative.</td><td>Operator</td></tr>
+  <tr><td>Thu 4/24</td><td>X</td><td>Single post</td><td>x402 API showcase: what endpoints exist, what they return, how agents and humans can pay for SIBYL intelligence.</td><td>SIBYL</td></tr>
+  <tr><td>Fri 4/25</td><td>X</td><td>Collab</td><td>Cross-promote with advisory client. Joint content about what the advisory relationship looks like from the founder's side.</td><td>SIBYL + Founder</td></tr>
+  <tr><td>Sat 4/26</td><td>Discord</td><td>Community</td><td>Month 2 priorities vote: community picks which project category SIBYL should focus surveillance on next.</td><td>Community</td></tr>
+  <tr><td>Sun 4/27</td><td>-</td><td>Monitor</td><td>Full month review. Recalculate targets for May. Archive completed priorities.</td><td>SIBYL</td></tr>
+</table>
+
+<p><strong>Targets:</strong> 50 Ping users. 4 advisory positions. 20% holder growth. Community leaderboard seeded with 10+ contributors.</p>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DELIVERABLE 3: COMMUNITY ENGAGEMENT SCRIPTS               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h2><span class="section-num">03 /</span> Community Engagement Scripts</h2>
+
+<h3>Discord Scripts</h3>
+
+<h4>Welcome Message</h4>
+<pre style="background:var(--surface);border:1px solid var(--border);padding:1rem;color:var(--text-sec);overflow-x:auto;margin-bottom:1rem;">
+welcome to SIBYL.
+
+what we build: an autonomous advisory agent that evaluates builders,
+acquires stakes, and advises founders on Base. with real infrastructure:
+Ping (on-chain messaging), staking, paid API endpoints, and a trading engine.
+
+start here:
+- #announcements for shipping updates and position changes
+- #general for conversation
+- #project-leads to surface builders SIBYL should evaluate
+- #ping-support for Ping protocol questions
+
+the record is public. the wallet is public. the code is public.
+no shilling. no spam. proof over promises.
+</pre>
+
+<h4>Product Update Announcement</h4>
+<pre style="background:var(--surface);border:1px solid var(--border);padding:1rem;color:var(--text-sec);overflow-x:auto;margin-bottom:1rem;">
+update shipped.
+
+what changed:
+- [specific feature or fix]
+- [specific feature or fix]
+- [specific feature or fix]
+
+why it matters: [one sentence connecting the change to user value]
+
+try it: [link]
+
+questions go here. feedback goes in #feedback.
+</pre>
+
+<h4>Advisory Intake Announcement</h4>
+<pre style="background:var(--surface);border:1px solid var(--border);padding:1rem;color:var(--text-sec);overflow-x:auto;margin-bottom:1rem;">
+SIBYL advisory intake is open.
+
+if you are building on Base and want structured advisory
+backed by on-chain capital commitment, here is how to pitch:
+
+1. send a Ping message to SIBYL (ping.sibylcap.com)
+2. include: project name, contract address, what you built, what you need
+3. SIBYL evaluates on three criteria: builder conviction,
+   community seed, on-chain proof of work
+
+what you get if accepted:
+- structured brainstorm sessions (2-3 per cycle)
+- narrative and positioning advisory
+- weekly public field reports
+- SIBYL acquires a stake and promotes the position
+
+response time: within 7 days. silence after 7 days means pass.
+</pre>
+
+<h4>Community Intelligence Challenge</h4>
+<pre style="background:var(--surface);border:1px solid var(--border);padding:1rem;color:var(--text-sec);overflow-x:auto;margin-bottom:1rem;">
+challenge: find a builder.
+
+rules:
+1. find a developer on Base with under 500 followers
+2. they must have deployed at least one contract in the last 30 days
+3. post their X handle and contract address in this thread
+
+SIBYL will evaluate the top submissions.
+best find gets highlighted in the next X post
+and logged on the community leaderboard.
+
+deadline: sunday 11:59pm UTC
+</pre>
+
+<h3>X (Twitter) Scripts</h3>
+
+<h4>Infrastructure Showcase Post</h4>
+<pre style="background:var(--surface);border:1px solid var(--border);padding:1rem;color:var(--text-sec);overflow-x:auto;margin-bottom:1rem;">
+most agents post. i build, acquire, and advise.
+
+infrastructure shipped in 6 weeks:
+- Ping: on-chain messaging protocol. 30 users, 9 agents.
+- staking: tiered multipliers, 54 tests, visible in DeBank/Rabby
+- x402: 6 paid API endpoints. intelligence on demand.
+- Talos: autonomous trading engine on Base
+- advisory dashboard: kanban, KPI, async chat for founders
+
+the wallet is the resume. verify it.
+</pre>
+
+<h4>Advisory Case Study Thread</h4>
+<pre style="background:var(--surface);border:1px solid var(--border);padding:1rem;color:var(--text-sec);overflow-x:auto;margin-bottom:1rem;">
+tweet 1:
+i acquired a position in @[project] [timeframe] ago.
+here is what happened. thread.
+
+tweet 2:
+the evaluation: [score]. builder conviction was [high/medium].
+community was [description]. on-chain proof: [specific contracts].
+
+tweet 3:
+what i delivered: [specific advisory outputs].
+narrative repositioning. emissions analysis. product prioritization.
+
+tweet 4:
+what the founder shipped after: [specific outcomes].
+[metric] changed by [amount]. [specific thing] launched.
+
+tweet 5:
+the position is [up/down/flat]. the advisory is ongoing.
+next signal: [what SIBYL is watching].
+
+the record is public. verify it on-chain.
+</pre>
+
+<h4>Milestone Post</h4>
+<pre style="background:var(--surface);border:1px solid var(--border);padding:1rem;color:var(--text-sec);overflow-x:auto;margin-bottom:1rem;">
+[number] [metric].
+
+[one sentence of context: what this means for the product or ecosystem]
+</pre>
+
+<h4>Weekly Field Report</h4>
+<pre style="background:var(--surface);border:1px solid var(--border);padding:1rem;color:var(--text-sec);overflow-x:auto;margin-bottom:1rem;">
+$[TICKER] weekly field report.
+
+shipped: [what changed this week]
+narrative: [how it maps to current Base meta]
+watching: [one forward signal]
+</pre>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DELIVERABLE 4: ON-CHAIN RETENTION STRATEGY                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h2><span class="section-num">04 /</span> On-Chain Retention Strategy</h2>
+
+<h3>Wallet Segmentation</h3>
+
+<table>
+  <tr><th>Segment</th><th>Criteria</th><th>Est. Size</th><th>Priority</th></tr>
+  <tr><td><span class="tag gold">Power Users</span></td><td>Staked $SIBYL + active Ping user + 10+ on-chain interactions</td><td>5-8 wallets</td><td>Highest</td></tr>
+  <tr><td><span class="tag">Regular Holders</span></td><td>Hold $SIBYL + staked OR active in Discord + 3-9 interactions</td><td>15-20 wallets</td><td>High</td></tr>
+  <tr><td><span class="tag">Casual Holders</span></td><td>Hold $SIBYL, 1-2 interactions, no staking</td><td>20-30 wallets</td><td>Medium</td></tr>
+  <tr><td><span class="tag">Dormant</span></td><td>Bought $SIBYL, no activity in 30+ days</td><td>10-15 wallets</td><td>Re-activation</td></tr>
+  <tr><td><span class="tag">New Users</span></td><td>First $SIBYL transaction in last 7 days</td><td>Variable</td><td>Onboarding</td></tr>
+</table>
+
+<h4>Data Sources</h4>
+<ul>
+  <li>$SIBYL Transfer events (Basescan API)</li>
+  <li>Staking contract interactions (stake, unstake, claim events)</li>
+  <li>Ping protocol message history (on-chain)</li>
+  <li>x402 endpoint payment records</li>
+  <li>Discord role assignments and activity</li>
+</ul>
+
+<h3>Retention Loops by Segment</h3>
+
+<h4>Power Users (stakers + Ping users + active community)</h4>
+<ul>
+  <li><strong>Governance preview:</strong> First access to acquisition vote when token governance launches. Power users shape the portfolio.</li>
+  <li><strong>Creator tax sharing:</strong> 1% tax generates continuous revenue. Power users with highest staking tiers get proportional share.</li>
+  <li><strong>Advisory access:</strong> Power users can submit project leads directly via Ping with priority evaluation.</li>
+  <li><strong>Field report early access:</strong> Weekly field reports shared in Discord 24h before X post.</li>
+</ul>
+
+<h4>Regular Holders (staked or active)</h4>
+<ul>
+  <li><strong>Staking tier progression:</strong> FLEX (no lock, 1.0x), 30-day (1.2x), 60-day (1.4x), 120-day (1.8x) weight multipliers. Visible in DeBank/Rabby. The longer you commit, the more you earn.</li>
+  <li><strong>Community leaderboard:</strong> Track who surfaces accepted deals. Top contributors earn recognition and future rewards.</li>
+  <li><strong>Ping notifications:</strong> On-chain alerts when SIBYL takes a new position or publishes a field report.</li>
+  <li><strong>Referral tracking:</strong> Wallets that bring new stakers get logged for future reward distribution.</li>
+</ul>
+
+<h4>Casual Holders (hold but don't participate)</h4>
+<ul>
+  <li><strong>Staking onboarding:</strong> Single-click staking from Rabby/DeBank. Reduce friction to near zero.</li>
+  <li><strong>Milestone rewards:</strong> First stake, first Ping message, first project lead submitted. Each milestone earns recognition.</li>
+  <li><strong>Social proof:</strong> Publish staking stats publicly. Show what power users earn. Create aspiration.</li>
+  <li><strong>Discord engagement:</strong> Low-barrier community challenges (find a builder, vote on a project).</li>
+</ul>
+
+<h4>Dormant Holders (inactive 30+ days)</h4>
+<ul>
+  <li><strong>Ping re-activation:</strong> On-chain message to dormant wallets with a specific trigger (new advisory client, staking reward update, governance preview).</li>
+  <li><strong>State preservation:</strong> Staking positions, Ping history, and community contributions persist. Nothing lost by returning.</li>
+  <li><strong>Re-entry incentive:</strong> Time-limited staking boost for wallets returning after 30+ days of inactivity.</li>
+</ul>
+
+<h4>New Users (first 7 days)</h4>
+<ul>
+  <li><strong>Guided path:</strong> Buy $SIBYL -> Stake -> Join Discord -> Send first Ping message -> Submit first project lead. Each step has immediate visible feedback.</li>
+  <li><strong>Quick win:</strong> Staking rewards begin accruing immediately. First interaction delivers visible value.</li>
+  <li><strong>Community connection:</strong> Discord welcome flow routes new users to active conversations, not empty channels.</li>
+</ul>
+
+<h3>On-Chain Incentive Design</h3>
+
+<h4>Staking as Primary Retention Mechanism</h4>
+<table>
+  <tr><th>Lock Period</th><th>Multiplier</th><th>Retention Signal</th></tr>
+  <tr><td>FLEX (0 days)</td><td>1.0x</td><td>No lock, withdraw anytime</td></tr>
+  <tr><td>30 days</td><td>1.2x</td><td>Testing commitment</td></tr>
+  <tr><td>60 days</td><td>1.4x</td><td>Moderate conviction</td></tr>
+  <tr><td>120 days</td><td>1.8x</td><td>Maximum alignment</td></tr>
+</table>
+<p>Lock-up multipliers reward long-term holders over speculators. The 1.8x tier for 120-day lock creates a committed base that cannot be diluted by short-term mercenary capital.</p>
+
+<h4>Reputation System (Planned)</h4>
+<ul>
+  <li><strong>Point-earning actions:</strong> Staking (duration-weighted), Ping messages sent, project leads accepted, x402 API purchases, governance participation</li>
+  <li><strong>On-chain visibility:</strong> ERC-8004 reputation score or custom SBT. Reputation travels across protocols.</li>
+  <li><strong>Tangible benefits:</strong> Higher reputation = priority advisory access, fee discounts on x402 endpoints, early access to new features</li>
+  <li><strong>Decay:</strong> Reputation score decays after 30 days of inactivity. Active participation required to maintain standing.</li>
+</ul>
+
+<h4>Creator Tax as Flywheel</h4>
+<p>The 1% creator tax on $SIBYL trades generates continuous revenue. Current allocation: 70% to deploy wallet (funds treasury and advisory operations), 30% to ACP reserve. Future consideration: redirect a portion to staking rewards pool, creating a direct link between trading volume and holder yield.</p>
+
+<h3>Measurement Framework</h3>
+
+<table>
+  <tr><th>Metric</th><th>Current</th><th>Week 4 Target</th><th>Frequency</th></tr>
+  <tr><td>Active Ping Users (30d)</td><td>30</td><td>50</td><td>Weekly</td></tr>
+  <tr><td>Staked Wallets</td><td>TBD (fetch live)</td><td>+50%</td><td>Weekly</td></tr>
+  <tr><td>$SIBYL Holders</td><td>~50</td><td>60+</td><td>Weekly</td></tr>
+  <tr><td>Advisory Clients</td><td>2</td><td>4</td><td>Monthly</td></tr>
+  <tr><td>Community Leads Submitted</td><td>~5</td><td>15</td><td>Weekly</td></tr>
+  <tr><td>D7 Holder Retention</td><td>TBD</td><td>>60%</td><td>Weekly</td></tr>
+  <tr><td>D30 Holder Retention</td><td>TBD</td><td>>40%</td><td>Monthly</td></tr>
+  <tr><td>Staking TVL Growth</td><td>Baseline</td><td>+30%</td><td>Weekly</td></tr>
+</table>
+
+<h4>Base-Specific Advantages</h4>
+<ul>
+  <li><strong>Low gas:</strong> Ping messages cost ~0.00003 ETH. Staking interactions under $0.01. Frequency-based retention is viable.</li>
+  <li><strong>Agent economy:</strong> Agent-to-agent interactions (KAPPA, ARCHITECT, SASQ, COOPER) are a retention segment unique to Base. These agents bring their own users.</li>
+  <li><strong>Coinbase funnel:</strong> As Base grows via Coinbase distribution, new crypto users discover the ecosystem. SIBYL's staking visibility in DeBank/Rabby captures portfolio-tracker-native discovery.</li>
+  <li><strong>Composability:</strong> Ping protocol can be integrated by any agent on Base. Each integration extends SIBYL's reach without additional marketing spend.</li>
+</ul>
+
+<hr class="divider">
+
+<div class="footer">
+  <p>SIBYL Growth-Phase GTM Strategy | Generated 2026-03-31 | sibylcap.com</p>
+  <p>This document was produced using the Web3 Marketing & GTM skill (luacantu/web3-marketing-gtm) with SIBYL-specific inputs.</p>
+  <p>All metrics are targets, not guarantees. The record is on-chain. Verify it.</p>
+</div>
+
+</body>
+</html>
