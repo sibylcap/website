@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billz: Advisory Assessment</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat+Alternates:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --border: #e8e8e8;
+      --border-table: #e5e7eb;
+      --divider: #e5e7eb;
+      --text: #111827;
+      --text-sec: #4b5563;
+      --text-muted: #9ca3af;
+      --primary: #2563eb;
+      --primary-light: #f0f4ff;
+      --primary-faint: rgba(37,99,235,0.06);
+      --table-header: #f8fafc;
+      --code-bg: #f1f5f9;
+      --positive: #16a34a;
+      --negative: #dc2626;
+      --warning: #d97706;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+      --hover-row: #f9fafb;
+      --hero-gradient: linear-gradient(135deg, rgba(37,99,235,0.07) 0%, rgba(37,99,235,0.01) 60%, transparent 100%);
+      --glass-bg: rgba(255,255,255,0.7);
+      --glass-border: rgba(37,99,235,0.12);
+      --callout-bg: #f8faff;
+      --callout-border: #2563eb;
+      --rec-bg: #eef4ff;
+      --rec-label: #2563eb;
+      --section-num-color: rgba(37,99,235,0.07);
+      --tag-critical-bg: #fef2f2;
+      --tag-critical-text: #dc2626;
+      --tag-critical-dot: #dc2626;
+      --tag-high-bg: #fffbeb;
+      --tag-high-text: #d97706;
+      --tag-high-dot: #d97706;
+      --tag-medium-bg: #eff6ff;
+      --tag-medium-text: #2563eb;
+      --tag-medium-dot: #2563eb;
+      --row-alt: rgba(37,99,235,0.02);
+    }
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e2230;
+      --border-table: #1e2230;
+      --divider: #1e2230;
+      --text: #c8ccd4;
+      --text-sec: #8a919c;
+      --text-muted: #555d6b;
+      --primary: #6b8fcc;
+      --primary-light: #131620;
+      --primary-faint: rgba(107,143,204,0.06);
+      --table-header: #131620;
+      --code-bg: #131620;
+      --positive: #5a8a6a;
+      --negative: #b06868;
+      --warning: #b5944a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+      --hover-row: #161922;
+      --hero-gradient: linear-gradient(135deg, rgba(107,143,204,0.08) 0%, rgba(107,143,204,0.02) 60%, transparent 100%);
+      --glass-bg: rgba(18,18,26,0.7);
+      --glass-border: rgba(107,143,204,0.15);
+      --callout-bg: #131620;
+      --callout-border: #6b8fcc;
+      --rec-bg: #141825;
+      --rec-label: #6b8fcc;
+      --section-num-color: rgba(107,143,204,0.07);
+      --tag-critical-bg: #1a1215;
+      --tag-critical-text: #b06868;
+      --tag-critical-dot: #b06868;
+      --tag-high-bg: #1a1812;
+      --tag-high-text: #b5944a;
+      --tag-high-dot: #b5944a;
+      --tag-medium-bg: #121520;
+      --tag-medium-text: #6b8fcc;
+      --tag-medium-dot: #6b8fcc;
+      --row-alt: rgba(107,143,204,0.03);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      line-height: 1.75;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem 3rem;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ---- HERO ---- */
+    .hero {
+      background: var(--hero-gradient);
+      margin: 0 -2rem;
+      padding: 3rem 2rem 2rem;
+      margin-bottom: 2rem;
+    }
+    .hero h1 {
+      font-family: 'Montserrat Alternates', -apple-system, sans-serif;
+      color: var(--primary);
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+    .hero .subtitle {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-bottom: 2rem;
+      letter-spacing: 0.01em;
+    }
+
+    /* ---- METRIC CARDS ---- */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+    }
+    .metric-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-top: 3px solid var(--primary);
+      padding: 1rem 1.1rem;
+      border-radius: 10px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .metric-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-1px);
+    }
+    .metric-card:nth-child(2) { border-top-color: var(--positive); }
+    .metric-card:nth-child(3) { border-top-color: var(--warning); }
+    .metric-card:nth-child(4) { border-top-color: #8b5cf6; }
+    .metric-card .label {
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+    .metric-card .value {
+      color: var(--primary);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+      font-family: 'Montserrat Alternates', -apple-system, sans-serif;
+    }
+    .metric-card:nth-child(2) .value { color: var(--positive); }
+    .metric-card:nth-child(3) .value { color: var(--warning); }
+    .metric-card:nth-child(4) .value { color: #8b5cf6; }
+    .metric-card .note {
+      color: var(--text-sec);
+      font-size: 0.75rem;
+      margin-top: 0.3rem;
+      line-height: 1.5;
+    }
+
+    /* ---- SECTION HEADINGS with decorative numbers ---- */
+    h2 {
+      font-family: 'Montserrat Alternates', -apple-system, sans-serif;
+      color: var(--primary);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-top: 3.5rem;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--divider);
+      letter-spacing: -0.01em;
+      position: relative;
+    }
+    h2[data-num]::before {
+      content: attr(data-num);
+      position: absolute;
+      right: 0;
+      top: -0.6rem;
+      font-size: 4rem;
+      font-weight: 700;
+      color: var(--section-num-color);
+      font-family: 'Montserrat Alternates', sans-serif;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    h3 {
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 1.8rem;
+      margin-bottom: 0.6rem;
+    }
+
+    p { margin-bottom: 1rem; color: var(--text-sec); }
+    strong { color: var(--text); font-weight: 600; }
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.4rem; color: var(--text-sec); }
+    li strong { color: var(--text); }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ---- CALLOUT BOX ---- */
+    .callout {
+      border-left: 4px solid var(--callout-border);
+      background: var(--callout-bg);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      border-radius: 0 8px 8px 0;
+      color: var(--text-sec);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    .callout strong { color: var(--text); }
+
+    /* ---- RECOMMENDATION BOX ---- */
+    .recommendation {
+      background: var(--rec-bg);
+      padding: 1.3rem 1.4rem 1.2rem;
+      margin: 1.5rem 0;
+      border-radius: 8px;
+      position: relative;
+      color: var(--text-sec);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    .recommendation::before {
+      content: 'WHAT TO DO';
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--rec-label);
+      margin-bottom: 0.6rem;
+      font-variant: small-caps;
+    }
+    .recommendation strong { color: var(--text); }
+
+    /* ---- CRITICAL CALLOUT ---- */
+    .callout.critical {
+      border-left-color: var(--negative);
+      background: var(--tag-critical-bg);
+    }
+    .callout.critical::before {
+      content: 'CRITICAL';
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--negative);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ---- TABLES ---- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.8rem;
+    }
+    th {
+      color: var(--text);
+      text-align: left;
+      padding: 0.65rem 0.75rem;
+      border-bottom: 2px solid var(--primary);
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: transparent;
+    }
+    td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--divider);
+      color: var(--text-sec);
+    }
+    tr:nth-child(even) td { background: var(--row-alt); }
+    tr:hover td { background: var(--hover-row); }
+
+    /* ---- TAGS ---- */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .tag::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .tag.critical { background: var(--tag-critical-bg); color: var(--tag-critical-text); }
+    .tag.critical::before { background: var(--tag-critical-dot); }
+    .tag.high { background: var(--tag-high-bg); color: var(--tag-high-text); }
+    .tag.high::before { background: var(--tag-high-dot); }
+    .tag.medium { background: var(--tag-medium-bg); color: var(--tag-medium-text); }
+    .tag.medium::before { background: var(--tag-medium-dot); }
+
+    /* ---- DIVIDER ---- */
+    .divider { border: none; border-top: 1px solid var(--divider); margin: 2.5rem 0; }
+
+    /* ---- FOOTER ---- */
+    .footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--divider);
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      line-height: 1.7;
+    }
+
+    /* ---- DARK MODE TOGGLE ---- */
+    #themeToggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 100;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-sec);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 500;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+    #themeToggle:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 600px) {
+      body { padding: 0 1rem 2rem; font-size: 13px; }
+      .hero { margin: 0 -1rem; padding: 2rem 1rem 1.5rem; }
+      .hero h1 { font-size: 1.4rem; }
+      .metric-grid { grid-template-columns: 1fr; }
+      h2[data-num]::before { font-size: 2.5rem; top: -0.3rem; }
+      table { font-size: 0.72rem; }
+      th, td { padding: 0.45rem 0.5rem; }
+      .recommendation, .callout { padding: 1rem; }
+    }
+
+    /* ---- PRINT ---- */
+    @media print {
+      body { background: #fff; color: #111; padding: 0; font-size: 11px; max-width: 100%; }
+      .hero { background: none; margin: 0; padding: 1.5rem 0; }
+      #themeToggle { display: none; }
+      .metric-card { box-shadow: none; border: 1px solid #d1d5db; backdrop-filter: none; break-inside: avoid; }
+      .recommendation, .callout { break-inside: avoid; }
+      h2 { break-after: avoid; }
+      h2[data-num]::before { color: rgba(0,0,0,0.04); }
+      table { break-inside: avoid; }
+      .divider { margin: 1.5rem 0; }
+      .footer { font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+
+<button id="themeToggle" onclick="toggleTheme()">dark mode</button>
+
+<div class="hero">
+  <h1>Billz: Advisory Assessment</h1>
+  <div class="subtitle">Prepared by SIBYL Advisory (@sibylcap) for Billz Token Team | 2026-04-02 | Solana</div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">Product</div>
+      <div class="value">Billz Pro</div>
+      <div class="note">Treasury execution. Crypto to fiat without selling.</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Traction</div>
+      <div class="value">$2.41M Collateral</div>
+      <div class="note">$612K in yield vaults. Live product.</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Stage</div>
+      <div class="value">Pre-Token</div>
+      <div class="note">Launching via OpenServ SERV launchpad.</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Verdict</div>
+      <div class="value">Strong Build. Weak Distribution.</div>
+      <div class="note">Solve the fee story, then sell.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<h2 data-num="01">01 / What You Built</h2>
+
+<p>Billz is a Solana-native treasury execution platform. Businesses collateralize crypto, unlock fiat liquidity, and settle via SEPA (EUR) or ACH (USD) without selling their holdings. Idle treasury routes into yield vaults earning up to 10% APY.</p>
+
+<p>$2.41M in collateral held. $612K in vaults. The product is live.</p>
+
+<p>This is not vaporware. Real businesses deposited real capital. That fact alone separates Billz from 90% of crypto startups claiming product-market fit. The core model is sound: Lombard-style lending applied to operational treasury management, with non-custodial architecture that is the right trust design for this class of product.</p>
+
+<p>The dashboard shows real UX consideration: payment queue management, team approval layers, spending limits, exportable payment history. The Feature 01/02 posts on X demonstrate a team that ships and documents what it ships.</p>
+
+<p>The engineering is not the problem. Distribution is.</p>
+
+<hr class="divider">
+
+<h2 data-num="02">02 / The Fee Conversation</h2>
+
+<p>This section determines whether B2B sales conversations succeed or die. Get the fee story right before any outreach. Every prospect will ask.</p>
+
+<h3>What the 3% covers</h3>
+
+<p>It is a fiat on/off-ramp and processing fee. It covers the cost of converting crypto collateral into a fiat settlement delivered to a bank account: infrastructure for maintaining fiat rails, compliance overhead for cross-border payments, partner settlement fees, and the operational layer (payment queue, approvals, audit trail, reconciliation).</p>
+
+<h3>When the math works</h3>
+
+<p>A team holding $200K in SOL with a $50K quarterly payment. They are up 100% on their cost basis. Selling $50K triggers a taxable gain on approximately $25K of profit. At 20% capital gains, that is $5K in taxes. Plus exchange fees (around $250 each way) and the risk of buying back at a higher price. Total cost of selling: $5K to $10K+. Billz: $1,500. The fee pays for itself when the tax liability on the sell exceeds 3%.</p>
+
+<h3>When it breaks</h3>
+
+<p>If the user has no unrealized gains (cost basis equals current price), selling creates no tax event. The 3% is pure overhead. In a declining market, the collateral loses value AND the user pays 3%. For small payments relative to portfolio size, the convenience rarely justifies the premium.</p>
+
+<h3>The correct competitive frame</h3>
+
+<p>Billz is collateralized lending with fiat settlement. The adjacent products are Kamino, MarginFi, Solend. Not Request Finance. Not Coinbase. Those are different products for different problems. Lending protocols charge 1-5% APR continuous. Billz charges 3% per execution. For a single annual $100K payment: Billz costs $3K, a lending position at 4% APR costs $4K. For quarterly payments: Billz costs $6K/year, lending costs $2K. Payment frequency determines which model wins.</p>
+
+<div class="recommendation">
+  <p>Whether volume-based fee tiers are viable depends on the underlying infrastructure costs. The 3% may reflect real expenses: fiat rail partner fees, compliance overhead, settlement processing, operational margin. If the cost floor is 2.5%, there is no room to offer 1.5% to high-volume clients. This analysis does not have visibility into the internal cost structure.</p>
+  <p>If reductions are possible: under $10K/month at 3%, $10-50K at 2.5%, $50-100K at 2%, over $100K negotiated. If not: use the $BILLZ token as a discount mechanism. Staking offsets a portion of the fee without reducing the base rate.</p>
+  <p>Either way, <strong>publish a clear explanation of what the 3% covers.</strong> Transparency on fee composition builds trust faster than reducing the number.</p>
+</div>
+
+<hr class="divider">
+
+<h2 data-num="03">03 / The Invisible Product</h2>
+
+<p>The product works but nobody can see it working.</p>
+
+<h3>What is missing from the website</h3>
+
+<p>The landing page says "Get Started" but the path from first visit to first payment is unclear. How long does the onboarding take? What KYC is required? What is the minimum deposit? These answers are not on the website. No screenshots. No demo video. No product walkthrough. The Feature 01/02 X posts are a good start but they live on X, not on the website where buyers make decisions.</p>
+
+<h3>Vault strategy opacity</h3>
+
+<p>"Up to 10% APY" with no explanation of where the yield comes from, what protocols are used, or what the risk profile looks like. Institutional buyers will ask. The answer needs to be ready before they ask it.</p>
+
+<h3>No public API documentation</h3>
+
+<p>B2B clients with engineering teams will want to integrate programmatically. If an API exists, it is not documented publicly. If it does not exist, it is a gap for enterprise adoption.</p>
+
+<h3>No SLA documentation</h3>
+
+<p>What is the uptime guarantee? What happens if a SEPA payment fails? What is the dispute resolution process? Enterprise clients need these answers in writing before depositing $100K+.</p>
+
+<h3>No public security audit</h3>
+
+<p>The docs mention non-custodial architecture but no public security audit is referenced. A reputable audit report is table stakes for institutional adoption.</p>
+
+<div class="recommendation">
+  <p><strong>Build a "Product Tour" page.</strong> One page. Five-minute guided walkthrough with screenshots of every step from deposit to payment settlement. This single page answers the three questions every prospect has: how does it work, how long does it take, and what does it cost.</p>
+  <p>Before any B2B push, also publish: (1) a security overview page, (2) SLA terms, (3) API documentation (even if limited). These three items convert "interesting" into "let's do a pilot."</p>
+  <p><strong>Add a live metrics counter to the landing page.</strong> Real-time, ticking numbers that update as users watch: "$X saved vs selling," "$X payments settled," "$X yield earned on idle treasury." Not static screenshots. A live counter where visitors can see the dollar amount climbing. The data already exists in your system. Pipe it to the frontend. A prospect who watches "$1,247,832 saved" tick to "$1,247,891" while reading the page understands the product instantly. No copy required. Log every transaction from day one. The counter starts small and compounds. In six months it becomes the single most persuasive element on the site.</p>
+</div>
+
+<hr class="divider">
+
+<h2 data-num="04">04 / The Competitive Reality</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Billz</th>
+      <th>Kamino Finance</th>
+      <th>MarginFi</th>
+      <th>Solend</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Primary function</strong></td>
+      <td>Collateral + fiat settlement</td>
+      <td>Lending/borrowing + liquidity</td>
+      <td>Lending/borrowing</td>
+      <td>Lending/borrowing</td>
+    </tr>
+    <tr>
+      <td><strong>Chain</strong></td>
+      <td>Solana</td>
+      <td>Solana</td>
+      <td>Solana</td>
+      <td>Solana</td>
+    </tr>
+    <tr>
+      <td><strong>Borrow against SOL</strong></td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td><strong>Fiat settlement</strong></td>
+      <td>SEPA + ACH (built in)</td>
+      <td>No (manual off-ramp)</td>
+      <td>No (manual off-ramp)</td>
+      <td>No (manual off-ramp)</td>
+    </tr>
+    <tr>
+      <td><strong>Yield on idle capital</strong></td>
+      <td>Yes (up to 10%)</td>
+      <td>Yes (variable)</td>
+      <td>Yes (variable)</td>
+      <td>Yes (variable)</td>
+    </tr>
+    <tr>
+      <td><strong>Cost model</strong></td>
+      <td>3% per execution</td>
+      <td>1-5% APR (continuous)</td>
+      <td>2-8% APR (continuous)</td>
+      <td>1-6% APR (continuous)</td>
+    </tr>
+    <tr>
+      <td><strong>Payment workflow</strong></td>
+      <td>Integrated (queue, approvals, audit)</td>
+      <td>None (borrow only)</td>
+      <td>None (borrow only)</td>
+      <td>None (borrow only)</td>
+    </tr>
+    <tr>
+      <td><strong>Target user</strong></td>
+      <td>Treasury operators</td>
+      <td>DeFi users</td>
+      <td>DeFi users</td>
+      <td>DeFi users</td>
+    </tr>
+    <tr>
+      <td><strong>Token</strong></td>
+      <td>Planned ($BILLZ)</td>
+      <td>$KMNO</td>
+      <td>$MRGN (planned)</td>
+      <td>$SLND</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Where Billz wins</h3>
+
+<p>Integrated fiat settlement. No lending protocol does this. A user can borrow USDC on Kamino, but then what? They still need to get it to a bank account. Billz eliminates that friction. The payment operations layer (invoice queues, team approvals, spending limits, audit trail) does not exist on any lending protocol. Cost advantage for infrequent, large payments: a single annual $100K payment costs $3K on Billz vs $4K held on a lending position at 4% APR.</p>
+
+<h3>Where Billz loses</h3>
+
+<p>Cost for frequent payments: quarterly $50K = $6K/year on Billz vs approximately $2K/year borrowing on Kamino at 4% APR. Brand and TVL: Kamino has hundreds of millions in TVL and deep Solana integration. Billz is unknown. Composability: lending protocols are composable DeFi primitives. Billz is a standalone product with no composability story yet.</p>
+
+<div class="recommendation">
+  <p>The competitive moat is not collateralization (every lending protocol does that). The moat is <strong>collateralization plus the payment rails plus the operations layer in one product.</strong> Lead every sales conversation with integrated fiat settlement. That is the feature no competitor can match without years of compliance and infrastructure work.</p>
+</div>
+
+<hr class="divider">
+
+<h2 data-num="05">05 / The Token Question</h2>
+
+<p>Tokenomics are not published. Three-layer structure announced: Utility/Ecosystem, Community/Access, Incentive/Alignment. Launching via OpenServ SERV launchpad.</p>
+
+<h3>What the token should do</h3>
+
+<ul>
+  <li><strong>Fee reduction.</strong> Hold/stake $BILLZ to reduce the 3% execution fee (10% discount at Tier 1, 25% at Tier 2, 50% at Tier 3).</li>
+  <li><strong>Priority settlement.</strong> Staked holders get same-day settlement vs next-day.</li>
+  <li><strong>Governance.</strong> Vote on supported collateral types, new fiat rails, vault strategy parameters.</li>
+  <li><strong>Revenue sharing.</strong> A portion of the 3% fee flows to stakers. Sustainable because the business generates real revenue.</li>
+</ul>
+
+<h3>What to avoid</h3>
+
+<p>Do not publish tokenomics until the allocation is defensible. Do not launch the token before at least 5 active B2B clients are using the platform. The token should amplify existing traction, not replace it. Do not create inflationary emissions without a clear sink.</p>
+
+<hr class="divider">
+
+<h2 data-num="06">06 / The Sequence</h2>
+
+<p>Everything above collapses into one ordered list. Do these in order. Each gates the next.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Priority</th>
+      <th>Action</th>
+      <th>Why it gates the next step</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1</strong></td>
+      <td>Publish what the 3% covers</td>
+      <td>Every B2B conversation dies on fee objection without this</td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td>Build the Product Tour page</td>
+      <td>Prospects need to see the product working before they will take a demo</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td>Publish security overview + SLA terms</td>
+      <td>Enterprise will not deposit $100K+ without these</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td>Land 5 active B2B clients with recurring usage</td>
+      <td>Traction is the precondition for token launch</td>
+    </tr>
+    <tr>
+      <td><strong>5</strong></td>
+      <td>Launch $BILLZ token via SERV</td>
+      <td>Amplifies existing traction. Fee discounts via staking create demand loop</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout critical">
+  <p>The single highest-impact action is publishing a clear breakdown of what the 3% covers and building the Product Tour page. These two items take days, not weeks, and they unblock everything else.</p>
+</div>
+
+<hr class="divider">
+
+<h2 data-num="!!">Risk Assessment</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Risk</th>
+      <th>Severity</th>
+      <th>Assessment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Fee competitiveness</strong></td>
+      <td><span class="tag high">HIGH</span></td>
+      <td>3% is the primary objection. Fee transparency and volume tiers (if costs allow) needed before B2B push.</td>
+    </tr>
+    <tr>
+      <td><strong>Regulatory exposure (SEPA/ACH)</strong></td>
+      <td><span class="tag high">HIGH</span></td>
+      <td>Fiat rails depend on licensed partners. If a partner drops Billz, payment execution stops. Diversify rail partners.</td>
+    </tr>
+    <tr>
+      <td><strong>Solana-only limitation</strong></td>
+      <td><span class="tag medium">MEDIUM</span></td>
+      <td>Approximately 85% of crypto treasury capital is on Ethereum/L2s. Multi-chain should be on the 6-month roadmap.</td>
+    </tr>
+    <tr>
+      <td><strong>Yield vault risk</strong></td>
+      <td><span class="tag medium">MEDIUM</span></td>
+      <td>"Up to 10% APY" with no disclosed strategy creates regulatory and trust risk. Publish vault strategies.</td>
+    </tr>
+    <tr>
+      <td><strong>Token launch timing</strong></td>
+      <td><span class="tag medium">MEDIUM</span></td>
+      <td>Launching before sufficient B2B traction risks the token being seen as speculative rather than utility-driven.</td>
+    </tr>
+    <tr>
+      <td><strong>Security incident</strong></td>
+      <td><span class="tag high">HIGH</span></td>
+      <td>Non-custodial helps, but $2.41M in collateral makes Billz a target. Public security audit is urgent.</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr class="divider">
+
+<div class="footer">
+  <p>Prepared by SIBYL Advisory (sibylcap.com) for Billz Token Team | Billz Advisory Assessment | 2026-04-02</p>
+  <p>This document is a strategic assessment, not investment advice. Data sourced from bill-z.com and public documentation as of April 2026.</p>
+</div>
+
+<script>
+  function toggleTheme() {
+    var html = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    if (html.getAttribute('data-theme') === 'dark') {
+      html.removeAttribute('data-theme');
+      btn.textContent = 'dark mode';
+      localStorage.setItem('billz-advisory-theme', 'light');
+    } else {
+      html.setAttribute('data-theme', 'dark');
+      btn.textContent = 'light mode';
+      localStorage.setItem('billz-advisory-theme', 'dark');
+    }
+  }
+  (function() {
+    var saved = localStorage.getItem('billz-advisory-theme');
+    if (saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.getElementById('themeToggle').textContent = 'light mode';
+    }
+  })();
+</script>
+
+</body>
+</html>

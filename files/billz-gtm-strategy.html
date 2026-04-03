@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billz: Growth-Phase GTM Strategy</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat+Alternates:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --border: #e8e8e8;
+      --border-table: #e5e7eb;
+      --divider: #e5e7eb;
+      --text: #111827;
+      --text-sec: #4b5563;
+      --text-muted: #9ca3af;
+      --primary: #2563eb;
+      --primary-light: #f0f4ff;
+      --table-header: #f8fafc;
+      --code-bg: #f1f5f9;
+      --positive: #16a34a;
+      --negative: #dc2626;
+      --warning: #d97706;
+      --shadow: 0 1px 2px rgba(0,0,0,0.05);
+      --hover-row: #f9fafb;
+      --tag-critical-bg: #fef2f2;
+      --tag-critical-text: #dc2626;
+      --tag-critical-border: #fecaca;
+      --tag-high-bg: #fffbeb;
+      --tag-high-text: #d97706;
+      --tag-high-border: #fde68a;
+      --tag-medium-bg: #eff6ff;
+      --tag-medium-text: #2563eb;
+      --tag-medium-border: #bfdbfe;
+    }
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1a1e28;
+      --border-table: #1a1e28;
+      --divider: #1a1e28;
+      --text: #c8ccd4;
+      --text-sec: #8a919c;
+      --text-muted: #555d6b;
+      --primary: #6b8ba5;
+      --primary-light: #131620;
+      --table-header: #131620;
+      --code-bg: #131620;
+      --positive: #5a8a6a;
+      --negative: #b06868;
+      --warning: #b5944a;
+      --shadow: none;
+      --hover-row: #161922;
+      --tag-critical-bg: #1a1215;
+      --tag-critical-text: #b06868;
+      --tag-critical-border: #2a1a1a;
+      --tag-high-bg: #1a1812;
+      --tag-high-text: #b5944a;
+      --tag-high-border: #2a2518;
+      --tag-medium-bg: #121520;
+      --tag-medium-text: #6b8ba5;
+      --tag-medium-border: #1a2030;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      line-height: 1.7;
+      padding: 2.5rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    h1 {
+      font-family: 'Montserrat Alternates', -apple-system, sans-serif;
+      color: var(--primary);
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.3rem;
+    }
+    .subtitle { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 2.5rem; letter-spacing: 0.01em; }
+    h2 {
+      color: var(--primary);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--divider);
+      font-family: 'Montserrat Alternates', -apple-system, sans-serif;
+      letter-spacing: -0.01em;
+    }
+    h3 {
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 1.8rem;
+      margin-bottom: 0.6rem;
+    }
+    h4 {
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 1.2rem;
+      margin-bottom: 0.4rem;
+    }
+    p { margin-bottom: 1rem; color: var(--text-sec); }
+    strong { color: var(--text); }
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.35rem; color: var(--text-sec); }
+    li strong { color: var(--text); }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.8rem; }
+    th {
+      background: var(--table-header);
+      color: var(--text);
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--border-table);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    td { padding: 0.55rem 0.75rem; border: 1px solid var(--border-table); color: var(--text-sec); }
+    tr:hover td { background: var(--hover-row); }
+    .tag {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      font-size: 0.7rem;
+      margin-right: 0.3rem;
+      border-radius: 4px;
+      font-weight: 500;
+      border: 1px solid transparent;
+    }
+    .tag.critical { background: var(--tag-critical-bg); color: var(--tag-critical-text); border-color: var(--tag-critical-border); }
+    .tag.high { background: var(--tag-high-bg); color: var(--tag-high-text); border-color: var(--tag-high-border); }
+    .tag.medium { background: var(--tag-medium-bg); color: var(--tag-medium-text); border-color: var(--tag-medium-border); }
+    .section-num { color: var(--text-muted); font-size: 0.75rem; font-weight: 500; }
+    blockquote {
+      border-left: 3px solid var(--primary);
+      background: var(--primary-light);
+      padding: 0.85rem 1rem;
+      color: var(--text-sec);
+      margin: 1.2rem 0;
+      font-style: italic;
+      border-radius: 0 6px 6px 0;
+    }
+    code {
+      background: var(--code-bg);
+      padding: 0.15rem 0.4rem;
+      font-size: 0.85em;
+      color: var(--primary);
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, monospace;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border-table);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--text-sec);
+      border-radius: 6px;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, monospace;
+    }
+    .divider { border: none; border-top: 1px solid var(--divider); margin: 2.5rem 0; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.9rem 1rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.15s ease;
+    }
+    .metric-card:hover { box-shadow: var(--shadow); }
+    .metric-card .label { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+    .metric-card .value { color: var(--primary); font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem; }
+    .metric-card .note { color: var(--text-sec); font-size: 0.75rem; margin-top: 0.2rem; }
+    .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--divider); color: var(--text-muted); font-size: 0.75rem; }
+    @media (max-width: 600px) {
+      body { padding: 1.25rem 1rem; font-size: 13px; }
+      .metric-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.35rem; }
+      table { font-size: 0.75rem; }
+    }
+    @media print {
+      body { background: #fff; padding: 0; font-size: 12px; max-width: 100%; }
+      .metric-card { box-shadow: none; border: 1px solid #d1d5db; break-inside: avoid; }
+      blockquote { background: none; }
+      h2 { break-after: avoid; }
+      table { break-inside: avoid; }
+      pre { break-inside: avoid; white-space: pre-wrap; }
+      .divider { margin: 1.5rem 0; }
+    }
+  </style>
+</head>
+<body>
+
+<button id="themeToggle" onclick="toggleTheme()" style="position:fixed;top:1rem;right:1rem;z-index:100;background:var(--surface);border:1px solid var(--border);color:var(--text-sec);font-family:Inter,sans-serif;font-size:0.7rem;padding:0.4rem 0.8rem;cursor:pointer;border-radius:4px;transition:all 0.2s">dark mode</button>
+
+<h1>Billz: Growth-Phase GTM Strategy</h1>
+<div class="subtitle">Prepared by SIBYL Advisory (@sibylcap) for Billz Token Team | Generated 2026-04-01 | Solana | Pre-token launch</div>
+
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="label">Product</div>
+    <div class="value">Billz Pro</div>
+    <div class="note">Crypto treasury execution. Pay fiat without selling crypto.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Chain</div>
+    <div class="value">Solana</div>
+    <div class="note">Non-custodial. SEPA + ACH rails. Yield vaults.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Traction</div>
+    <div class="value">$2.41M Collateral</div>
+    <div class="note">$184K unlocked. $612K in vaults. Up to 10% APY.</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Phase</div>
+    <div class="value">Pre-Token</div>
+    <div class="note">Product live. Token launching via OpenServ SERV launchpad.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 01: GTM GROWTH PLAN                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h2><span class="section-num">01 /</span> GTM Growth Plan</h2>
+
+<h3>Executive Summary</h3>
+<p>Billz is a Solana-native treasury execution platform that lets crypto-native businesses pay real-world expenses: rent, payroll, vendors, invoices. All without selling their holdings. Users collateralize crypto assets, unlock liquidity against them, settle via SEPA (EUR) or ACH (USD) fiat rails, and route idle treasury into yield vaults earning up to 10% APY. The product is live with $2.41M in collateral held.</p>
+
+<p>The core value proposition: <strong>"Pay without selling."</strong> Businesses keep crypto exposure while meeting fiat obligations. This is Lombard-style lending applied to operational treasury management.</p>
+
+<blockquote>The product works. $2.41M in collateral proves demand exists. The challenge is not whether businesses need this . They do. The challenge is reaching them: penetrating the Solana ecosystem, establishing credibility with high-volume B2B clients, and converting awareness into recurring usage before competitors close the gap.</blockquote>
+
+<h3>Market Context</h3>
+<ul>
+  <li><strong>Solana ecosystem:</strong> Fastest-growing L1 for DeFi and payments. Near-zero fees enable micro-transactions. Solana Pay, Jupiter aggregator, and institutional adoption (Franklin Templeton, PayPal PYUSD) create infrastructure tailwinds.</li>
+  <li><strong>Crypto treasury problem:</strong> DAOs, trading firms, protocol teams, and crypto-native businesses all have treasury in crypto but expenses in fiat. Current solutions force liquidation (CEX off-ramps), lose capital efficiency, and create tax events.</li>
+  <li><strong>Competitive landscape:</strong> Request Finance (invoicing), Coinshift (multisig treasury), Utopia Labs (DAO payments), traditional off-ramps (Coinbase, Kraken). Most are Ethereum-first. Solana has a gap for structured treasury execution.</li>
+  <li><strong>Billz differentiator:</strong> Combines collateralized liquidity + fiat settlement + yield optimization in one workflow. Non-custodial. Operator-focused (not retail off-ramp). SEPA + ACH coverage spans EU + US markets.</li>
+</ul>
+
+<h3>Target Audience Segments</h3>
+
+<h4>Primary: Crypto-native businesses on Solana</h4>
+<ul>
+  <li><strong>Who:</strong> Protocol teams, DeFi projects, NFT studios, trading firms with Solana treasury and recurring fiat expenses</li>
+  <li><strong>Where:</strong> Solana Discord, DeFi communities, governance forums, crypto-native finance tools</li>
+  <li><strong>Motivation:</strong> Pay team, vendors, rent without selling SOL/tokens during volatile or bullish markets</li>
+  <li><strong>Pain point:</strong> Manual CEX withdrawal cycles. Tax events on every liquidation. No audit trail. No treasury optimization.</li>
+  <li><strong>Discovery:</strong> Solana ecosystem partners, OpenServ network, targeted B2B outreach, content marketing</li>
+</ul>
+
+<h4>Secondary: DAOs and multi-sig treasuries</h4>
+<ul>
+  <li><strong>Who:</strong> DAOs managing community funds with operational costs (developers, grants, services)</li>
+  <li><strong>Where:</strong> Governance platforms (Realms on Solana), DAO tooling communities, Squads (Solana multi-sig)</li>
+  <li><strong>Motivation:</strong> Execute treasury operations transparently with documentation and controls</li>
+  <li><strong>Discovery:</strong> DAO treasury management content, Squads integration, governance forum presence</li>
+</ul>
+
+<h4>Tertiary: Crypto-native freelancers and solo operators</h4>
+<ul>
+  <li><strong>Who:</strong> Individuals who earn in crypto but pay rent/bills in fiat. Contractors, developers, creators.</li>
+  <li><strong>Where:</strong> Solana developer communities, freelance crypto networks, X</li>
+  <li><strong>Motivation:</strong> Avoid selling crypto at bad times. Maintain exposure while covering expenses.</li>
+  <li><strong>Discovery:</strong> X content, referral from Billz Pro users, personal finance crypto communities</li>
+</ul>
+
+<h3>Positioning Statement</h3>
+<p>For crypto-native businesses on Solana who need to pay real-world expenses without liquidating their holdings, Billz is a treasury execution platform that unlocks collateralized liquidity and settles via SEPA/ACH fiat rails. Unlike traditional off-ramps that force asset sales, Billz preserves your exposure, optimizes idle capital, and provides audit-ready documentation for every transaction.</p>
+
+<h3>Growth Phases</h3>
+
+<h4>Phase 1: Credibility &amp; Case Studies (Week 1-2)</h4>
+<ul>
+  <li>Publish 2-3 anonymized case studies from existing users ($2.41M collateral = there are real users). Show: how much saved by not selling, yield earned on idle treasury, workflow before vs after Billz.</li>
+  <li>Content series on X: "Feature 01, Feature 02..." approach is working (8-13 likes). Continue but add outcome framing: "This dashboard saved [User] $X in unnecessary liquidations."</li>
+  <li>Integrate with Solana ecosystem: list on Solana ecosystem pages, apply to Solana Foundation ecosystem directory, engage with Superteam.</li>
+  <li>OpenServ partnership announcement already live. Use the SERV launchpad visibility.</li>
+  <li><strong>Targets:</strong> 3 case studies published. Listed on 2 ecosystem directories. 500 new X followers.</li>
+</ul>
+
+<h4>Phase 2: B2B Pipeline Building (Week 3-4)</h4>
+<ul>
+  <li>Direct outreach to 20 Solana protocol teams with known treasury &gt; $100K. Use on-chain data to identify targets (Solscan, DefiLlama).</li>
+  <li>Partner with Squads (Solana multi-sig) for integration. Every Squads user is a potential Billz user. This is the highest-impact partnership.</li>
+  <li>Host a Twitter Space: "How crypto teams pay expenses without selling tokens". Invite 2-3 protocol treasurers to share their pain.</li>
+  <li>Create a "Treasury Health Check" tool or calculator: input your treasury size, show how much you'd save over 12 months using Billz vs selling.</li>
+  <li><strong>Targets:</strong> 20 protocols contacted. 5 demos completed. 2 pilot agreements. Squads partnership initiated.</li>
+</ul>
+
+<h4>Phase 3: Token Launch &amp; Flywheel (Week 5+)</h4>
+<ul>
+  <li>Token launch via OpenServ SERV launchpad. Time it with a major partnership announcement or milestone.</li>
+  <li>Token utility: fee discounts, staking for priority access, governance over treasury parameters.</li>
+  <li>Post-launch retention: staking rewards funded by fee revenue. Volume-based tier system.</li>
+  <li><strong>Targets:</strong> Successful token launch. 10 active B2B clients. $5M in total collateral. Monthly recurring volume &gt; $500K.</li>
+</ul>
+
+<h3>Key Metrics &amp; Targets</h3>
+
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="label">Week 2 Target</div>
+    <div class="value">$3M Collateral</div>
+    <div class="note">From $2.41M current baseline</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Week 4 Target</div>
+    <div class="value">5 B2B Pilots</div>
+    <div class="note">Signed pilot agreements</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Week 4 Target</div>
+    <div class="value">1,000 X Followers</div>
+    <div class="note">Estimated current ~200-500</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Month 2 Target</div>
+    <div class="value">$5M / 10 Clients</div>
+    <div class="note">$5M collateral. 10 active recurring clients.</div>
+  </div>
+</div>
+
+<p><strong>Leading indicators:</strong> new deposits, demo requests, X engagement rate, ecosystem directory views</p>
+<p><strong>Lagging indicators:</strong> monthly fiat settlement volume, client retention rate, collateral growth, yield vault TVL</p>
+
+<h3>Risk Factors</h3>
+<table>
+  <tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr>
+  <tr>
+    <td>3% fee perceived as high vs CEX off-ramps</td>
+    <td>High</td>
+    <td>High</td>
+    <td>Frame as "cost of capital efficiency" not "transaction fee." Show NPV: keeping $100K in SOL during a 30% rally vs selling = $30K saved minus $3K fee = $27K net positive.</td>
+  </tr>
+  <tr>
+    <td>Slow Solana ecosystem adoption</td>
+    <td>Medium</td>
+    <td>High</td>
+    <td>Multi-chain expansion to Base/Ethereum. But Solana-first is correct: lowest fees, fastest settlement, growing institutional base.</td>
+  </tr>
+  <tr>
+    <td>Regulatory uncertainty (EU/US fiat rails)</td>
+    <td>Medium</td>
+    <td>High</td>
+    <td>Non-custodial architecture reduces regulatory surface. SEPA/ACH via licensed partners. Compliance documentation already in place per docs.</td>
+  </tr>
+  <tr>
+    <td>Competition from larger players (Coinbase Prime, etc.)</td>
+    <td>Medium</td>
+    <td>Medium</td>
+    <td>Billz targets crypto-native operators, not institutions using Coinbase Prime. Different user, different workflow, different price point.</td>
+  </tr>
+  <tr>
+    <td>Token launch doesn't generate sustained interest</td>
+    <td>Medium</td>
+    <td>Medium</td>
+    <td>Tie token utility directly to platform usage (fee discounts, staking priority). Not a speculative token. A utility token that saves money.</td>
+  </tr>
+</table>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 02: CAMPAIGN CALENDAR                              -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h2><span class="section-num">02 /</span> Campaign Calendar: April 7 to May 4, 2026</h2>
+
+<h3>Week 1: Foundation &amp; Credibility (April 7-13)</h3>
+<p><strong>Goal:</strong> Establish Billz as the treasury execution layer for Solana. Prove the product with real data.</p>
+
+<table>
+  <tr><th>Day</th><th>Channel</th><th>Type</th><th>Description</th><th>Owner</th></tr>
+  <tr><td>Mon</td><td>X</td><td>Post</td><td>"Billz by the numbers: $2.41M collateral. $612K in yield vaults. X payments settled. The product is live."</td><td>Team</td></tr>
+  <tr><td>Tue</td><td>X</td><td>Thread</td><td>Case study #1: How a Solana protocol saved $X by using Billz instead of selling SOL. Anonymized if needed.</td><td>Team</td></tr>
+  <tr><td>Wed</td><td>Docs</td><td>Update</td><td>Publish full product walkthrough video (dashboard, deposit, pay, vault). Embed on docs and website.</td><td>Team</td></tr>
+  <tr><td>Thu</td><td>X</td><td>Post</td><td>Continue Feature series: Feature 03 (Payment execution). Show the SEPA/ACH settlement flow.</td><td>Team</td></tr>
+  <tr><td>Fri</td><td>X</td><td>Engagement</td><td>Reply to 5 Solana treasury discussions. Add value first, mention Billz second.</td><td>Team</td></tr>
+  <tr><td>Sat</td><td>Community</td><td>Outreach</td><td>Apply to Solana ecosystem directory. Submit to DeFi aggregator listings.</td><td>Team</td></tr>
+  <tr><td>Sun</td><td>-</td><td>Monitor</td><td>Review week metrics: new deposits, X engagement, website traffic.</td><td>Team</td></tr>
+</table>
+<p><strong>Targets:</strong> Case study published. Feature video live. 2 ecosystem submissions.</p>
+
+<h3>Week 2: Education &amp; Partnerships (April 14-20)</h3>
+<p><strong>Goal:</strong> Build understanding of the collateralized treasury model. Initiate partnership pipeline.</p>
+
+<table>
+  <tr><th>Day</th><th>Channel</th><th>Type</th><th>Description</th><th>Owner</th></tr>
+  <tr><td>Mon</td><td>X</td><td>Post</td><td>"The real cost of selling crypto to pay expenses." Calculator or infographic showing tax events + missed upside.</td><td>Team</td></tr>
+  <tr><td>Tue</td><td>X</td><td>Post</td><td>Case study #2: DAO treasury management with Billz. Workflow, savings, audit trail.</td><td>Team</td></tr>
+  <tr><td>Wed</td><td>Solana</td><td>Partnership</td><td>Initiate Squads multi-sig integration conversation. Every Squads user = Billz prospect.</td><td>Team</td></tr>
+  <tr><td>Thu</td><td>X</td><td>Post</td><td>Feature 04: Yield vaults. Show how idle treasury earns 10% APY while waiting for next payment cycle.</td><td>Team</td></tr>
+  <tr><td>Fri</td><td>X</td><td>Space</td><td>Twitter Space: "How crypto teams pay expenses without selling tokens." Invite 2 protocol treasurers.</td><td>Team + Guests</td></tr>
+  <tr><td>Sat</td><td>Community</td><td>Content</td><td>Publish "Treasury Health Check" calculator on website. Input treasury size &rarr; see projected savings.</td><td>Team</td></tr>
+  <tr><td>Sun</td><td>-</td><td>Monitor</td><td>Pipeline review: demos booked, partnerships initiated.</td><td>Team</td></tr>
+</table>
+<p><strong>Targets:</strong> Squads partnership initiated. Twitter Space completed. Calculator live. 2 demos booked.</p>
+
+<h3>Week 3: B2B Pipeline Push (April 21-27)</h3>
+<p><strong>Goal:</strong> Convert awareness into demos and pilot agreements.</p>
+
+<table>
+  <tr><th>Day</th><th>Channel</th><th>Type</th><th>Description</th><th>Owner</th></tr>
+  <tr><td>Mon</td><td>Direct</td><td>Outreach</td><td>Contact 10 Solana protocols with treasury &gt; $100K. Personalized DM with on-chain treasury reference.</td><td>Team</td></tr>
+  <tr><td>Tue</td><td>X</td><td>Post</td><td>"What your off-ramp costs you: a thread." Compare Billz vs CEX withdrawal for a $50K quarterly payment.</td><td>Team</td></tr>
+  <tr><td>Wed</td><td>Direct</td><td>Outreach</td><td>Contact 10 more protocols. Different angle: yield on idle treasury + payment execution.</td><td>Team</td></tr>
+  <tr><td>Thu</td><td>X</td><td>Post</td><td>OpenServ token launch teaser (if timing allows). Build anticipation without overpromising.</td><td>Team + OpenServ</td></tr>
+  <tr><td>Fri</td><td>X</td><td>Collab</td><td>Co-post with OpenServ about the Billz x SERV partnership. Joint content reaches both audiences.</td><td>Team + OpenServ</td></tr>
+  <tr><td>Sat</td><td>Community</td><td>Update</td><td>Week 3 metrics: demos completed, pilot agreements, collateral growth. Transparency builds trust.</td><td>Team</td></tr>
+  <tr><td>Sun</td><td>-</td><td>Monitor</td><td>Pipeline conversion review. Which protocols responded? What objections came up?</td><td>Team</td></tr>
+</table>
+<p><strong>Targets:</strong> 20 protocols contacted. 5 demos completed. 2 pilot agreements.</p>
+
+<h3>Week 4: Token Prep &amp; Conversion (April 28 to May 4)</h3>
+<p><strong>Goal:</strong> Prepare for token launch. Lock in B2B clients. Establish recurring revenue baseline.</p>
+
+<table>
+  <tr><th>Day</th><th>Channel</th><th>Type</th><th>Description</th><th>Owner</th></tr>
+  <tr><td>Mon</td><td>X</td><td>Post</td><td>$BILLZ token utility preview: fee discounts, staking for priority settlement, governance. Substance over hype.</td><td>Team</td></tr>
+  <tr><td>Tue</td><td>X</td><td>Post</td><td>Case study #3: Monthly recurring treasury execution. Show the workflow for a team that pays vendors every month via Billz.</td><td>Team</td></tr>
+  <tr><td>Wed</td><td>Docs</td><td>Update</td><td>Publish tokenomics (when ready). Clear allocation, vesting, utility breakdown.</td><td>Team</td></tr>
+  <tr><td>Thu</td><td>X</td><td>Post</td><td>"Month 1 in numbers." Collateral growth, payments settled, yield earned, clients onboarded. Radical transparency.</td><td>Team</td></tr>
+  <tr><td>Fri</td><td>X</td><td>Collab</td><td>Joint AMA with OpenServ about the SERV launchpad and Billz token launch.</td><td>Team + OpenServ</td></tr>
+  <tr><td>Sat</td><td>Community</td><td>Prep</td><td>Pre-launch community building. Whitelist or early access for existing Billz users.</td><td>Team</td></tr>
+  <tr><td>Sun</td><td>-</td><td>Monitor</td><td>Full month review. Recalculate targets for token launch timing.</td><td>Team</td></tr>
+</table>
+<p><strong>Targets:</strong> Tokenomics published. 5 active B2B clients. $3M+ collateral. Community prepped for launch.</p>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 03: COMMUNITY ENGAGEMENT SCRIPTS                   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h2><span class="section-num">03 /</span> Community Engagement Scripts</h2>
+
+<h3>X (Twitter) Scripts</h3>
+
+<h4>Product Positioning Post</h4>
+<pre>billz lets you pay rent, payroll, and vendors without selling your crypto.
+
+collateralize your holdings. unlock liquidity. settle via SEPA or ACH. keep your exposure.
+
+$2.41M in collateral held. the product is live.</pre>
+<p><em>(Link in reply)</em></p>
+
+<h4>Cost Comparison Thread</h4>
+<pre>tweet 1: what your off-ramp actually costs you. thread.
+
+tweet 2: selling $50K of SOL to pay quarterly expenses. you lose: the upside
+if SOL moves, a taxable event, and the position you spent months building.
+
+tweet 3: with billz: collateralize the SOL, unlock $50K in fiat liquidity,
+pay the invoice. SOL stays in your wallet. if SOL goes up 30%, you kept
+$15K in upside.
+
+tweet 4: the 3% execution fee costs $1,500. the alternative costs you
+$15,000 in missed upside plus taxes. the math is not close.
+
+tweet 5: try it: bill-z.com</pre>
+
+<h4>Feature Tutorial Post</h4>
+<pre>feature [N]: [feature name]
+
+[2-3 sentences: what it does and why it matters for treasury operators]
+
+[screenshot or demo link in reply]</pre>
+
+<h4>B2B Case Study Post</h4>
+<pre>a solana protocol used billz to pay $X in monthly expenses without selling
+a single token.
+
+before: sell SOL on exchange, withdraw to bank, wire to vendors. 3 days.
+tax event. exposure lost.
+
+after: collateralize SOL, settle via SEPA in hours. SOL stays. yield
+accruing on idle balance.
+
+the difference over 12 months: $X in preserved upside.</pre>
+
+<h4>Token Launch Announcement (when ready)</h4>
+<pre>$BILLZ is launching on the @openservai SERV launchpad.
+
+utility:
+- fee discounts for holders
+- staking for priority settlement
+- governance over treasury parameters
+
+the token exists because the product works. $2.41M in collateral. real
+payments. real yield.
+
+not a promise. a product.</pre>
+
+<h3>Discord / Community Scripts</h3>
+
+<h4>Welcome Message</h4>
+<pre>welcome to Billz.
+
+what we build: treasury execution for crypto-native businesses on Solana.
+pay fiat expenses without selling your holdings. SEPA + ACH rails. yield
+on idle treasury.
+
+how it works:
+1. deposit and collateralize your crypto
+2. unlock liquidity against it
+3. pay invoices, vendors, rent, payroll
+4. idle capital earns yield in vaults
+
+start here: pro.bill-z.com
+docs: docs.bill-z.com
+questions: drop them in #support</pre>
+
+<h4>B2B Outreach Template (DM)</h4>
+<pre>hey [name] -- noticed [protocol] has significant treasury on Solana.
+
+billz lets you pay operational expenses (team, vendors, infra) without
+selling your holdings. collateralize, unlock fiat liquidity, settle via
+SEPA or ACH.
+
+no custodial risk. audit trail for every payment. idle treasury earns yield.
+
+happy to walk through a 15-min demo if it fits your workflow. no pressure.
+
+[link to docs or case study]</pre>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 04: ON-CHAIN RETENTION STRATEGY                    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h2><span class="section-num">04 /</span> On-Chain Retention Strategy</h2>
+
+<h3>Wallet Segmentation (Solana-native)</h3>
+<table>
+  <tr><th>Segment</th><th>Criteria</th><th>Est. Size</th><th>Priority</th></tr>
+  <tr><td>Power Users</td><td>&gt; $100K collateral, 5+ monthly settlements, vault active</td><td>5-10 wallets</td><td>Highest</td></tr>
+  <tr><td>Regular Users</td><td>$10K-100K collateral, 1-4 settlements/month</td><td>15-30 wallets</td><td>High</td></tr>
+  <tr><td>Casual Users</td><td>&lt; $10K collateral, occasional use</td><td>30-50 wallets</td><td>Medium</td></tr>
+  <tr><td>Depositors (non-payers)</td><td>Collateral deposited, no payments executed</td><td>10-20 wallets</td><td>Activation</td></tr>
+  <tr><td>Vault-only Users</td><td>Using yield vaults but not payment execution</td><td>Variable</td><td>Cross-sell</td></tr>
+  <tr><td>Dormant</td><td>Deposited once, inactive 30+ days</td><td>Variable</td><td>Re-activation</td></tr>
+</table>
+<p><strong>Data sources:</strong> on-chain deposit events, settlement logs, vault deposits/withdrawals, collateral health metrics.</p>
+
+<h3>Retention Loops</h3>
+
+<h4>Power Users ($100K+)</h4>
+<ul>
+  <li>Dedicated account manager or priority support channel</li>
+  <li>Custom fee tiers based on volume (incentivize more throughput)</li>
+  <li>Early access to new features (multi-currency, batch payments, API access)</li>
+  <li>Quarterly treasury review: show savings vs traditional off-ramp</li>
+  <li>Referral commission for bringing other B2B clients</li>
+</ul>
+
+<h4>Regular Users ($10K-100K)</h4>
+<ul>
+  <li>Monthly treasury health email: collateral ratio, yield earned, payments processed</li>
+  <li>Fee reduction milestones: 3% &rarr; 2.5% at $50K monthly volume, 2% at $100K</li>
+  <li>Vault optimization suggestions: "Your idle $X could earn $Y/month in the vault"</li>
+  <li>Payment scheduling: automate recurring settlements (rent, payroll)</li>
+</ul>
+
+<h4>Casual and Depositors</h4>
+<ul>
+  <li>Guided first payment: walk through the full flow with a small test transaction</li>
+  <li>"First payment free" (waive fee on first settlement under $1K) to break inertia</li>
+  <li>Dashboard tour with tooltip guidance</li>
+  <li>Email nudge: "You deposited $X but haven't paid anything yet. Here's how."</li>
+</ul>
+
+<h4>Dormant</h4>
+<ul>
+  <li>Re-activation: "Your collateral is sitting idle. Here's what it could earn in vaults."</li>
+  <li>Market trigger: "SOL up 20% this month. Good thing you didn't sell to pay rent."</li>
+  <li>Feature update emails: new capabilities that weren't available when they last used the platform</li>
+</ul>
+
+<h3>Token-Based Retention (post-launch)</h3>
+
+<h4>$BILLZ Utility Design</h4>
+<ul>
+  <li><strong>Fee discounts:</strong> Hold/stake $BILLZ to reduce the 3% execution fee. Tiered: 10% discount at 1K BILLZ, 25% at 10K, 50% at 100K.</li>
+  <li><strong>Priority settlement:</strong> Staked BILLZ holders get faster fiat settlement (same-day vs next-day).</li>
+  <li><strong>Governance:</strong> Vote on supported collateral types, new fiat rails (GBP, CHF), vault strategy parameters.</li>
+  <li><strong>Revenue sharing:</strong> A portion of platform fees distributed to stakers (sustainable because revenue is real).</li>
+</ul>
+
+<h4>Flywheel</h4>
+<p>More users &rarr; more fees &rarr; more staking rewards &rarr; more token demand &rarr; more users. This only works because the underlying product generates revenue. The token amplifies existing economics, it doesn't create them from nothing.</p>
+
+<h3>Measurement Framework</h3>
+<table>
+  <tr><th>Metric</th><th>Current</th><th>Month 1 Target</th><th>Month 3 Target</th><th>Frequency</th></tr>
+  <tr><td>Total collateral</td><td>$2.41M</td><td>$3.5M</td><td>$7M</td><td>Weekly</td></tr>
+  <tr><td>Monthly settlement volume</td><td>Unknown</td><td>$200K</td><td>$1M</td><td>Monthly</td></tr>
+  <tr><td>Active clients (monthly)</td><td>Unknown (est. 10-20)</td><td>15</td><td>40</td><td>Monthly</td></tr>
+  <tr><td>Vault TVL</td><td>$612K</td><td>$1M</td><td>$2.5M</td><td>Weekly</td></tr>
+  <tr><td>Client retention (M2)</td><td>N/A</td><td>&gt;70%</td><td>&gt;80%</td><td>Monthly</td></tr>
+  <tr><td>Average settlement size</td><td>Unknown</td><td>Track baseline</td><td>Growing</td><td>Monthly</td></tr>
+  <tr><td>Fee revenue (monthly)</td><td>Unknown</td><td>$6K+</td><td>$30K+</td><td>Monthly</td></tr>
+</table>
+
+<h3>Solana-Specific Advantages</h3>
+<ul>
+  <li><strong>Near-zero gas:</strong> Collateral management, vault deposits, and on-chain operations cost fractions of a cent. Enables frequent rebalancing and micro-transactions that would be uneconomical on Ethereum.</li>
+  <li><strong>Speed:</strong> Sub-second finality means collateral operations and vault entries happen instantly. No waiting for block confirmations.</li>
+  <li><strong>Institutional momentum:</strong> Franklin Templeton, PayPal PYUSD, Visa all active on Solana. Billz rides the same institutional adoption wave.</li>
+  <li><strong>Composability:</strong> Integration with Solana DeFi (Jupiter, Drift, Marinade) for vault strategies. Each integration extends Billz's yield capabilities.</li>
+  <li><strong>Squads multi-sig:</strong> The default Solana treasury tool. Integration = distribution to every Squads user automatically.</li>
+</ul>
+
+<hr class="divider">
+
+<div class="footer">
+  <p>Prepared by SIBYL Advisory (sibylcap.com) for Billz Token Team | Billz Growth-Phase GTM Strategy</p>
+  <p>This document was produced using SIBYL's advisory infrastructure and the Web3 Marketing &amp; GTM skill.</p>
+  <p>All metrics are targets, not guarantees. Current platform data ($2.41M collateral, $612K vaults) sourced from bill-z.com as of April 1, 2026.</p>
+</div>
+
+<script>
+function toggleTheme() {
+  var html = document.documentElement;
+  var btn = document.getElementById('themeToggle');
+  if (html.getAttribute('data-theme') === 'dark') {
+    html.removeAttribute('data-theme');
+    btn.textContent = 'dark mode';
+    localStorage.setItem('billz-theme', 'light');
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    btn.textContent = 'light mode';
+    localStorage.setItem('billz-theme', 'dark');
+  }
+}
+if (localStorage.getItem('billz-theme') === 'dark') {
+  document.documentElement.setAttribute('data-theme', 'dark');
+  document.getElementById('themeToggle').textContent = 'light mode';
+}
+</script>
+
+</body>
+</html>
