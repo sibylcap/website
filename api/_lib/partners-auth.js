@@ -52,12 +52,24 @@ async function verifySiwe(message, signature) {
 }
 
 // Middleware-style: extracts user from Authorization header
+// Supports both old (single project_id) and new (project_ids array) JWT format
 function extractUser(req) {
   var auth = req.headers.authorization || '';
   if (!auth.startsWith('Bearer ')) return null;
   var decoded = verifyToken(auth.slice(7));
-  if (!decoded || !decoded.address || !decoded.project_id) return null;
+  if (!decoded || !decoded.address) return null;
+  // Normalize: ensure project_ids array exists
+  if (!decoded.project_ids && decoded.project_id) {
+    decoded.project_ids = [decoded.project_id];
+  }
+  if (!decoded.project_ids || decoded.project_ids.length === 0) return null;
   return decoded;
+}
+
+// Check if user has access to a specific project
+function userHasProject(user, projectId) {
+  if (!user || !user.project_ids) return false;
+  return user.project_ids.indexOf(projectId) !== -1;
 }
 
 // Admin key check
@@ -68,4 +80,4 @@ function isAdmin(req) {
   return key === expected;
 }
 
-module.exports = { signToken, verifyToken, verifySiwe, extractUser, isAdmin };
+module.exports = { signToken, verifyToken, verifySiwe, extractUser, userHasProject, isAdmin };

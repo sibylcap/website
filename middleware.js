@@ -19,6 +19,7 @@ export default function middleware(request) {
     if (!path.startsWith('/api/') && !path.startsWith('/partners/') && !path.startsWith('/images/')) {
       const mapped = path === '/' ? '/partners/index.html'
         : path === '/dashboard' ? '/partners/dashboard.html'
+        : path.startsWith('/dashboard/') ? '/partners/dashboard.html'
         : path === '/messages' ? '/partners/messages.html'
         : null;
       if (mapped) {

@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.5/ethers.umd.min.js"></script>
   <style>
     :root {
       --bg:            #08090a;
@@ -92,6 +93,82 @@
       transition: all 0.2s;
     }
     .logout-btn:hover { border-color: var(--negative); color: var(--negative); }
+    /* Login overlay */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .login-overlay.hidden { display: none; }
+    .login-brand {
+      text-align: center;
+    }
+    .login-brand h1 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .login-brand p {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
+    .connect-btn {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.7rem 2rem;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      transition: all 0.2s;
+    }
+    .connect-btn:hover { background: var(--gold); color: var(--bg); }
+    .connect-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .login-status {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-align: center;
+      min-height: 1.2em;
+    }
+    .login-status.error { color: var(--negative); }
+
+    .project-switcher-wrap {
+      position: relative;
+      display: none;
+    }
+    .project-switcher-wrap.visible { display: flex; gap: 0.35rem; align-items: center; }
+    .project-tab {
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 0.3rem 0.75rem;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .project-tab:hover { border-color: var(--accent); color: var(--text-secondary); }
+    .project-tab.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--highest);
+    }
 
     /* Main layout: kanban + chat side by side on large screens */
     .main-layout {
@@ -704,6 +781,104 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* Sessions archive */
+    .sessions-archive {
+      padding: 0 1.2rem;
+    }
+    .archive-session {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+    .archive-header {
+      padding: 0.6rem 0.8rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .archive-header:hover { background: var(--elevated); }
+    .archive-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .archive-arrow {
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+      display: inline-block;
+    }
+    .archive-arrow.open { transform: rotate(90deg); }
+    .archive-session-title {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .archive-session-meta {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+    }
+    .archive-tasks {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      border-top: 1px solid var(--border);
+    }
+    .archive-tasks.open {
+      max-height: 2000px;
+    }
+    .archive-tasks-inner {
+      padding: 0.5rem 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .archive-task {
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.5rem 0.7rem;
+    }
+    .archive-task-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.15rem;
+    }
+    .archive-task-title {
+      font-size: 0.72rem;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .archive-task-badge {
+      font-size: 0.55rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+    }
+    .archive-task-badge.status-completed { background: #1a2e22; color: var(--positive); }
+    .archive-task-badge.status-pending { background: var(--highest); color: var(--text-secondary); }
+    .archive-task-badge.status-in_progress { background: #3d3520; color: var(--warning); }
+    .archive-task-badge.status-blocked { background: #2e1a1a; color: var(--negative); }
+    .archive-task-desc {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .kanban-empty-session {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
     @media (max-width: 900px) {
       .kanban-col { width: 220px; min-width: 220px; }
       .chat-msg { max-width: 85%; }
@@ -717,10 +892,21 @@
   </style>
 </head>
 <body>
+  <!-- Login overlay: shown when not authenticated -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-brand">
+      <h1>SIBYL</h1>
+      <p>Partner Dashboard</p>
+    </div>
+    <button class="connect-btn" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+
   <div class="topbar">
     <div class="topbar-left">
       <span class="topbar-brand">SIBYL</span>
       <span class="project-name" id="projectName"></span>
+      <div class="project-switcher-wrap" id="projectSwitcher"></div>
     </div>
     <div class="topbar-right">
       <span class="topbar-wallet" id="walletDisplay"></span>
@@ -754,13 +940,17 @@
             <span class="report-title">Session Report</span>
             <span class="report-session-name" id="reportSessionName"></span>
           </div>
-          <span class="report-toggle" id="reportToggle">&#9660;</span>
+          <div style="display:flex;align-items:center;gap:0.6rem">
+            <a id="reportDownload" href="#" target="_blank" style="font-size:0.6rem;color:var(--accent);text-decoration:none;border:1px solid var(--border-strong);padding:0.2rem 0.5rem;white-space:nowrap" onclick="event.stopPropagation()">open in new tab</a>
+            <span class="report-toggle" id="reportToggle">&#9660;</span>
+          </div>
         </div>
         <div class="report-body" id="reportBody">
           <iframe class="report-iframe" id="reportIframe"></iframe>
         </div>
       </div>
     </div>
+    <div class="sessions-archive" id="sessionsArchive" style="display:none"></div>
     <div class="kanban-container">
       <div class="kanban" id="kanban">
         <div class="loading">loading...</div>
@@ -787,7 +977,13 @@
     var API = '/api/partners';
     var token = localStorage.getItem('sibyl_partner_token');
     var isSubdomain = window.location.host.startsWith('partners.');
-    if (!token) window.location.href = isSubdomain ? '/' : '/partners';
+
+    // Extract project ID from URL: /dashboard/ww3 or /partners/dashboard/ww3
+    var PROJECT_ID = (function() {
+      var path = window.location.pathname;
+      var match = path.match(/\/dashboard\/([a-zA-Z0-9_-]+)/);
+      return match ? match[1] : null;
+    })();
 
     var COLUMNS = ['pending', 'in_progress', 'completed', 'blocked'];
     var COL_LABELS = { pending: 'Pending', in_progress: 'In Progress', completed: 'Completed', blocked: 'Blocked' };
@@ -803,14 +999,128 @@
     function headers() {
       return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
     }
+    function showLogin(msg) {
+      document.getElementById('loginOverlay').classList.remove('hidden');
+      if (msg) {
+        var s = document.getElementById('loginStatus');
+        s.className = 'login-status error';
+        s.textContent = msg;
+      }
+    }
+    function hideLogin() {
+      document.getElementById('loginOverlay').classList.add('hidden');
+    }
     function logout() {
       localStorage.removeItem('sibyl_partner_token');
-      window.location.href = isSubdomain ? '/' : '/partners';
+      token = null;
+      showLogin();
+    }
+    // Append project_id to API paths when PROJECT_ID is set
+    function withProject(path) {
+      if (!PROJECT_ID) return path;
+      var sep = path.indexOf('?') === -1 ? '?' : '&';
+      return path + sep + 'project_id=' + PROJECT_ID;
     }
     async function apiFetch(path, opts) {
-      var res = await fetch(API + path, Object.assign({ headers: headers() }, opts || {}));
-      if (res.status === 401) { logout(); return null; }
+      var res = await fetch(API + withProject(path), Object.assign({ headers: headers() }, opts || {}));
+      if (res.status === 401) { showLogin('session expired. reconnect wallet.'); return null; }
       return res.json();
+    }
+
+    // ── Wallet connect (inline) ─────────────────────────────────────
+    async function connectWallet() {
+      var btn = document.getElementById('connectBtn');
+      var status = document.getElementById('loginStatus');
+      status.className = 'login-status';
+      status.textContent = '';
+
+      if (!window.ethereum) {
+        status.className = 'login-status error';
+        status.textContent = 'no wallet detected. install MetaMask or Rabby.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'connecting...';
+
+      try {
+        var provider = new ethers.BrowserProvider(window.ethereum);
+        var signer = await provider.getSigner();
+        var address = await signer.getAddress();
+
+        status.textContent = 'requesting nonce...';
+
+        var nonceRes = await fetch(API + '/auth?action=nonce', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: address }),
+        });
+        var nonceData = await nonceRes.json();
+
+        if (!nonceRes.ok) {
+          status.className = 'login-status error';
+          status.textContent = nonceData.error || 'failed to get nonce';
+          btn.disabled = false;
+          btn.textContent = 'Connect Wallet';
+          return;
+        }
+
+        status.textContent = 'sign the message in your wallet...';
+
+        var domain = window.location.host;
+        var origin = window.location.origin;
+        var siweMessage = [
+          domain + ' wants you to sign in with your Ethereum account:',
+          address,
+          '',
+          'Sign in to SIBYL Advisory Partner Dashboard',
+          '',
+          'URI: ' + origin,
+          'Version: 1',
+          'Chain ID: 8453',
+          'Nonce: ' + nonceData.nonce,
+          'Issued At: ' + new Date().toISOString(),
+        ].join('\n');
+
+        var signature = await signer.signMessage(siweMessage);
+
+        status.textContent = 'verifying...';
+
+        var verifyRes = await fetch(API + '/auth?action=verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: siweMessage, signature: signature }),
+        });
+        var verifyData = await verifyRes.json();
+
+        if (!verifyRes.ok) {
+          status.className = 'login-status error';
+          status.textContent = (verifyData.detail || verifyData.error || 'verification failed');
+          btn.disabled = false;
+          btn.textContent = 'Connect Wallet';
+          return;
+        }
+
+        // Auth success: store token and load dashboard in place
+        token = verifyData.token;
+        localStorage.setItem('sibyl_partner_token', token);
+
+        // If no project ID in URL, redirect to first project
+        if (!PROJECT_ID && verifyData.projects && verifyData.projects.length > 0) {
+          var base = isSubdomain ? '/dashboard/' : '/partners/dashboard/';
+          window.location.replace(base + verifyData.projects[0].id);
+          return;
+        }
+
+        hideLogin();
+        initDashboard();
+
+      } catch (err) {
+        status.className = 'login-status error';
+        status.textContent = err.message || 'connection failed';
+        btn.disabled = false;
+        btn.textContent = 'Connect Wallet';
+      }
     }
     function toast(msg) {
       var el = document.getElementById('toast');
@@ -821,6 +1131,28 @@
     function esc(s) {
       if (!s) return '';
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ── Project switcher ──────────────────────────────────────────
+    function switchProject(id) {
+      var base = isSubdomain ? '/dashboard/' : '/partners/dashboard/';
+      window.location.href = base + id;
+    }
+    async function loadProjectSwitcher() {
+      var data = await apiFetch('/auth');
+      if (!data || !data.projects || data.projects.length < 2) return;
+      var wrap = document.getElementById('projectSwitcher');
+      wrap.innerHTML = '';
+      data.projects.forEach(function(p) {
+        var tab = document.createElement('a');
+        tab.className = 'project-tab' + (p.id === PROJECT_ID ? ' active' : '');
+        tab.textContent = p.id.toUpperCase();
+        tab.title = p.name;
+        tab.href = 'javascript:void(0)';
+        tab.onclick = function() { switchProject(p.id); };
+        wrap.appendChild(tab);
+      });
+      wrap.classList.add('visible');
     }
 
     // ── Kanban ──────────────────────────────────────────────────────
@@ -843,31 +1175,106 @@
           var rp = document.getElementById('reportPanel');
           rp.style.display = '';
           document.getElementById('reportSessionName').textContent = docSession.title;
-          document.getElementById('reportIframe').src = docSession.document_url;
+          // Rewrite absolute sibylcap.com URLs to relative paths for same-origin iframe loading
+          var docUrl = docSession.document_url;
+          if (docUrl && docUrl.indexOf('sibylcap.com') !== -1) {
+            try { docUrl = new URL(docUrl).pathname; } catch(e) {}
+          }
+          document.getElementById('reportIframe').src = docUrl;
+          document.getElementById('reportDownload').href = docUrl;
         }
       }
 
       allTasks = taskData.tasks;
-      var grouped = {};
-      COLUMNS.forEach(function(c) { grouped[c] = []; });
-      allTasks.forEach(function(t) { if (grouped[t.status]) grouped[t.status].push(t); });
+      var sessions = projData.sessions || [];
+
+      // Group tasks by session_id
+      var tasksBySession = {};
+      allTasks.forEach(function(t) {
+        var sid = t.session_id;
+        if (!tasksBySession[sid]) tasksBySession[sid] = [];
+        tasksBySession[sid].push(t);
+      });
+
+      // Find active session (latest non-closed) and completed sessions
+      var activeSession = null;
+      var closedSessions = [];
+      sessions.forEach(function(s) {
+        if (s.status === 'closed') {
+          closedSessions.push(s);
+        } else if (!activeSession) {
+          activeSession = s;
+        }
+      });
+
+      // Render completed sessions archive
+      var archiveEl = document.getElementById('sessionsArchive');
+      if (closedSessions.length > 0) {
+        archiveEl.style.display = '';
+        var archHtml = '';
+        closedSessions.forEach(function(s) {
+          var sTasks = tasksBySession[s.id] || [];
+          var completedCount = sTasks.filter(function(t) { return t.status === 'completed'; }).length;
+          archHtml += '<div class="archive-session">';
+          archHtml += '<div class="archive-header" onclick="toggleArchiveSession(this)">';
+          archHtml += '<div class="archive-header-left">';
+          archHtml += '<span class="archive-arrow">&#9654;</span>';
+          archHtml += '<span class="archive-session-title">' + esc(s.title) + '</span>';
+          archHtml += '</div>';
+          archHtml += '<span class="archive-session-meta">' + completedCount + '/' + sTasks.length + ' complete</span>';
+          archHtml += '</div>';
+          archHtml += '<div class="archive-tasks">';
+          archHtml += '<div class="archive-tasks-inner">';
+          if (sTasks.length === 0) {
+            archHtml += '<div style="color:var(--text-muted);font-size:0.65rem;padding:0.5rem 0;">no tasks</div>';
+          }
+          sTasks.forEach(function(t) {
+            archHtml += '<div class="archive-task">';
+            archHtml += '<div class="archive-task-header">';
+            archHtml += '<span class="archive-task-title">' + esc(t.title) + '</span>';
+            archHtml += '<span class="archive-task-badge status-' + t.status + '">' + t.status.replace('_', ' ') + '</span>';
+            archHtml += '</div>';
+            if (t.description) archHtml += '<div class="archive-task-desc">' + esc(t.description) + '</div>';
+            archHtml += '</div>';
+          });
+          archHtml += '</div></div></div>';
+        });
+        archiveEl.innerHTML = archHtml;
+      } else {
+        archiveEl.style.display = 'none';
+        archiveEl.innerHTML = '';
+      }
+
+      // Render active session tasks in kanban (or empty state)
+      var activeTasks = activeSession ? (tasksBySession[activeSession.id] || []) : [];
+      // Also keep allTasks filtered to active session for panel interactions
+      allTasks = activeTasks;
 
       var kanban = document.getElementById('kanban');
-      var html = '';
-      COLUMNS.forEach(function(col) {
-        var items = grouped[col];
-        html += '<div class="kanban-col">';
-        html += '<div class="col-header"><span class="col-title ' + col + '">' + COL_LABELS[col] + '</span><span class="col-count">' + items.length + '</span></div>';
-        html += '<div class="col-body" data-status="' + col + '" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">';
-        if (items.length === 0) {
-          html += '<div class="empty-col">no tasks</div>';
-        }
-        items.forEach(function(t) {
-          html += renderCard(t);
+
+      if (!activeSession) {
+        kanban.innerHTML = '<div class="kanban-empty-session">all sessions closed. waiting for next session.</div>';
+      } else {
+        var grouped = {};
+        COLUMNS.forEach(function(c) { grouped[c] = []; });
+        activeTasks.forEach(function(t) { if (grouped[t.status]) grouped[t.status].push(t); });
+
+        var html = '';
+        COLUMNS.forEach(function(col) {
+          var items = grouped[col];
+          html += '<div class="kanban-col">';
+          html += '<div class="col-header"><span class="col-title ' + col + '">' + COL_LABELS[col] + '</span><span class="col-count">' + items.length + '</span></div>';
+          html += '<div class="col-body" data-status="' + col + '" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">';
+          if (items.length === 0) {
+            html += '<div class="empty-col">no tasks</div>';
+          }
+          items.forEach(function(t) {
+            html += renderCard(t);
+          });
+          html += '</div></div>';
         });
-        html += '</div></div>';
-      });
-      kanban.innerHTML = html;
+        kanban.innerHTML = html;
+      }
     }
 
     var allTasks = [];
@@ -1100,7 +1507,7 @@
     }
 
     async function downloadFile(id, filename) {
-      var res = await fetch(API + '/attachments?id=' + id + '&download=1', { headers: headers() });
+      var res = await fetch(API + withProject('/attachments?id=' + id + '&download=1'), { headers: headers() });
       if (!res.ok) { toast('download failed'); return; }
       var blob = await res.blob();
       var url = URL.createObjectURL(blob);
@@ -1254,26 +1661,35 @@
 
       var prices = data.prices || [];
       var milestones = data.milestones || [];
+      var advisoryStart = data.advisory_start ? new Date(data.advisory_start).getTime() : null;
 
-      if (prices.length < 2) {
+      if (prices.length < 2 && milestones.length === 0) {
         ctx.fillStyle = '#555d6b';
         ctx.font = '12px IBM Plex Mono';
         ctx.textAlign = 'center';
-        ctx.fillText('price data not yet available', W / 2, H / 2);
+        ctx.fillText('no data yet', W / 2, H / 2);
         return;
       }
 
-      // Time range
+      // Time range: start from advisory start or earliest price, whichever is earlier
       var pad = { top: 10, right: 10, bottom: 22, left: 50 };
       var chartW = W - pad.left - pad.right;
       var chartH = H - pad.top - pad.bottom;
 
-      var startTime = new Date(prices[0].date).getTime();
-      var endTime = new Date(prices[prices.length - 1].date).getTime();
+      var priceStart = prices.length ? new Date(prices[0].date).getTime() : Infinity;
+      var priceEnd = prices.length ? new Date(prices[prices.length - 1].date).getTime() : 0;
+      var milestoneStart = milestones.length ? new Date(milestones[0].date).getTime() : Infinity;
+      var milestoneEnd = milestones.length ? new Date(milestones[milestones.length - 1].date).getTime() : 0;
+
+      var startTime = Math.min(priceStart, milestoneStart, advisoryStart || Infinity);
+      var endTime = Math.max(priceEnd, milestoneEnd, Date.now());
+      // Add small padding to end so markers aren't clipped at edge
+      endTime += (endTime - startTime) * 0.02;
       var timeRange = endTime - startTime || 1;
 
-      // Price range
-      var closes = prices.map(function(p) { return p.close; });
+      // Price range (safe defaults if no price data)
+      var hasPrices = prices.length >= 2;
+      var closes = hasPrices ? prices.map(function(p) { return p.close; }) : [0, 1];
       var minPrice = Math.min.apply(null, closes);
       var maxPrice = Math.max.apply(null, closes);
       var priceRange = maxPrice - minPrice || minPrice * 0.1 || 1;
@@ -1290,53 +1706,58 @@
       for (var g = 0; g <= 4; g++) {
         var gy = pad.top + (chartH / 4) * g;
         ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(W - pad.right, gy); ctx.stroke();
-        var gPrice = maxPrice - (priceRange / 4) * g;
-        ctx.fillStyle = '#555d6b';
-        ctx.font = '9px IBM Plex Mono';
-        ctx.textAlign = 'right';
-        ctx.fillText('$' + formatPrice(gPrice), pad.left - 5, gy + 3);
+        if (hasPrices) {
+          var gPrice = maxPrice - (priceRange / 4) * g;
+          ctx.fillStyle = '#555d6b';
+          ctx.font = '9px IBM Plex Mono';
+          ctx.textAlign = 'right';
+          ctx.fillText('$' + formatPrice(gPrice), pad.left - 5, gy + 3);
+        }
       }
 
-      // Date labels
+      // Date labels along time axis
       ctx.fillStyle = '#555d6b';
       ctx.font = '9px IBM Plex Mono';
       ctx.textAlign = 'center';
-      var labelCount = Math.min(5, prices.length);
+      var dateLabels = hasPrices ? prices : milestones;
+      var labelCount = Math.min(5, dateLabels.length);
       for (var d = 0; d < labelCount; d++) {
-        var idx = Math.floor(d * (prices.length - 1) / (labelCount - 1));
-        var dt = new Date(prices[idx].date);
+        var idx = Math.floor(d * (dateLabels.length - 1) / Math.max(labelCount - 1, 1));
+        var dt = new Date(dateLabels[idx].date);
         var lbl = (dt.getMonth() + 1) + '/' + dt.getDate();
-        ctx.fillText(lbl, xPos(prices[idx].date), H - 4);
+        ctx.fillText(lbl, xPos(dateLabels[idx].date), H - 4);
       }
 
-      // Price line
-      ctx.beginPath();
-      ctx.strokeStyle = '#6b8ba5';
-      ctx.lineWidth = 1.5;
-      ctx.lineJoin = 'round';
-      prices.forEach(function(p, i) {
-        var x = xPos(p.date);
-        var y = yPos(p.close);
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
+      if (hasPrices) {
+        // Price line
+        ctx.beginPath();
+        ctx.strokeStyle = '#6b8ba5';
+        ctx.lineWidth = 1.5;
+        ctx.lineJoin = 'round';
+        prices.forEach(function(p, i) {
+          var x = xPos(p.date);
+          var y = yPos(p.close);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
 
-      // Price fill
-      ctx.lineTo(xPos(prices[prices.length - 1].date), pad.top + chartH);
-      ctx.lineTo(xPos(prices[0].date), pad.top + chartH);
-      ctx.closePath();
-      var grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
-      grad.addColorStop(0, 'rgba(107, 139, 165, 0.12)');
-      grad.addColorStop(1, 'rgba(107, 139, 165, 0)');
-      ctx.fillStyle = grad;
-      ctx.fill();
+        // Price fill
+        ctx.lineTo(xPos(prices[prices.length - 1].date), pad.top + chartH);
+        ctx.lineTo(xPos(prices[0].date), pad.top + chartH);
+        ctx.closePath();
+        var grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
+        grad.addColorStop(0, 'rgba(107, 139, 165, 0.12)');
+        grad.addColorStop(1, 'rgba(107, 139, 165, 0)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
 
       // Milestone markers
       var markerData = [];
       milestones.forEach(function(m) {
         var mTime = new Date(m.date).getTime();
-        if (mTime < startTime || mTime > endTime) return;
         var mx = xPos(m.date);
+        if (mx < pad.left || mx > W - pad.right) return;
         var color = MILESTONE_COLORS[m.type] || '#8a919c';
 
         // Vertical line
@@ -1423,10 +1844,54 @@
       }
     }
 
+    // ── Archive toggle ─────────────────────────────────────────────────
+    function toggleArchiveSession(headerEl) {
+      var arrow = headerEl.querySelector('.archive-arrow');
+      var tasksEl = headerEl.nextElementSibling;
+      var isOpen = tasksEl.classList.contains('open');
+      if (isOpen) {
+        tasksEl.classList.remove('open');
+        arrow.classList.remove('open');
+      } else {
+        tasksEl.classList.add('open');
+        arrow.classList.add('open');
+      }
+    }
+
     // ── Init ────────────────────────────────────────────────────────
 
-    Promise.all([loadBoard(), loadMessages(), loadTimeline()]);
-    setInterval(loadMessages, 30000);
+    var _msgInterval = null;
+    function initDashboard() {
+      Promise.all([loadBoard(), loadMessages(), loadTimeline(), loadProjectSwitcher()]);
+      if (_msgInterval) clearInterval(_msgInterval);
+      _msgInterval = setInterval(loadMessages, 30000);
+    }
+
+    // Check existing session or show login
+    (function() {
+      if (!token) { showLogin(); return; }
+      // Validate token is still good
+      fetch(API + '/auth', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(function(r) {
+          if (!r.ok) throw new Error('expired');
+          return r.json();
+        })
+        .then(function(data) {
+          // If no project ID in URL, redirect to first project
+          if (!PROJECT_ID && data.projects && data.projects.length > 0) {
+            var base = isSubdomain ? '/dashboard/' : '/partners/dashboard/';
+            window.location.replace(base + data.projects[0].id);
+            return;
+          }
+          hideLogin();
+          initDashboard();
+        })
+        .catch(function() {
+          localStorage.removeItem('sibyl_partner_token');
+          token = null;
+          showLogin();
+        });
+    })();
   </script>
 </body>
 </html>

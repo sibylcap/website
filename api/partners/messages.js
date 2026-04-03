@@ -15,11 +15,17 @@ module.exports = async function handler(req, res) {
     var user = auth.extractUser(req);
     if (!user) return res.status(401).json({ error: 'not authenticated' });
 
+    // Resolve project: explicit query param or first from JWT
+    var projectId = req.query.project_id || user.project_ids[0];
+    if (!auth.userHasProject(user, projectId)) {
+      return res.status(403).json({ error: 'no access to this project' });
+    }
+
     if (req.method === 'GET') {
       var opts = {};
       if (req.query.limit) opts.limit = Math.min(parseInt(req.query.limit) || 50, 100);
       if (req.query.before) opts.before = parseInt(req.query.before);
-      var messages = await db.getMessages(user.project_id, opts);
+      var messages = await db.getMessages(projectId, opts);
       return res.json({ messages: messages });
     }
 
@@ -29,7 +35,7 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'message body is required' });
       }
       var msg = await db.createMessage({
-        project_id: user.project_id,
+        project_id: projectId,
         sender: user.address,
         body: body.trim(),
       });

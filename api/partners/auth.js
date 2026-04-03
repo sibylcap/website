@@ -13,13 +13,14 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    // GET: return current session
+    // GET: return current session with all accessible projects
     if (req.method === 'GET') {
       var user = auth.extractUser(req);
       if (!user) return res.status(401).json({ error: 'not authenticated' });
-      var project = await db.getProjectById(user.project_id);
-      if (!project) return res.status(401).json({ error: 'project not found' });
-      return res.json({ address: user.address, project: project });
+      var projects = await db.getProjectsByWallet(user.address);
+      if (!projects || projects.length === 0) return res.status(401).json({ error: 'no projects found' });
+      // Back-compat: also return first project as "project"
+      return res.json({ address: user.address, projects: projects, project: projects[0] });
     }
 
     // POST: nonce or verify
@@ -54,13 +55,14 @@ module.exports = async function handler(req, res) {
         if (!nonceRecord) {
           return res.status(401).json({ error: 'invalid or expired nonce' });
         }
-        // Check wallet is registered
-        var project = await db.getProjectByWallet(result.address);
-        if (!project) {
+        // Check wallet is registered (may have multiple projects)
+        var projects = await db.getProjectsByWallet(result.address);
+        if (!projects || projects.length === 0) {
           return res.status(403).json({ error: 'wallet not registered as a partner' });
         }
-        var token = auth.signToken({ address: result.address, project_id: project.id });
-        return res.json({ token: token, project: project });
+        var projectIds = projects.map(function(p) { return p.id; });
+        var token = auth.signToken({ address: result.address, project_ids: projectIds });
+        return res.json({ token: token, projects: projects, project: projects[0] });
       }
 
       return res.status(400).json({ error: 'unknown action. use ?action=nonce or ?action=verify' });

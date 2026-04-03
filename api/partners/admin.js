@@ -99,6 +99,22 @@ module.exports = async function handler(req, res) {
         return res.json({ session: updated });
       }
 
+      if (action === 'grant-access') {
+        if (!body.wallet || !body.project_id) {
+          return res.status(400).json({ error: 'wallet and project_id are required' });
+        }
+        var access = await db.grantAccess(body.wallet, body.project_id, body.role);
+        return res.json({ access: access });
+      }
+
+      if (action === 'revoke-access') {
+        if (!body.wallet || !body.project_id) {
+          return res.status(400).json({ error: 'wallet and project_id are required' });
+        }
+        await db.revokeAccess(body.wallet, body.project_id);
+        return res.json({ ok: true });
+      }
+
       if (action === 'send-message') {
         if (!body.project_id || !body.body) {
           return res.status(400).json({ error: 'project_id and body are required' });

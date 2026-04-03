@@ -1,5 +1,6 @@
 /* Advisory Partner Dashboard: Project endpoint.
-   GET /api/partners/project — returns project data with sessions and task counts */
+   GET /api/partners/project            — returns first project (back-compat)
+   GET /api/partners/project?id=exo     — returns specific project with sessions and task counts */
 
 var db = require('../_lib/partners-db');
 var auth = require('../_lib/partners-auth');
@@ -15,7 +16,12 @@ module.exports = async function handler(req, res) {
     var user = auth.extractUser(req);
     if (!user) return res.status(401).json({ error: 'not authenticated' });
 
-    var project = await db.getProjectById(user.project_id);
+    var projectId = req.query.id || req.query.project_id || user.project_ids[0];
+    if (!auth.userHasProject(user, projectId)) {
+      return res.status(403).json({ error: 'no access to this project' });
+    }
+
+    var project = await db.getProjectById(projectId);
     if (!project) return res.status(404).json({ error: 'project not found' });
 
     var sessions = await db.getSessionsByProject(project.id);

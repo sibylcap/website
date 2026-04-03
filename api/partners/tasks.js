@@ -18,11 +18,17 @@ module.exports = async function handler(req, res) {
     var user = auth.extractUser(req);
     if (!user) return res.status(401).json({ error: 'not authenticated' });
 
+    // Resolve project: explicit query param or first from JWT
+    var projectId = req.query.project_id || user.project_ids[0];
+    if (!auth.userHasProject(user, projectId)) {
+      return res.status(403).json({ error: 'no access to this project' });
+    }
+
     if (req.method === 'GET') {
       var filters = {};
       if (req.query.session_id) filters.session_id = parseInt(req.query.session_id);
       if (req.query.status) filters.status = req.query.status;
-      var tasks = await db.getTasksByProject(user.project_id, filters);
+      var tasks = await db.getTasksByProject(projectId, filters);
       return res.json({ tasks: tasks });
     }
 
@@ -33,7 +39,7 @@ module.exports = async function handler(req, res) {
 
       // Verify the task belongs to this project
       var task = await db.getTaskById(taskId);
-      if (!task || task.project_id !== user.project_id) {
+      if (!task || task.project_id !== projectId) {
         return res.status(404).json({ error: 'task not found' });
       }
 

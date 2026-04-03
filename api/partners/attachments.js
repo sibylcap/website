@@ -18,11 +18,17 @@ module.exports = async function handler(req, res) {
     var user = auth.extractUser(req);
     if (!user) return res.status(401).json({ error: 'not authenticated' });
 
+    // Resolve project: explicit query param or first from JWT
+    var projectId = req.query.project_id || user.project_ids[0];
+    if (!auth.userHasProject(user, projectId)) {
+      return res.status(403).json({ error: 'no access to this project' });
+    }
+
     if (req.method === 'GET') {
       // Download a specific file
       if (req.query.id && req.query.download) {
         var att = await db.getAttachmentById(parseInt(req.query.id));
-        if (!att || att.project_id !== user.project_id) {
+        if (!att || att.project_id !== projectId) {
           return res.status(404).json({ error: 'not found' });
         }
         var buf = Buffer.from(att.data, 'base64');
@@ -36,7 +42,7 @@ module.exports = async function handler(req, res) {
       var taskId = parseInt(req.query.task_id);
       if (!taskId) return res.status(400).json({ error: 'task_id required' });
       var task = await db.getTaskById(taskId);
-      if (!task || task.project_id !== user.project_id) {
+      if (!task || task.project_id !== projectId) {
         return res.status(404).json({ error: 'task not found' });
       }
       var attachments = await db.getAttachmentsByTask(taskId);
@@ -50,7 +56,7 @@ module.exports = async function handler(req, res) {
       }
 
       var task = await db.getTaskById(parseInt(task_id));
-      if (!task || task.project_id !== user.project_id) {
+      if (!task || task.project_id !== projectId) {
         return res.status(404).json({ error: 'task not found' });
       }
 
@@ -62,7 +68,7 @@ module.exports = async function handler(req, res) {
 
       var att = await db.createAttachment({
         task_id: parseInt(task_id),
-        project_id: user.project_id,
+        project_id: projectId,
         filename: filename.slice(0, 255),
         mime_type: (mime_type || 'application/octet-stream').slice(0, 100),
         size_bytes: sizeBytes,

@@ -15,7 +15,13 @@ module.exports = async function handler(req, res) {
     var user = auth.extractUser(req);
     if (!user) return res.status(401).json({ error: 'not authenticated' });
 
-    var project = await db.getProjectById(user.project_id);
+    // Resolve project: explicit query param or first from JWT
+    var projectId = req.query.project_id || user.project_ids[0];
+    if (!auth.userHasProject(user, projectId)) {
+      return res.status(403).json({ error: 'no access to this project' });
+    }
+
+    var project = await db.getProjectById(projectId);
     if (!project) return res.status(404).json({ error: 'project not found' });
 
     // Fetch milestones: sessions + task status changes
@@ -65,30 +71,47 @@ module.exports = async function handler(req, res) {
     var prices = [];
     if (project.token_ca) {
       try {
-        var url = 'https://api.geckoterminal.com/api/v2/networks/base/tokens/' + project.token_ca + '/ohlcv/day?aggregate=1&limit=90&currency=usd';
-        var priceRes = await fetch(url, {
-          headers: { 'Accept': 'application/json' },
-        });
-        if (priceRes.ok) {
-          var priceData = await priceRes.json();
-          var ohlcv = priceData.data && priceData.data.attributes && priceData.data.attributes.ohlcv_list;
-          if (ohlcv && ohlcv.length) {
-            // GeckoTerminal returns [timestamp, open, high, low, close, volume]
-            // newest first, so reverse
-            prices = ohlcv.map(function(c) {
-              return {
-                date: new Date(c[0] * 1000).toISOString(),
-                open: c[1],
-                high: c[2],
-                low: c[3],
-                close: c[4],
-                volume: c[5],
-              };
-            }).reverse();
+        var parseOhlcv = function(list) {
+          if (!list || !list.length) return [];
+          return list.map(function(c) {
+            return { date: new Date(c[0] * 1000).toISOString(), open: c[1], high: c[2], low: c[3], close: c[4], volume: c[5] };
+          }).reverse();
+        };
+
+        var fetchOhlcv = async function(url) {
+          var r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+          if (!r.ok) return [];
+          var d = await r.json();
+          return parseOhlcv(d.data && d.data.attributes && d.data.attributes.ohlcv_list);
+        };
+
+        // 1. Try token-level daily OHLCV
+        prices = await fetchOhlcv('https://api.geckoterminal.com/api/v2/networks/base/tokens/' + project.token_ca + '/ohlcv/day?aggregate=1&limit=90&currency=usd');
+
+        // 2. If empty, discover top pool and try daily then hourly
+        if (prices.length === 0) {
+          var poolsRes = await fetch('https://api.geckoterminal.com/api/v2/networks/base/tokens/' + project.token_ca + '/pools?page=1', { headers: { 'Accept': 'application/json' } });
+          if (poolsRes.ok) {
+            var poolsData = await poolsRes.json();
+            var pools = poolsData.data || [];
+            if (pools.length > 0) {
+              var poolAddr = pools[0].attributes && pools[0].attributes.address;
+              if (poolAddr) {
+                // Try daily first
+                prices = await fetchOhlcv('https://api.geckoterminal.com/api/v2/networks/base/pools/' + poolAddr + '/ohlcv/day?aggregate=1&limit=90&currency=usd');
+                // Fall back to hourly (last 7 days = 168 hours)
+                if (prices.length === 0) {
+                  prices = await fetchOhlcv('https://api.geckoterminal.com/api/v2/networks/base/pools/' + poolAddr + '/ohlcv/hour?aggregate=1&limit=168&currency=usd');
+                }
+                // Fall back to 4-hour (last 30 days = 180 candles)
+                if (prices.length === 0) {
+                  prices = await fetchOhlcv('https://api.geckoterminal.com/api/v2/networks/base/pools/' + poolAddr + '/ohlcv/hour?aggregate=4&limit=180&currency=usd');
+                }
+              }
+            }
           }
         }
       } catch (e) {
-        // Price fetch failed, continue without it
         console.error('[partners/timeline] price fetch error:', e.message);
       }
     }

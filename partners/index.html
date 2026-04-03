@@ -112,16 +112,26 @@
   <script>
     var API = '/api/partners';
 
+    function redirectToProject(projects) {
+      var isSubdomain = window.location.host.startsWith('partners.');
+      var base = isSubdomain ? '/dashboard' : '/partners/dashboard';
+      if (projects && projects.length === 1) {
+        window.location.href = base + '/' + projects[0].id;
+      } else if (projects && projects.length > 1) {
+        // Multiple projects: redirect to first, picker available in dashboard
+        window.location.href = base + '/' + projects[0].id;
+      } else {
+        window.location.href = base;
+      }
+    }
+
     // Check for existing session
     (function() {
       var token = localStorage.getItem('sibyl_partner_token');
       if (token) {
         fetch(API + '/auth', { headers: { 'Authorization': 'Bearer ' + token } })
           .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
-          .then(function() {
-            var isSubdomain = window.location.host.startsWith('partners.');
-            window.location.href = isSubdomain ? '/dashboard' : '/partners/dashboard';
-          })
+          .then(function(data) { redirectToProject(data.projects); })
           .catch(function() { localStorage.removeItem('sibyl_partner_token'); });
       }
     })();
@@ -203,10 +213,9 @@
           return;
         }
 
-        // Store token and redirect
+        // Store token and redirect to project-specific dashboard
         localStorage.setItem('sibyl_partner_token', verifyData.token);
-        var isSubdomain = window.location.host.startsWith('partners.');
-        window.location.href = isSubdomain ? '/dashboard' : '/partners/dashboard';
+        redirectToProject(verifyData.projects);
 
       } catch (err) {
         status.className = 'status-text error';

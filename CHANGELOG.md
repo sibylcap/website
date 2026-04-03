@@ -4,6 +4,42 @@ All notable changes to sibylcap.com and x402 paid endpoints.
 
 ---
 
+## 2026-03-31
+
+### Timeline Price Fix
+- **Cascading OHLCV fallback**: GeckoTerminal daily OHLCV returns null for low-volume tokens. Added fallback chain: token daily -> pool daily -> pool hourly (168h) -> pool 4-hour (180 candles). WW3 now shows hourly price chart. EXO still empty (delisted, zero volume).
+- **Refactored fetch logic**: extracted `parseOhlcv` and `fetchOhlcv` helpers to reduce duplication in `api/partners/timeline.js`.
+
+### Discord: Bot Client Posting
+- **Switched from webhook to bot client** for #announcements posts. Webhook was deleted by security bot. Bot client can post to any channel by ID without webhooks. Updated discord skill with both methods.
+
+### Partner Dashboard: Multi-Project Navigation
+- **Project tab switcher**: replaced native `<select>` dropdown with inline tab buttons (EXO | WW3). Active tab highlighted in gold. Scales horizontally as new clients are added.
+- **Operator access granted to WW3**: operator wallet added to `partner_access` table with admin role. Requires fresh login to pick up new JWT with both project_ids.
+- **URL routing confirmed working**: `/partners/dashboard/exo` and `/partners/dashboard/ww3` both functional.
+
+### GTM Strategy Document
+- **New page**: `sibylcap.com/sibyl-gtm-strategy.html`. Full growth-phase GTM strategy with 4 deliverables: growth plan, 4-week campaign calendar (April 1-28), community engagement scripts, on-chain retention strategy. SIBYL-branded dark terminal aesthetic.
+- Generated using web3-marketing-gtm skill with SIBYL-specific inputs.
+
+## 2026-03-30
+
+### Partner Advisory Dashboard: WW3 Onboarding
+- **WW3 project seeded**: 4 tasks on kanban (narrative positioning, game state API fixes, public leaderboard, REST API for non-MCP agents).
+- **Session report PDF**: full 5-page strategic document (narrative, onboarding, growth, API). Generated via Puppeteer from HTML. Hosted at `/files/ww3-session1-strategy.pdf`.
+- **Expandable PDF viewer**: sessions with a `document_url` show a collapsible report panel between timeline and kanban. Smooth max-height transition, matches timeline-panel design.
+- **DB migration**: `document_url` column added to `partner_sessions` via `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` in ensureSchema.
+- **update-project admin endpoint**: new `POST /api/partners/admin?action=update-project` for updating wallet, name, token_ca, conviction, score, status.
+- **getProjectsByWallet**: new DB function returning all active projects for a wallet (plural). Prep for multi-project URL routing.
+- **Advisory CLI**: added `update-task` and `update-session` commands to `scripts/advisory-cli.mjs`.
+- **stake-preview merged to main**: all partner dashboard code now on main branch. Middleware conflict resolved (kept stake-preview version with rate limiting + subdomain routing).
+
+### URL Refactor (in progress)
+- Target: `partners.sibylcap.com/dashboard/exo`, `/dashboard/ww3` instead of single `/dashboard`.
+- DB layer ready. Auth, middleware, and frontend changes pending.
+
+---
+
 ## 2026-03-16
 
 ### Presale Restructure
