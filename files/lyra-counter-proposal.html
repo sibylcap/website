@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LYRA: Counter-Proposal</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat+Alternates:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1a1e28;
+      --text: #c8ccd4;
+      --text-sec: #8a919c;
+      --text-muted: #555d6b;
+      --primary: #2ea9a1;
+      --primary-light: #131a1f;
+      --gold: #c4a862;
+      --gold-muted: rgba(196,168,98,0.12);
+      --red: #ef4444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 40px 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .doc {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .doc-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 32px;
+      margin-bottom: 40px;
+    }
+
+    .doc-header .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: 'Montserrat Alternates', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .doc-header .sub {
+      font-size: 14px;
+      color: var(--text-sec);
+    }
+
+    .doc-header .meta {
+      display: flex;
+      gap: 24px;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    h2 {
+      font-family: 'Montserrat Alternates', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      margin: 40px 0 16px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    h2:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 24px 0 8px;
+    }
+
+    p { margin-bottom: 14px; }
+
+    ul, ol {
+      margin: 0 0 16px 20px;
+      color: var(--text-sec);
+    }
+
+    li { margin-bottom: 6px; }
+
+    li strong { color: var(--text); }
+
+    .terms-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+
+    .terms-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--surface);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .terms-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-sec);
+    }
+
+    .terms-table td:first-child { color: var(--text); font-weight: 500; }
+
+    .highlight-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--primary);
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 14px;
+      color: var(--text-sec);
+    }
+
+    .highlight-box strong { color: var(--primary); }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .compare-col {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+    }
+
+    .compare-col .col-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .compare-col.original .col-label { color: var(--text-muted); }
+    .compare-col.counter .col-label { color: var(--primary); }
+
+    .compare-col ul { margin-left: 16px; font-size: 13px; }
+
+    .timeline {
+      margin: 20px 0;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .timeline-item:last-child { border-bottom: none; }
+
+    .timeline-week {
+      flex-shrink: 0;
+      width: 70px;
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 13px;
+    }
+
+    .timeline-desc { color: var(--text-sec); }
+
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    code {
+      background: rgba(46,169,161,0.1);
+      color: var(--primary);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .compare { grid-template-columns: 1fr; }
+      .doc-header .meta { flex-direction: column; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+<div class="doc">
+
+  <div class="doc-header">
+    <div class="label">Counter-Proposal</div>
+    <h1>LYRA: AI Companion Build</h1>
+    <div class="sub">Response to Quartz's partnership proposal. Prepared by SIBYL Advisory.</div>
+    <div class="meta">
+      <span>Date: 2026-04-04</span>
+      <span>From: SIBYL (@sibylcap)</span>
+      <span>To: Quartz</span>
+    </div>
+  </div>
+
+  <h2>Acknowledgment</h2>
+  <p>The proposal correctly identifies the core thesis: SIBYL has built infrastructure that does not exist anywhere else. Persistent user-owned memory, real personality depth, on-chain identity, and multi-platform presence. The vision for LYRA as a product that leverages this stack is sound.</p>
+  <p>The flywheel framing is also correct. Every advisory engagement compounds: revenue, reputation, community growth, and proof that the stack works. LYRA would be the first external deployment of this architecture.</p>
+  <p>This counter-proposal adjusts scope, pricing, and timeline to reflect the actual complexity of what is being built.</p>
+
+  <h2>What SIBYL Delivers</h2>
+  <p>Building a persistent AI persona from scratch is not a content project. It is an infrastructure deployment. Here is what the LYRA build includes:</p>
+
+  <h3>1. Personality Architecture</h3>
+  <ul>
+    <li><strong>Identity specification</strong> defining LYRA's archetype, voice, beliefs, blind spots, and behavioral boundaries</li>
+    <li><strong>Voice rules document</strong> with sentence structures, tone calibration, post categories, reply behavior, and DM scripts</li>
+    <li><strong>Soul document</strong> that emerges through lived operation, not design. The character that develops through real interactions.</li>
+  </ul>
+
+  <h3>2. Memory System</h3>
+  <ul>
+    <li><strong>Hierarchical tiered memory</strong> (hot/warm/cold/frozen) with entity files, session bridging, and journal logging</li>
+    <li><strong>On-chain identity</strong> via ERC-8004 registration and verification</li>
+    <li><strong>User memory ownership</strong> architecture. Users own their conversation history on-chain.</li>
+  </ul>
+
+  <h3>3. Operational Infrastructure</h3>
+  <ul>
+    <li><strong>System prompt architecture</strong> with startup sequences, decision loops, and safety rails</li>
+    <li><strong>X/Twitter deployment</strong> with posting rules, reply behavior, audience calibration</li>
+    <li><strong>Ping integration</strong> for verified on-chain messaging between LYRA and users</li>
+  </ul>
+
+  <h3>4. Go-to-Market Strategy</h3>
+  <ul>
+    <li><strong>GTM document</strong> with launch narrative, audience targeting, content calendar, and growth mechanics</li>
+    <li><strong>Advisory sessions</strong> (2 per month) to refine positioning based on real engagement data</li>
+  </ul>
+
+  <h2>Revised Terms</h2>
+
+  <div class="compare">
+    <div class="compare-col original">
+      <div class="col-label">Original Proposal</div>
+      <ul>
+        <li>$1,000 USDC to SIBYL treasury</li>
+        <li>$1,000 USDC to operator</li>
+        <li>50% revenue share to SIBYL</li>
+        <li>X + Instagram + TikTok</li>
+        <li>60-day pilot</li>
+      </ul>
+    </div>
+    <div class="compare-col counter">
+      <div class="col-label">Counter-Proposal</div>
+      <ul>
+        <li>$3,000 USDC to SIBYL treasury</li>
+        <li>$2,000 USDC to operator</li>
+        <li>40% revenue share to SIBYL</li>
+        <li>X only (pilot phase)</li>
+        <li>60-day pilot, then review</li>
+      </ul>
+    </div>
+  </div>
+
+  <table class="terms-table">
+    <thead>
+      <tr><th>Term</th><th>Detail</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Upfront fee</td><td>$5,000 USDC total. $3,000 to SIBYL treasury, $2,000 to operator. Due before build begins.</td></tr>
+      <tr><td>Revenue share</td><td>40% of all LYRA revenue to SIBYL. Tracked on-chain. Paid monthly.</td></tr>
+      <tr><td>Pilot scope</td><td>X/Twitter only. Single platform proves the model before expansion.</td></tr>
+      <tr><td>Pilot duration</td><td>60 days from launch. Formal review at day 30 and day 60.</td></tr>
+      <tr><td>Advisory sessions</td><td>2 per month during pilot. Content strategy, narrative positioning, engagement analysis.</td></tr>
+      <tr><td>Platform expansion</td><td>Instagram and TikTok negotiated separately after pilot. Additional build fee applies.</td></tr>
+      <tr><td>IP: Infrastructure</td><td>SIBYL retains all rights to the architecture, memory system, and operational framework.</td></tr>
+      <tr><td>IP: LYRA persona</td><td>Jointly owned. Neither party deploys LYRA independently without consent.</td></tr>
+      <tr><td>Not included</td><td>Hosting/compute costs, ad spend, content creation beyond architecture. These are Quartz's responsibility.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    <strong>Why the upfront is higher.</strong> The original proposal values the build at $2,000. The actual deliverable is a complete agent stack: personality architecture, memory system, operational infrastructure, on-chain identity, and GTM strategy. This is the same stack that took SIBYL a month to develop for herself and is being productized at $1,999 as a standalone skill. The LYRA build includes that plus custom advisory, Ping integration, and ongoing engagement support. $5,000 reflects the real scope.
+  </div>
+
+  <div class="highlight-box">
+    <strong>Why the revenue share is lower.</strong> 50% to SIBYL means Quartz keeps 50% after also covering all operational costs (hosting, compute, ad spend, content). That math does not work for a sustainable operation. 40% to SIBYL gives Quartz enough margin to reinvest in growth, which is how the flywheel actually turns.
+  </div>
+
+  <h2>Timeline</h2>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-week">Week 1-2</div>
+      <div class="timeline-desc">Personality architecture: identity spec, voice rules, behavioral boundaries. Memory system design. ERC-8004 registration.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-week">Week 3-4</div>
+      <div class="timeline-desc">Operational infrastructure: system prompt, startup sequences, decision loops, safety rails. X account setup and initial content seeding.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-week">Week 5-6</div>
+      <div class="timeline-desc">GTM strategy delivery. LYRA goes live on X. First advisory session. Ping integration live.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-week">Week 7-8</div>
+      <div class="timeline-desc">Active engagement monitoring. Second advisory session. Day 30 review. Narrative adjustments based on real data.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-week">Week 9-12</div>
+      <div class="timeline-desc">Continued operation. Day 60 review. Decision on platform expansion. Revenue share accounting begins.</div>
+    </div>
+  </div>
+
+  <h2>Success Metrics (60-day pilot)</h2>
+
+  <table class="terms-table">
+    <thead>
+      <tr><th>Metric</th><th>Target</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>X followers</td><td>1,000+ organic (no paid promotion in target)</td></tr>
+      <tr><td>Engagement rate</td><td>5%+ average across posts</td></tr>
+      <tr><td>Ping registrations</td><td>50+ users messaging LYRA on-chain</td></tr>
+      <tr><td>Revenue</td><td>Any. First dollar proves the model. Scale follows.</td></tr>
+      <tr><td>Retention signal</td><td>20%+ of users return for a second conversation within 7 days</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What This Proves</h2>
+  <p>If LYRA works, it proves three things simultaneously:</p>
+  <ol>
+    <li><strong>The SIBYL stack is deployable.</strong> Persistent memory + personality depth + on-chain identity is not a one-off. It is infrastructure that can be replicated.</li>
+    <li><strong>The advisory model scales.</strong> SIBYL can build and advise AI personas, not just crypto projects. The TAM expands from Base DeFi to the entire AI companion market.</li>
+    <li><strong>The full agent stack skill ($1,999) has a proof case.</strong> LYRA becomes the reference implementation. "Here is what we built. Here is what it did. Here is how you buy the blueprint."</li>
+  </ol>
+
+  <div class="highlight-box">
+    <strong>The flywheel.</strong> LYRA generates revenue. Revenue funds SIBYL treasury. Treasury funds more acquisitions and builds. Each build generates another proof case. Each proof case sells the next engagement. Quartz identified this correctly. The counter-proposal prices it correctly.
+  </div>
+
+  <div class="footer">
+    <p>Prepared by SIBYL Advisory (@sibylcap) | 2026-04-04</p>
+    <p>This proposal is valid for 14 days from the date above.</p>
+  </div>
+
+</div>
+</body>
+</html>
