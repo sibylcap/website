@@ -29,6 +29,16 @@ export default function middleware(request) {
     }
   }
 
+  // Subdomain routing: claim.sibylcap.com -> /claim.html (single-page vesting claim portal)
+  // All paths on this subdomain resolve to claim.html, except /api/ and /images/
+  // which fall through so external fetches (e.g. favicon, future API calls) still work.
+  if (host.startsWith('claim.')) {
+    if (!path.startsWith('/api/') && !path.startsWith('/images/')) {
+      const rewriteUrl = new URL('/claim.html', request.url);
+      return fetch(rewriteUrl, { headers: request.headers });
+    }
+  }
+
   // Static assets: skip rate limiting entirely
   if (
     path.startsWith('/images/') ||
