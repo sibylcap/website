@@ -480,7 +480,8 @@
     <div id="connectState">
       <div class="card" style="text-align:center;padding:48px 28px">
         <p style="color:var(--text-secondary);margin-bottom:20px;font-size:0.8125rem">
-          connect the wallet you used for the presale deposit
+          connect the wallet you used for the presale deposit.<br>
+          <span style="color:var(--text-muted);font-size:0.6875rem">the TGE 50% was distributed at launch. this portal claims the vesting 50%.</span>
         </p>
         <button class="btn-connect" onclick="connectWallet()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="14" r="1.5"/></svg>
@@ -528,7 +529,7 @@
       <div class="card">
         <div class="card-title">Your Allocation</div>
         <div class="stat-row">
-          <span class="stat-label">Total allocation</span>
+          <span class="stat-label">Presale allocation</span>
           <span class="stat-value" id="statTotal">...</span>
         </div>
         <div class="stat-row">
@@ -573,7 +574,7 @@
           <div class="timeline-item">
             <div class="timeline-dot" id="dotLinear"></div>
             <div class="timeline-header">
-              <span class="timeline-title">6-Month Linear (50%)</span>
+              <span class="timeline-title">3-Month Linear (50%)</span>
               <span class="timeline-amount" id="amtLinear">...</span>
             </div>
             <div class="timeline-sub" id="dateLinear">...</div>
@@ -613,7 +614,7 @@
 
   <script>
     // ── Auth ──
-    const PASS_HASH = '9cfeca2355a8ee17f7c34760c857e19a4f95d0a94b2ae56a99f27d0ae67105ec';
+    const PASS_HASH = 'c321be9c6676eb61d9d15c05cf00ef75957dd523d13f334494a8cb0f62787acf';
 
     async function sha256(msg) {
       const data = new TextEncoder().encode(msg);
@@ -645,9 +646,8 @@
     }
 
     // ── Contract config ──
-    // TODO: set after Virtuals launch
-    const VESTING_CA = '';  // vesting contract address
-    const TOKEN_CA = '';    // $SIBYL token address
+    const VESTING_CA = '0xD6B830F72FE36AC6Fb2Bb959642B29c64bE3cF11';  // SibylVesting V2, deployed 2026-03-19
+    const TOKEN_CA = '0x797f214a2CD64a4963A91Fa21c8C55Ec3EBa4714';    // $SIBYL token
     const RPC = 'https://mainnet.base.org';
 
     const VESTING_ABI = {
@@ -829,19 +829,27 @@
         document.getElementById('claimableAmount').textContent = fmtTokens(claimableAmt) + ' SIBYL';
         document.getElementById('claimBtn').disabled = claimableAmt === 0n;
 
-        // Stats
-        const locked = total - vested;
-        document.getElementById('statTotal').textContent = fmtTokens(total) + ' SIBYL';
-        document.getElementById('statVested').textContent = fmtTokens(vested) + ' SIBYL';
-        document.getElementById('statClaimed').textContent = fmtTokens(claimed) + ' SIBYL';
+        // Stats — shown from the beneficiary's full-picture perspective (presale total, not just contract slice).
+        // TGE (50%) was received at launch + linear (50%) vests via this contract.
+        const locked = total - vested;                          // linear portion still locked
+        const totalVested = total + vested;                     // TGE + contract linear progress
+        const totalClaimed = total + claimed;                   // TGE received + linear claims from contract
+        document.getElementById('statTotal').textContent = fmtTokens(total * 2n) + ' SIBYL';
+        document.getElementById('statVested').textContent = fmtTokens(totalVested) + ' SIBYL';
+        document.getElementById('statClaimed').textContent = fmtTokens(totalClaimed) + ' SIBYL';
         document.getElementById('statLocked').textContent = fmtTokens(locked) + ' SIBYL';
 
         // Timeline
+        // NOTE: The contract's `allocations(address).total` = the LINEAR PORTION (50% of presale).
+        // The TGE 50% was distributed via direct transfers on 2026-03-19, outside this contract.
+        // So `total` from the contract equals tgeAmount equals linearAmount.
+        // Presale grand total = total * 2.
         const now = Math.floor(Date.now() / 1000);
         const cliffEnd = tgeTs + 30 * 86400;
-        const vestEnd = cliffEnd + 180 * 86400;
-        const tgeAmount = total / 2n;
-        const linearAmount = total - tgeAmount;
+        const vestEnd = cliffEnd + 90 * 86400;   // 90-day linear per SibylVesting.sol VESTING_DURATION
+        const tgeAmount = total;                  // TGE 50% — already distributed at launch
+        const linearAmount = total;               // Linear 50% — what this contract holds
+        const presaleTotal = total * 2n;          // full original presale allocation
 
         // TGE
         document.getElementById('amtTge').textContent = fmtTokens(tgeAmount) + ' SIBYL';
@@ -859,10 +867,10 @@
           : '30 days to 7 months after TGE';
 
         // Full
-        document.getElementById('amtFull').textContent = fmtTokens(total) + ' SIBYL';
+        document.getElementById('amtFull').textContent = fmtTokens(presaleTotal) + ' SIBYL';
         document.getElementById('dateFull').textContent = tgeTs > 0
           ? fmtDate(vestEnd)
-          : '7 months after TGE';
+          : '4 months after TGE';
 
         // Dot states + linear progress
         if (tgeTs === 0) {
@@ -884,10 +892,10 @@
           document.getElementById('dotFull').className = 'timeline-dot locked';
 
           const elapsed = now - cliffEnd;
-          const pct = Math.min((elapsed / (180 * 86400)) * 100, 100);
+          const pct = Math.min((elapsed / (90 * 86400)) * 100, 100);
           document.getElementById('linearProgress').style.width = pct.toFixed(1) + '%';
           document.getElementById('linearPctLabel').textContent = pct.toFixed(1) + '% vested';
-          const linearVested = (linearAmount * BigInt(elapsed)) / BigInt(180 * 86400);
+          const linearVested = (linearAmount * BigInt(elapsed)) / BigInt(90 * 86400);
           document.getElementById('linearVestedAmt').textContent = fmtTokens(linearVested) + ' SIBYL';
         } else {
           // Fully vested
