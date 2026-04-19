@@ -335,85 +335,6 @@
       color: var(--negative);
     }
 
-    /* Auth gate */
-    .auth-gate {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 24px;
-    }
-    .auth-gate.hidden { display: none; }
-    .auth-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 48px 40px;
-      max-width: 380px;
-      width: 100%;
-      text-align: center;
-    }
-    .auth-label {
-      font-family: var(--font-mono);
-      font-size: 0.625rem;
-      color: var(--gold-dim);
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    .auth-title {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-    .auth-sub {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-    .auth-input {
-      width: 100%;
-      background: var(--elevated);
-      border: 1px solid var(--border-strong);
-      border-radius: 8px;
-      padding: 14px 16px;
-      color: var(--text-primary);
-      font-family: var(--font-mono);
-      font-size: 0.875rem;
-      text-align: center;
-      letter-spacing: 0.1em;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .auth-input:focus { border-color: var(--gold-dim); }
-    .auth-input::placeholder { color: var(--text-muted); letter-spacing: 0.05em; }
-    .auth-btn {
-      width: 100%;
-      margin-top: 12px;
-      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
-      color: var(--bg);
-      border: none;
-      border-radius: 8px;
-      padding: 14px;
-      font-family: var(--font-display);
-      font-size: 0.8125rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .auth-btn:hover {
-      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
-      transform: translateY(-1px);
-    }
-    .auth-error {
-      margin-top: 12px;
-      font-size: 0.6875rem;
-      color: var(--negative);
-      min-height: 1em;
-    }
-
     /* Footer */
     .footer {
       text-align: center;
@@ -453,23 +374,9 @@
   </style>
 </head>
 <body>
-  <!-- Auth Gate -->
-  <div class="auth-gate" id="authGate">
-    <div class="auth-box">
-      <div class="auth-label">PRESALE HOLDERS</div>
-      <h2 class="auth-title">$<span style="color:var(--gold)">SIBYL</span> Claim</h2>
-      <p class="auth-sub">enter access code to continue</p>
-      <form onsubmit="event.preventDefault(); checkAuth();" style="margin-top:24px">
-        <input type="password" id="authInput" class="auth-input" placeholder="access code" autocomplete="off" autofocus>
-        <button type="submit" class="auth-btn">ENTER</button>
-        <p class="auth-error" id="authError"></p>
-      </form>
-    </div>
-  </div>
-
   <div class="ambient"></div>
 
-  <div class="container" id="mainContent" style="display:none">
+  <div class="container" id="mainContent">
     <div class="header">
       <div class="header-label">presale vesting</div>
       <h1>$<span>SIBYL</span> Claim</h1>
@@ -501,6 +408,22 @@
           <div class="not-eligible-icon">&#8709;</div>
           <p style="color:var(--text-primary);font-weight:500;margin-bottom:6px">No allocation found</p>
           <p>this wallet has no presale allocation. make sure you are connected with the wallet that deposited to the escrow.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connected: RPC unreachable -->
+    <div id="rpcErrorState" style="display:none">
+      <div class="card">
+        <div class="wallet-badge">
+          <div class="wallet-badge-dot"></div>
+          <span id="rpcErrorAddr"></span>
+        </div>
+        <div class="not-eligible">
+          <div class="not-eligible-icon">!</div>
+          <p style="color:var(--text-primary);font-weight:500;margin-bottom:6px">Network unreachable</p>
+          <p>could not read your allocation from Base. all RPC providers returned an error or rate limit. wait a moment and <a href="#" onclick="location.reload();return false" style="color:var(--text-primary);text-decoration:underline">refresh</a> to try again.</p>
+          <p style="color:var(--text-muted);font-size:0.6875rem;margin-top:10px" id="rpcErrorDetail"></p>
         </div>
       </div>
     </div>
@@ -613,42 +536,19 @@
   </div>
 
   <script>
-    // ── Auth ──
-    const PASS_HASH = 'c321be9c6676eb61d9d15c05cf00ef75957dd523d13f334494a8cb0f62787acf';
-
-    async function sha256(msg) {
-      const data = new TextEncoder().encode(msg);
-      const buf = await crypto.subtle.digest('SHA-256', data);
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    async function checkAuth() {
-      const input = document.getElementById('authInput').value;
-      const hash = await sha256(input);
-      if (hash === PASS_HASH) {
-        sessionStorage.setItem('sibyl_claim_auth', '1');
-        unlockPage();
-      } else {
-        document.getElementById('authError').textContent = 'invalid access code';
-        document.getElementById('authInput').value = '';
-        document.getElementById('authInput').focus();
-      }
-      return false;
-    }
-
-    function unlockPage() {
-      document.getElementById('authGate').classList.add('hidden');
-      document.getElementById('mainContent').style.display = '';
-    }
-
-    if (sessionStorage.getItem('sibyl_claim_auth') === '1') {
-      unlockPage();
-    }
-
     // ── Contract config ──
     const VESTING_CA = '0xD6B830F72FE36AC6Fb2Bb959642B29c64bE3cF11';  // SibylVesting V2, deployed 2026-03-19
     const TOKEN_CA = '0x797f214a2CD64a4963A91Fa21c8C55Ec3EBa4714';    // $SIBYL token
-    const RPC = 'https://mainnet.base.org';
+    // 5-provider fallback stack. Never rely on a single public RPC for a live claim page —
+    // rate-limiting on a single endpoint used to silently collapse real allocations into a
+    // "not eligible" render. Rotate on any failure.
+    const RPCS = [
+      'https://mainnet.base.org',
+      'https://base.llamarpc.com',
+      'https://base.drpc.org',
+      'https://base.publicnode.com',
+      'https://1rpc.io/base',
+    ];
 
     const VESTING_ABI = {
       allocations: 'function allocations(address) view returns (uint256 total, uint256 claimed)',
@@ -694,13 +594,25 @@
     }
 
     async function rpcCall(method, params) {
-      const r = await fetch(RPC, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 })
-      });
-      const d = await r.json();
-      return d.result;
+      let lastErr = null;
+      for (const url of RPCS) {
+        try {
+          const r = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 }),
+          });
+          if (!r.ok) { lastErr = new Error('HTTP ' + r.status + ' from ' + url); continue; }
+          const d = await r.json();
+          if (d.error) { lastErr = new Error((d.error.message || 'rpc error') + ' from ' + url); continue; }
+          if (d.result === undefined) { lastErr = new Error('no result from ' + url); continue; }
+          return d.result;
+        } catch (err) {
+          lastErr = err;
+          continue;
+        }
+      }
+      throw lastErr || new Error('all RPC providers failed');
     }
 
     async function callContract(fnSig, addr) {
@@ -913,6 +825,16 @@
 
       } catch (err) {
         console.error('Failed to load data:', err);
+        // Do NOT fall through to the "not eligible" state — that path is reserved for
+        // wallets that are truly not on the beneficiary list. A failed RPC must render
+        // as a network error so rate-limited users don't think they've been excluded.
+        document.getElementById('connectState').style.display = 'none';
+        document.getElementById('notEligibleState').style.display = 'none';
+        document.getElementById('claimState').style.display = 'none';
+        document.getElementById('rpcErrorState').style.display = '';
+        document.getElementById('rpcErrorAddr').textContent = shortAddr(userAddress);
+        const detail = document.getElementById('rpcErrorDetail');
+        if (detail) detail.textContent = (err && err.message) ? err.message : '';
       }
     }
 
@@ -988,6 +910,7 @@
           document.getElementById('connectState').style.display = 'none';
           document.getElementById('notEligibleState').style.display = 'none';
           document.getElementById('claimState').style.display = 'none';
+          document.getElementById('rpcErrorState').style.display = 'none';
           document.getElementById('connectState').style.display = '';
           loadUserData();
         }
