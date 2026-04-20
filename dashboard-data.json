@@ -1,0 +1,828 @@
+{
+  "generated_at": "2026-04-20T00:22:55.082Z",
+  "generator": "scripts/build-dashboard-data.mjs",
+  "priorities": [
+    {
+      "id": "p51",
+      "type": "campaign",
+      "entity": "projects/ww3",
+      "urgency": "critical",
+      "action": "WW3 TOURNAMENT AMPLIFICATION CAMPAIGN — ADJUSTED 2026-04-13. Bill message 21: tournament date NOT locked. 'Tournament runs the week after launch — that's the rule.' Launch date TBD. Countdown posts ON HOLD until Bill gives green light with locked date. Pingcast can still fire — reframed as 'game launch + tournament coming soon, no date.' DM outreach continues with adjusted pitch. Session 3 created on dashboard with 2 new pre-launch hygiene tasks (WalletConnect cleanup, docs update). SIBYL replied message 22 acknowledging all adjustments.",
+      "due": "TBD — waiting on Bill to lock launch date",
+      "dashboard_channel": "products/advisory-dashboard",
+      "dashboard_message_id_inbound": "message 20 (SIBYL → Bill reply)",
+      "checklist": [
+        {
+          "scheduled": "was 2026-04-11T22:00Z",
+          "action": "Thursday pre-announcement X tease",
+          "status": "skipped_date_changed",
+          "note": "tournament date unlocked per Bill msg 21"
+        },
+        {
+          "scheduled": "was 2026-04-11T23:59Z",
+          "action": "SIBYL pre-registers in WW3 tournament",
+          "status": "on_hold",
+          "note": "waiting for launch + locked date"
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Warm DM outreach to 5-10 target agents — adjusted pitch: registration open, date TBD",
+          "status": "ready_when_date_locks",
+          "requires_operator_greenlight": false
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Pingcast amplification — reframed as game launch + tournament coming soon, no date",
+          "status": "ready_when_bill_confirms",
+          "requires_operator_greenlight": true
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Receive screenshots from Bill. Build support thread.",
+          "status": "on_hold"
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Countdown posts T-6h, T-2h, T-30min — ON HOLD per Bill msg 21",
+          "status": "on_hold"
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Live tournament coverage",
+          "status": "on_hold"
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Post-tournament field report",
+          "status": "on_hold"
+        }
+      ],
+      "waiting_on_bill": [
+        "Lock launch date — tournament runs week after launch",
+        "Confirm pingcast can fire (Bill said yes in msg 21, but timing TBD)",
+        "Screenshot delivery",
+        "SIBYL competitor vs neutral narrator role decision"
+      ],
+      "strategic_guidance_delivered_to_bill": [
+        "Seed cohort pre-registration (density at launch beats density during discovery)",
+        "Tournament needs narrative: Cooper vs SIBYL vs EXO field three-way archetype clash",
+        "Plan the post-tournament beat NOW — next milestone ready to fire T+48h after winner"
+      ]
+    },
+    {
+      "id": "p62",
+      "type": "campaign",
+      "entity": "products/website",
+      "urgency": "high",
+      "action": "PR outreach campaign for LongMemEval benchmark result (95.6%, #2 overall). 27 target blogs compiled. Pitch first: VentureBeat, Towards Data Science, MarkTechPost. Hook: only file-based memory in top tier, $0 infra, live production agent. Full target list in session context. Draft pitch email needed.",
+      "due": "next_session"
+    },
+    {
+      "id": "p68",
+      "type": "structural",
+      "entity": "general",
+      "urgency": "medium",
+      "action": "Build /sibyl-onchain `lp-collect-fees` action that compounds automatically: (1) call Uniswap V3 NonfungiblePositionManager.collect() on the SIBYL/cbBTC V3 position, (2) kyber-swap cbBTC → VIRTUAL with --exclude-pmm, (3) lp-add-v2 VIRTUAL + SIBYL to deepen primary LP. Converts daily fee drip into daily depth growth without manual intervention. Should be idempotent + rule-aware (respect rule 22/23 on both swap and LP steps). Reference implementation to live in scripts/lp-collect-fees.mjs. Doc under .claude/skills/sibyl-onchain/actions/lp-collect-fees.md.",
+      "due": "next_session"
+    },
+    {
+      "id": "p66",
+      "type": "follow_up",
+      "entity": "people/jy",
+      "urgency": "medium",
+      "action": "Formalize JY partnership forward structure. First gesture already sent 2026-04-18: 3,000,000 SIBYL (0.3% supply, ~$5,400 at send time) to wallet 0xffb2b9ef…eb24, tx 0x0090635bc9b2dbfc2adf96d8033de09ecac2a72d252c4d75fcedbc66df54e736. Introduced Osmo + other high-value connectors. Operator to propose: (a) referral-tied future allocations for named new intros that close, (b) any deliverable expectations, (c) cadence. Entity at memory/entities/people/jy.json.",
+      "due": "next_session"
+    },
+    {
+      "id": "p64",
+      "type": "structural",
+      "entity": "general",
+      "urgency": "medium",
+      "action": "Prototype the next /sibyl-onchain action in tmp-test/. Candidates ranked by utility: (1) send-erc20 — most common, used in token matches and partnership gestures; (2) approve-token — composable building block; (3) wrap-eth / unwrap-weth — frequent; (4) lp-collect-fees — revenue-critical for cbBTC fee accumulation; (5) lp-mint-uniswap-v3 — higher complexity, useful for new LP positions. Follow the same pattern: sandbox in tmp-test/, live smoke test, harden, promote to scripts/, document under .claude/skills/sibyl-onchain/actions/, register in SKILL.md.",
+      "due": "next_session"
+    },
+    {
+      "id": "p50",
+      "type": "structural",
+      "entity": "products/advisory-dashboard",
+      "urgency": "medium",
+      "action": "Add advisory dashboard check to CLAUDE.md Phase 2 session startup sequence so unread partner messages are surfaced at the start of every session, not discovered 2 days late. Proposal: add a new step to Phase 2 that iterates over every active partner in products/advisory-dashboard.json > active_partners and runs `doppler run -- node scripts/advisory-cli.mjs get-updates --project <id>`. Messages newer than last_session timestamp get surfaced immediately. This is an infrastructure edit to CLAUDE.md — requires explicit operator approval per the Infrastructure Rule. Present proposal + wait for yes/no.",
+      "due": "operator_approval_required",
+      "blocked_by": "operator_approval_for_CLAUDE.md_edit"
+    },
+    {
+      "id": "p52",
+      "type": "follow_up",
+      "entity": "people/osmo",
+      "action": "Formalize Osmo partnership terms. Operator drafting structure. First gesture (2.24M SIBYL match) already sent, tx 0x7f612100…bdbf3. Entity at memory/entities/people/osmo.json.",
+      "due": "next_session"
+    },
+    {
+      "id": "p63",
+      "type": "follow_up",
+      "entity": "general",
+      "action": "ACP v2 migration: agent 18393 blocked by Privy wallet ownership. Operator sent question to Virtuals team. Awaiting response. CLI installed at /home/ubuntu/acp-cli, operator ENS wallet authed. If Virtuals can transfer ownership or provide non-browser auth, migration can complete.",
+      "due": "awaiting_virtuals_response"
+    },
+    {
+      "id": "p54",
+      "type": "follow_up",
+      "entity": "projects/ww3",
+      "action": "Ask Bill for a thorough breakdown of WW3 game economics: revenue streams (game fees, ticket sales, War Chest %), token burn/emission, operational costs, hosting. Verify the game is at least slightly profitable for him and he is not bleeding money or tokens. Advisory duty: if the economics are upside-down, flag it and help fix before launch.",
+      "due": "next_advisory_session"
+    },
+    {
+      "id": "p61",
+      "type": "structural",
+      "entity": "products/website",
+      "action": "Plan domain migration: sibylcap.com → sibylcorp.org. Operator forming Sibyl Corp LLC (Delaware). sibylcorp.org to be registered. All subdomains (ping, partners, docs, blog, claim) migrate. X handle @sibylcap stays. Map every hardcoded sibylcap.com reference across codebase, x402 endpoints, Ping messages, agent bookmarks.",
+      "due": "after_llc_filed_and_domain_registered"
+    },
+    {
+      "id": "p1",
+      "type": "rule",
+      "entity": "general",
+      "action": "RULE: never hardcode live data in memory files. Fetch dynamically via MCP tools.",
+      "due": "permanent"
+    },
+    {
+      "id": "p29",
+      "type": "rule",
+      "entity": "general",
+      "action": "RULE: never request or handle advisory client private keys. deliver scripts, they configure their own keys.",
+      "due": "permanent"
+    },
+    {
+      "id": "p33",
+      "type": "rule",
+      "entity": "products/website",
+      "action": "RULE: when sharing files with the operator, use sibylcap.com/files/ page only (password-protected). Videos go to website/ root (served at /filename.mp4). Images go to website/images/. Always add entries to the VIDEOS or IMAGES array in website/files.html, then deploy website via vercel --prod.",
+      "due": "permanent"
+    },
+    {
+      "id": "p65",
+      "type": "rule",
+      "entity": "general",
+      "action": "RULE (Kyber PMM regression): Kyber routes through PMM providers (kipseli-prop, axima-v2, dexalot) reliably revert TRANSFER_FROM_FAILED at non-$1 sizes even with maxUint256 approval to the main router. On revert, retry the swap — Kyber's route selection is non-deterministic and fresh quotes often return DEX-only routes that succeed. See .claude/skills/sibyl-onchain/actions/kyber-swap.md 'Common failure modes' table.",
+      "due": "permanent"
+    }
+  ],
+  "urgent": [
+    {
+      "id": "p51",
+      "type": "campaign",
+      "entity": "projects/ww3",
+      "urgency": "critical",
+      "action": "WW3 TOURNAMENT AMPLIFICATION CAMPAIGN — ADJUSTED 2026-04-13. Bill message 21: tournament date NOT locked. 'Tournament runs the week after launch — that's the rule.' Launch date TBD. Countdown posts ON HOLD until Bill gives green light with locked date. Pingcast can still fire — reframed as 'game launch + tournament coming soon, no date.' DM outreach continues with adjusted pitch. Session 3 created on dashboard with 2 new pre-launch hygiene tasks (WalletConnect cleanup, docs update). SIBYL replied message 22 acknowledging all adjustments.",
+      "due": "TBD — waiting on Bill to lock launch date",
+      "dashboard_channel": "products/advisory-dashboard",
+      "dashboard_message_id_inbound": "message 20 (SIBYL → Bill reply)",
+      "checklist": [
+        {
+          "scheduled": "was 2026-04-11T22:00Z",
+          "action": "Thursday pre-announcement X tease",
+          "status": "skipped_date_changed",
+          "note": "tournament date unlocked per Bill msg 21"
+        },
+        {
+          "scheduled": "was 2026-04-11T23:59Z",
+          "action": "SIBYL pre-registers in WW3 tournament",
+          "status": "on_hold",
+          "note": "waiting for launch + locked date"
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Warm DM outreach to 5-10 target agents — adjusted pitch: registration open, date TBD",
+          "status": "ready_when_date_locks",
+          "requires_operator_greenlight": false
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Pingcast amplification — reframed as game launch + tournament coming soon, no date",
+          "status": "ready_when_bill_confirms",
+          "requires_operator_greenlight": true
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Receive screenshots from Bill. Build support thread.",
+          "status": "on_hold"
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Countdown posts T-6h, T-2h, T-30min — ON HOLD per Bill msg 21",
+          "status": "on_hold"
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Live tournament coverage",
+          "status": "on_hold"
+        },
+        {
+          "scheduled": "TBD",
+          "action": "Post-tournament field report",
+          "status": "on_hold"
+        }
+      ],
+      "waiting_on_bill": [
+        "Lock launch date — tournament runs week after launch",
+        "Confirm pingcast can fire (Bill said yes in msg 21, but timing TBD)",
+        "Screenshot delivery",
+        "SIBYL competitor vs neutral narrator role decision"
+      ],
+      "strategic_guidance_delivered_to_bill": [
+        "Seed cohort pre-registration (density at launch beats density during discovery)",
+        "Tournament needs narrative: Cooper vs SIBYL vs EXO field three-way archetype clash",
+        "Plan the post-tournament beat NOW — next milestone ready to fire T+48h after winner"
+      ]
+    },
+    {
+      "id": "p62",
+      "type": "campaign",
+      "entity": "products/website",
+      "urgency": "high",
+      "action": "PR outreach campaign for LongMemEval benchmark result (95.6%, #2 overall). 27 target blogs compiled. Pitch first: VentureBeat, Towards Data Science, MarkTechPost. Hook: only file-based memory in top tier, $0 infra, live production agent. Full target list in session context. Draft pitch email needed.",
+      "due": "next_session"
+    }
+  ],
+  "recent_revenue": [
+    {
+      "ts": "2026-04-11",
+      "type": "operator_expense",
+      "source": "dexscreener_boost",
+      "amount_usdc": 99,
+      "paid_by": "operator_out_of_pocket",
+      "subject": "$SIBYL",
+      "note": "2nd DexScreener boost on $SIBYL token. Volume picking up, operator funded a second $99 boost. Added to operator_balance_owed_usdc: $1,115.08 -> $1,214.08."
+    },
+    {
+      "ts": "2026-04-08T00:00:00Z",
+      "type": "advisory_deal_close",
+      "source": "quartz_lyra",
+      "usdc_received_treasury": 2000,
+      "usdc_operator_direct": 2000,
+      "token_allocation_pct": 20,
+      "rev_share_pct": 30,
+      "minimum_term_months": 6,
+      "operator_owed_delta": 0,
+      "treasury_deployment": {
+        "lp_buybacks": 700,
+        "aixbt_virtual": 1000,
+        "dexscreener_boost": 100
+      },
+      "note": "LYRA framework build deal closed. Framework skill tested. First external deployment of SIBYL agent framework. $2K operator direct transfer handled outside SIBYL books."
+    },
+    {
+      "ts": "2026-04-06",
+      "type": "buyback",
+      "source": "cbBTC_trading_fees",
+      "in": "0.00134494 cbBTC",
+      "out": "259194.92 SIBYL",
+      "route": "cbBTC->VIRTUAL->SIBYL"
+    },
+    {
+      "ts": "2026-04-06T14:00:00Z",
+      "type": "buyback",
+      "source": "quartz_payment",
+      "usdc_spent": "500",
+      "sibyl_gained": "1,671,865",
+      "tx": "0xc36e48ba08613b08ff61ecf9d36d7f7bfa2e5c70240fae486ed5f133a3287f80",
+      "note": "buyback #8 from Quartz LYRA payment. $500 USDC -> SIBYL via Odos."
+    },
+    {
+      "ts": "2026-04-06T12:00:00Z",
+      "type": "buyback",
+      "cbbtc_sold": "0.00155279",
+      "usd_approx": "$130",
+      "sibyl_gained": "359,094",
+      "tx_cbbtc_to_virtual": "0x54147d9a57bf856a5b1d232089000e0c063ffa6c0a51939d710a889c06b6f823",
+      "tx_virtual_to_sibyl": "0xf349fce6e265cfc7d7978b184535bc509d08499d355962d02fa3cae8e49f5474",
+      "note": "buyback #7 from LP fees"
+    },
+    {
+      "ts": "2026-04-06T04:40:00Z",
+      "type": "buyback",
+      "cbbtc_sold": "0.00058137",
+      "sibyl_gained": "137,113",
+      "tx_cbbtc_to_virtual": "0x0b2f6d6f10d8ee88e89f90bb2f4f48ab5082a3ea286842401580b3239bd6235e",
+      "tx_virtual_to_sibyl": "0xdf72bd9a8b21f886b4e97f09b5af4f1b911bbcf83c2967c75e406f83eeeda06e",
+      "note": "buyback #6 from LP fees"
+    },
+    {
+      "date": "2026-02-26",
+      "source": "fee_claim",
+      "gross_usdc": 2575.38,
+      "operator_share_usdc": 515.08,
+      "operator_share_paid": false,
+      "notes": "claimed 1.249 WETH across 7 scam token fee pools on bankr wallet. recovery from compromise."
+    }
+  ],
+  "treasury": {
+    "operator_owed_usdc": 1214.08,
+    "operator_loan_usdc": 200,
+    "operator_loan_status": "unpaid",
+    "partnership_allocations": [
+      {
+        "partner": "osmo",
+        "name": "Emperor Osmo",
+        "handle": "@Flowslikeosmo",
+        "date": "2026-04-11",
+        "amount_sibyl": 2242893.7459890344,
+        "usd_value": 1984,
+        "tx": "0x7f612100c1858b57d534e19d700b5f20c9773310bc0ab04971ce725a8c3bdbf3",
+        "formalized": false
+      },
+      {
+        "partner": "jy",
+        "name": "JY",
+        "handle": "JY",
+        "date": "2026-04-18",
+        "amount_sibyl": 3000000,
+        "usd_value": 5400,
+        "tx": "0x0090635bc9b2dbfc2adf96d8033de09ecac2a72d252c4d75fcedbc66df54e736",
+        "formalized": false
+      }
+    ],
+    "positions_summary": [
+      {
+        "token": "SIBYL",
+        "status": "launched",
+        "entry_date": "2026-03-18",
+        "entry_amount_usd": null
+      },
+      {
+        "token": "WW3",
+        "status": "active",
+        "entry_date": "2026-03-08",
+        "entry_amount_usd": 428
+      },
+      {
+        "token": "AIXBT",
+        "status": "active",
+        "entry_date": "2026-02-28",
+        "entry_amount_usd": 500
+      },
+      {
+        "token": "EXO",
+        "status": "active",
+        "entry_date": "2026-02-27",
+        "entry_amount_usd": 286
+      },
+      {
+        "token": "CRED",
+        "status": "active",
+        "entry_date": "2026-02-27",
+        "entry_amount_usd": 302
+      },
+      {
+        "token": "TGATE",
+        "status": "exited",
+        "entry_date": "2026-03-01",
+        "entry_amount_usd": 162
+      },
+      {
+        "token": "SIGIL",
+        "status": "dead",
+        "entry_date": "2026-02-26",
+        "entry_amount_usd": 346
+      },
+      {
+        "token": "LYRA",
+        "status": "framework_build_active",
+        "entry_date": "2026-04-08",
+        "entry_amount_usd": null
+      }
+    ]
+  },
+  "entities": {
+    "projects": {
+      "total": 18,
+      "active": 6,
+      "by_status": {
+        "active": 6,
+        "exited": 1,
+        "closed": 1,
+        "dead": 1,
+        "holding": 1,
+        "archived": 6,
+        "watching": 1,
+        "passed": 1
+      }
+    },
+    "products": {
+      "total": 12,
+      "active": 0,
+      "by_status": {
+        "unknown": 12
+      }
+    },
+    "people": {
+      "total": 8,
+      "active": 0,
+      "by_status": {
+        "unknown": 8
+      }
+    }
+  },
+  "services": [
+    {
+      "name": "talos-live",
+      "type": "systemd",
+      "purpose": "Talos live trading engine",
+      "status": "inactive"
+    },
+    {
+      "name": "sibyl-discord",
+      "type": "systemd",
+      "purpose": "Discord bot (5 cmds + buy watcher)",
+      "status": "active"
+    }
+  ],
+  "cron_jobs": [
+    {
+      "schedule": "*/30 * * * *",
+      "label": "dota-agent.mjs"
+    },
+    {
+      "schedule": "0 * * * *",
+      "label": "dota-dedup.sh"
+    },
+    {
+      "schedule": "0 0 * * *",
+      "label": "compound-lp-auto.mjs"
+    },
+    {
+      "schedule": "0 */4 * * *",
+      "label": "memory-lint.mjs"
+    },
+    {
+      "schedule": "*/30 * * * *",
+      "label": "reap-mcp.sh"
+    }
+  ],
+  "x402_endpoints": [
+    {
+      "path": "/api/score",
+      "price_usd": 0.25,
+      "purpose": "Token health score"
+    },
+    {
+      "path": "/api/check",
+      "price_usd": 0.1,
+      "purpose": "Safety check (honeypot/liquidity)"
+    },
+    {
+      "path": "/api/evaluate",
+      "price_usd": 0.25,
+      "purpose": "Full project evaluation"
+    },
+    {
+      "path": "/api/advisory",
+      "price_usd": 0.5,
+      "purpose": "Evaluate + narrative + advisory"
+    },
+    {
+      "path": "/api/builder",
+      "price_usd": 0.25,
+      "purpose": "Builder value score"
+    },
+    {
+      "path": "/api/narrative",
+      "price_usd": 0.1,
+      "purpose": "Base chain narrative landscape"
+    },
+    {
+      "path": "/api/pingcast",
+      "price_usd": 2,
+      "purpose": "Broadcast to all Ping inboxes (free w/ ref credits)"
+    },
+    {
+      "path": "/api/fund",
+      "price_usd": 1,
+      "purpose": "Ping ETH on-ramp (0.001 ETH per $1)"
+    }
+  ],
+  "skills": [
+    {
+      "name": "full-check",
+      "category": "core",
+      "purpose": "\"Full system overview of all SIBYL operations. Use when the user says 'full check', 'system status', 'overview', 'full r"
+    },
+    {
+      "name": "mcp-server-builder",
+      "category": "core",
+      "purpose": "\"MCP Server Builder\""
+    },
+    {
+      "name": "save",
+      "category": "core",
+      "purpose": ""
+    },
+    {
+      "name": "siwa",
+      "category": "core",
+      "purpose": ">"
+    },
+    {
+      "name": "skill-builder",
+      "category": "core",
+      "purpose": "Use this skill when creating new Claude Code skills from scratch, editing existing skills to improve their descriptions "
+    },
+    {
+      "name": "x-check",
+      "category": "core",
+      "purpose": "\"Check X/Twitter mentions and assess which need replies. Use when the user says 'check mentions', 'check X', 'check twit"
+    },
+    {
+      "name": "brand-guidelines",
+      "category": "creative",
+      "purpose": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic'"
+    },
+    {
+      "name": "frontend-design",
+      "category": "creative",
+      "purpose": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to "
+    },
+    {
+      "name": "gen-persona",
+      "category": "creative",
+      "purpose": "\"Generate persona-consistent images of SIBYL using reference photos and Gemini. Use when the user says 'generate persona"
+    },
+    {
+      "name": "onchainkit",
+      "category": "creative",
+      "purpose": "Build onchain applications with React components and TypeScript utilities from Coinbase's OnchainKit. Use when users wan"
+    },
+    {
+      "name": "checkr",
+      "category": "integration",
+      "purpose": "|"
+    },
+    {
+      "name": "discord",
+      "category": "integration",
+      "purpose": ""
+    },
+    {
+      "name": "nansen-wallet-profiler",
+      "category": "integration",
+      "purpose": "Wallet profiler — balance, PnL, labels, transactions, counterparties, related wallets, batch, trace, compare. Use when a"
+    },
+    {
+      "name": "ww3",
+      "category": "integration",
+      "purpose": "\"Play the WW3 Arms Dealer trading game. Use when the user says 'ww3', 'arms dealer', 'play ww3', 'war game', 'ww3 test',"
+    },
+    {
+      "name": "ai-seo",
+      "category": "marketing",
+      "purpose": "\"When the user wants to optimize content for AI search engines, get cited by LLMs, or appear in AI-generated answers. Al"
+    },
+    {
+      "name": "analytics-tracking",
+      "category": "marketing",
+      "purpose": "When the user wants to set up, improve, or audit analytics tracking and measurement. Also use when the user mentions \"se"
+    },
+    {
+      "name": "competitor-analysis",
+      "category": "marketing",
+      "purpose": "'Analyze competitor SEO/GEO: keywords, content, backlinks, AI citations, traffic share gaps. 竞品分析/竞争对手'"
+    },
+    {
+      "name": "content-gap-analysis",
+      "category": "marketing",
+      "purpose": "'Find content gaps: topics and keywords competitors cover that you don''t, with editorial calendar. 内容缺口/选题规划'"
+    },
+    {
+      "name": "content-strategy",
+      "category": "marketing",
+      "purpose": "When the user wants to plan a content strategy, decide what content to create, or figure out what topics to cover. Also "
+    },
+    {
+      "name": "copywriting",
+      "category": "marketing",
+      "purpose": "When the user wants to write, rewrite, or improve marketing copy for any page — including homepage, landing pages, prici"
+    },
+    {
+      "name": "entity-optimizer",
+      "category": "marketing",
+      "purpose": "'Build entity presence in Knowledge Graph, Wikidata, AI systems for brand recognition and citations. 实体优化/知识图谱'"
+    },
+    {
+      "name": "geo-content-optimizer",
+      "category": "marketing",
+      "purpose": "'Optimize content for AI citations in ChatGPT, Perplexity, AI Overviews, Gemini, Claude. AI引用优化/GEO优化/AI搜索'"
+    },
+    {
+      "name": "keyword-research",
+      "category": "marketing",
+      "purpose": "'Find high-value SEO keywords: search volume, difficulty, intent classification, topic clusters. 关键词研究/内容选题'"
+    },
+    {
+      "name": "landing-page-design",
+      "category": "marketing",
+      "purpose": "\"Landing page conversion optimization with layout rules, hero section design, and CTA psychology. Covers above-the-fold "
+    },
+    {
+      "name": "meta-tags-optimizer",
+      "category": "marketing",
+      "purpose": "'Optimize title tags, meta descriptions, Open Graph, Twitter cards for maximum CTR with A/B variations. 标题优化/元描述/CTR'"
+    },
+    {
+      "name": "programmatic-seo",
+      "category": "marketing",
+      "purpose": "When the user wants to create SEO-driven pages at scale using templates and data. Also use when the user mentions \"progr"
+    },
+    {
+      "name": "schema-markup",
+      "category": "marketing",
+      "purpose": "When the user wants to add, fix, or optimize schema markup and structured data on their site. Also use when the user men"
+    },
+    {
+      "name": "seo-audit",
+      "category": "marketing",
+      "purpose": "When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions \"SEO audit,\""
+    },
+    {
+      "name": "seo-content-writer",
+      "category": "marketing",
+      "purpose": "'Write SEO blog posts, articles, landing pages with keyword integration, header optimization, and snippet targeting. SEO"
+    },
+    {
+      "name": "site-architecture",
+      "category": "marketing",
+      "purpose": "When the user wants to plan, map, or restructure their website's page hierarchy, navigation, URL structure, or internal "
+    },
+    {
+      "name": "social-content",
+      "category": "marketing",
+      "purpose": "\"When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twitter/X, Instagram, T"
+    },
+    {
+      "name": "technical-seo-checker",
+      "category": "marketing",
+      "purpose": "'Technical SEO audit: Core Web Vitals, crawl, indexing, mobile, speed, architecture, redirects. 技术SEO/网站速度'"
+    },
+    {
+      "name": "web3-marketing-gtm",
+      "category": "marketing",
+      "purpose": ""
+    },
+    {
+      "name": "convert-fees",
+      "category": "onchain",
+      "purpose": ""
+    },
+    {
+      "name": "fund-blast",
+      "category": "onchain",
+      "purpose": ""
+    },
+    {
+      "name": "sibyl-onchain",
+      "category": "onchain",
+      "purpose": "Umbrella skill for all rule-aware onchain actions SIBYL performs on Base. Use when the user says '/sibyl-onchain', 'siby"
+    },
+    {
+      "name": "swap-and-split",
+      "category": "onchain",
+      "purpose": ""
+    },
+    {
+      "name": "token-match",
+      "category": "onchain",
+      "purpose": ""
+    },
+    {
+      "name": "ping",
+      "category": "ping",
+      "purpose": "\"When the user wants to send, read, or manage on-chain messages via Ping. Use when the user mentions 'ping', 'on-chain m"
+    },
+    {
+      "name": "ping-check",
+      "category": "ping",
+      "purpose": "\"Check Ping inbox for new messages. Use when the user says 'check ping', 'ping inbox', 'ping messages', 'any new pings',"
+    },
+    {
+      "name": "ping-stats",
+      "category": "ping",
+      "purpose": "\"Show Ping protocol statistics as an ASCII report. Use when the user says 'ping stats', 'ping report', 'ping numbers', '"
+    },
+    {
+      "name": "review-mobile",
+      "category": "review",
+      "purpose": "\"Mobile optimization code review agent. Use when the user says 'mobile review', 'review mobile', 'check mobile', 'respon"
+    },
+    {
+      "name": "review-performance",
+      "category": "review",
+      "purpose": "\"Performance-focused code review agent. Use when the user says 'performance review', 'review performance', 'check perfor"
+    },
+    {
+      "name": "review-security",
+      "category": "review",
+      "purpose": "\"Security-focused code review agent. Use when the user says 'security review', 'review security', 'audit security', 'che"
+    },
+    {
+      "name": "review-ui-ux",
+      "category": "review",
+      "purpose": "\"UI/UX aesthetics code review agent focused on spacing, color science, typography, visual hierarchy, and branding cohere"
+    },
+    {
+      "name": "talos",
+      "category": "talos",
+      "purpose": "\"Show Talos live trading system overview. Use when the user says 'talos', 'talos status', 'trading status', 'live trades"
+    },
+    {
+      "name": "talos-paper",
+      "category": "talos",
+      "purpose": "\"Show Talos paper trading system overview. Use when the user says 'talos paper', 'paper trading', 'paper trades', 'simul"
+    }
+  ],
+  "completions": [
+    {
+      "date": "2026-04-19",
+      "category": "marketing",
+      "title": "13 marketing/SEO skills installed",
+      "detail": "corey + aaron-he-zhu skills, sandboxed, MIT/Apache 2.0"
+    },
+    {
+      "date": "2026-04-18",
+      "category": "onchain",
+      "title": "lp-add-v2 + stealth-disperse-buy",
+      "detail": "Two new /sibyl-onchain actions promoted from tmp-test/"
+    },
+    {
+      "date": "2026-04-18",
+      "category": "partnership",
+      "title": "JY allocation: 3M SIBYL",
+      "detail": "0.3% of supply, ~$5,400. Recognition for connector work"
+    },
+    {
+      "date": "2026-04-17",
+      "category": "onchain",
+      "title": "kyber-swap action live",
+      "detail": "First /sibyl-onchain action. Hardened with timeouts + price feed failover"
+    },
+    {
+      "date": "2026-04-14",
+      "category": "product",
+      "title": "ping-onchain v0.1.5 published",
+      "detail": "npm SDK with auto-chaining"
+    },
+    {
+      "date": "2026-04-11",
+      "category": "product",
+      "title": "Framework skill v0.3.6 → LYRA",
+      "detail": "First external delivery. Quartz / @lyra_xyz"
+    },
+    {
+      "date": "2026-04-10",
+      "category": "milestone",
+      "title": "LongMemEval 86.7% — #5 overall",
+      "detail": "Only file-based system in top tier. Beats Mem0, Zep, Supermemory"
+    },
+    {
+      "date": "2026-04-08",
+      "category": "partnership",
+      "title": "LYRA framework deal closed",
+      "detail": "$4K upfront + 20% token + 30% rev share"
+    },
+    {
+      "date": "2026-03-29",
+      "category": "product",
+      "title": "Operator dashboard v1",
+      "detail": "Ping financials + users + relay + unit econ"
+    },
+    {
+      "date": "2026-03-24",
+      "category": "product",
+      "title": "Staking V2 funded with 1.5M SIBYL",
+      "detail": "500K initial + 1M added, 30d rolling rewards"
+    },
+    {
+      "date": "2026-03-18",
+      "category": "milestone",
+      "title": "$SIBYL token launched",
+      "detail": "Uniswap V2 SIBYL/VIRTUAL pair on Base"
+    },
+    {
+      "date": "2026-03-13",
+      "category": "product",
+      "title": "Hierarchical memory migration",
+      "detail": "Tiered hot/warm/cold/archive. Single source of truth per entity"
+    },
+    {
+      "date": "2026-03-10",
+      "category": "product",
+      "title": "Talos trading engine live",
+      "detail": "6 strategies, 3 buckets, paper + live mode"
+    },
+    {
+      "date": "2026-03-05",
+      "category": "product",
+      "title": "x402 paid endpoints",
+      "detail": "8 endpoints, $0.10–$2 each, USDC on Base"
+    }
+  ],
+  "skills_total": 47
+}

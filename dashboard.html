@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PING : Operator Dashboard</title>
+  <title>SIBYL : Operator Dashboard</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    /* SIBYL design system vars (inline to avoid loading full style.css) */
+    /* ── design tokens (inlined to avoid loading style.css) ── */
     :root {
       --bg:            #08090a;
       --surface:       #0e1118;
@@ -29,6 +29,7 @@
       --positive:      #5a8a6a;
       --negative:      #b06868;
       --warning:       #b5944a;
+      --critical:      #c25555;
       --font-display:  'Syne', 'Helvetica Neue', sans-serif;
       --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
     }
@@ -44,15 +45,13 @@
       min-height: 100vh;
     }
     ::selection { background: var(--accent); color: var(--bg); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
 
-    /* Auth gate */
+    /* ── auth gate ── */
     .auth-gate {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      gap: 1.5rem;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; gap: 1.5rem;
     }
     .auth-gate .auth-label {
       color: var(--text-muted);
@@ -69,34 +68,22 @@
       font-family: var(--font-mono);
       font-size: 0.8rem;
       padding: 0.6rem 1rem;
-      width: 240px;
-      text-align: center;
-      letter-spacing: 0.1em;
-      outline: none;
-      transition: border-color 0.2s;
+      width: 240px; text-align: center; letter-spacing: 0.1em;
+      outline: none; transition: border-color 0.2s;
     }
     .auth-input:focus { border-color: var(--accent); }
     .auth-input::placeholder { color: var(--text-muted); letter-spacing: 0.05em; }
-    .auth-error {
-      color: var(--negative);
-      font-size: 0.65rem;
-      height: 1rem;
-    }
+    .auth-error { color: var(--negative); font-size: 0.65rem; height: 1rem; }
 
-    /* Loading state */
+    /* ── loading ── */
     .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      letter-spacing: 0.15em;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; color: var(--text-muted);
+      font-size: 0.75rem; letter-spacing: 0.15em;
     }
     .loading::after {
       content: '';
-      width: 16px;
-      height: 16px;
+      width: 16px; height: 16px;
       border: 1.5px solid var(--border-strong);
       border-top-color: var(--accent);
       border-radius: 50%;
@@ -105,15 +92,15 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Dashboard layout */
-    .dashboard { display: none; max-width: 1080px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
+    /* ── shell ── */
+    .dashboard { display: none; max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
     .dashboard.active { display: block; }
 
-    /* Header */
     .dash-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1.5rem;
       padding-bottom: 1.25rem;
       border-bottom: 1px solid var(--border);
       margin-bottom: 2rem;
@@ -127,34 +114,55 @@
       color: var(--text-muted);
     }
     .dash-title span { color: var(--gold); }
-    .dash-meta {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      font-size: 0.7rem;
+
+    /* ── pill tabs ── */
+    .view-tabs {
+      display: inline-flex;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+      justify-self: center;
+    }
+    .view-tab {
+      background: transparent;
+      border: none;
       color: var(--text-muted);
+      font-family: var(--font-display);
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.45rem 1.1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.18s ease;
     }
-    .dash-refresh {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .refresh-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--positive);
-      animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+    .view-tab:hover { color: var(--text-secondary); }
+    .view-tab.active {
+      background: var(--gold);
+      color: var(--bg);
     }
 
-    /* Section */
-    .section {
-      margin-bottom: 2.5rem;
+    .dash-meta {
+      display: flex; align-items: center; gap: 1.25rem;
+      font-size: 0.65rem; color: var(--text-muted);
+      justify-self: end;
     }
+    .dash-refresh { display: flex; align-items: center; gap: 0.4rem; }
+    .refresh-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--positive); animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ── view containers ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── section ── */
+    .section { margin-bottom: 2.25rem; }
     .section-label {
       font-family: var(--font-display);
       font-size: 0.65rem;
@@ -165,18 +173,21 @@
       margin-bottom: 1rem;
       padding-bottom: 0.5rem;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      display: flex; align-items: center; gap: 0.5rem;
     }
     .section-label::before {
-      content: '';
-      width: 6px;
-      height: 1px;
-      background: var(--gold);
+      content: ''; width: 6px; height: 1px; background: var(--gold);
+    }
+    .section-label .meta {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      text-transform: none;
     }
 
-    /* Stat grid */
+    /* ── stat grid ── */
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -186,77 +197,46 @@
       border-radius: 4px;
       overflow: hidden;
     }
-    .stat-card {
-      background: var(--surface);
-      padding: 1rem 1.25rem;
-    }
+    .stat-card { background: var(--surface); padding: 1rem 1.25rem; }
     .stat-label {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-size: 0.62rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
       margin-bottom: 0.35rem;
     }
     .stat-value {
-      font-size: 1.25rem;
-      font-weight: 500;
+      font-size: 1.25rem; font-weight: 500;
       color: var(--text-primary);
       font-variant-numeric: tabular-nums;
     }
     .stat-value.positive { color: var(--positive); }
     .stat-value.negative { color: var(--negative); }
-    .stat-value.gold { color: var(--gold); }
+    .stat-value.gold     { color: var(--gold); }
+    .stat-value.violet   { color: var(--violet); }
     .stat-sub {
-      font-size: 0.7rem;
-      color: var(--text-secondary);
+      font-size: 0.7rem; color: var(--text-secondary);
       margin-top: 0.15rem;
     }
 
-    /* Revenue bars */
+    /* ── revenue bars ── */
     .rev-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+      display: flex; align-items: center; gap: 1rem;
       padding: 0.6rem 0;
       border-bottom: 1px solid var(--border);
     }
     .rev-row:last-child { border-bottom: none; }
-    .rev-label {
-      width: 140px;
-      flex-shrink: 0;
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-    }
-    .rev-bar-wrap {
-      flex: 1;
-      height: 20px;
-      background: var(--elevated);
-      border-radius: 2px;
-      overflow: hidden;
-      position: relative;
-    }
-    .rev-bar {
-      height: 100%;
-      border-radius: 2px;
-      transition: width 0.6s ease;
-    }
+    .rev-label { width: 140px; flex-shrink: 0; font-size: 0.7rem; color: var(--text-secondary); }
+    .rev-bar-wrap { flex: 1; height: 20px; background: var(--elevated); border-radius: 2px; overflow: hidden; position: relative; }
+    .rev-bar { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
     .rev-bar.gross { background: var(--accent); }
-    .rev-bar.cost { background: var(--negative); }
-    .rev-bar.net { background: var(--positive); }
-    .rev-val {
-      width: 180px;
-      flex-shrink: 0;
-      text-align: right;
-      font-size: 0.75rem;
-      font-variant-numeric: tabular-nums;
-    }
+    .rev-bar.cost  { background: var(--negative); }
+    .rev-bar.net   { background: var(--positive); }
+    .rev-val { width: 180px; flex-shrink: 0; text-align: right; font-size: 0.75rem; font-variant-numeric: tabular-nums; }
     .rev-val .eth { color: var(--text-primary); }
     .rev-val .usd { color: var(--text-muted); margin-left: 0.5rem; }
 
-    /* Fee info row */
+    /* ── fee/info inline row ── */
     .fee-row {
-      display: flex;
-      gap: 2rem;
+      display: flex; gap: 2rem; flex-wrap: wrap;
       margin-top: 0.75rem;
       padding: 0.75rem 1rem;
       background: var(--surface);
@@ -267,105 +247,172 @@
     .fee-item { color: var(--text-secondary); }
     .fee-item strong { color: var(--text-primary); font-weight: 500; }
 
-    /* User list */
-    .user-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 0.75rem;
-    }
-    .user-table th {
-      font-size: 0.6rem;
+    /* ── tables (priorities, completions, wallets, revenue events, services, etc.) ── */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      font-size: 0.58rem;
       font-weight: 500;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-align: left;
       padding: 0.5rem 0.75rem;
       border-bottom: 1px solid var(--border-strong);
+      background: var(--surface);
     }
-    .user-table td {
-      font-size: 0.75rem;
-      padding: 0.4rem 0.75rem;
+    .data-table td {
+      font-size: 0.74rem;
+      padding: 0.55rem 0.75rem;
       border-bottom: 1px solid var(--border);
       color: var(--text-secondary);
+      vertical-align: top;
     }
-    .user-table tr:hover td { background: var(--elevated); }
-    .user-table .addr {
-      font-variant-numeric: tabular-nums;
-      color: var(--text-muted);
-      font-size: 0.7rem;
+    .data-table tr:hover td { background: var(--elevated); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+    .data-table .mono { font-family: var(--font-mono); }
+
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
     }
+    .table-scroll { max-height: 420px; overflow-y: auto; }
+    .table-scroll::-webkit-scrollbar { width: 4px; }
+    .table-scroll::-webkit-scrollbar-track { background: var(--surface); }
+    .table-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+    /* ── badges ── */
     .badge {
       display: inline-block;
       font-size: 0.55rem;
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 0.15rem 0.4rem;
+      padding: 0.15rem 0.45rem;
       border-radius: 2px;
       vertical-align: middle;
+      white-space: nowrap;
     }
-    .badge.agent {
-      background: rgba(107, 139, 165, 0.15);
-      color: var(--accent);
-      border: 1px solid rgba(107, 139, 165, 0.25);
-    }
-    .badge.human {
-      background: rgba(181, 160, 112, 0.1);
-      color: var(--gold);
-      border: 1px solid rgba(181, 160, 112, 0.2);
-    }
+    .badge.critical { background: rgba(194,85,85,0.12); color: var(--critical); border: 1px solid rgba(194,85,85,0.28); }
+    .badge.high     { background: rgba(181,148,74,0.12); color: var(--warning);  border: 1px solid rgba(181,148,74,0.28); }
+    .badge.medium   { background: rgba(107,139,165,0.12); color: var(--accent);  border: 1px solid rgba(107,139,165,0.25); }
+    .badge.low      { background: rgba(85,93,107,0.18);   color: var(--text-muted);   border: 1px solid rgba(85,93,107,0.3); }
+    .badge.active   { background: rgba(90,138,106,0.12); color: var(--positive); border: 1px solid rgba(90,138,106,0.28); }
+    .badge.inactive { background: rgba(176,104,104,0.12); color: var(--negative); border: 1px solid rgba(176,104,104,0.28); }
+    .badge.gold     { background: rgba(181,160,112,0.10); color: var(--gold); border: 1px solid rgba(181,160,112,0.25); }
+    .badge.accent   { background: rgba(107,139,165,0.15); color: var(--accent); border: 1px solid rgba(107,139,165,0.25); }
+    .badge.violet   { background: rgba(136,120,168,0.12); color: var(--violet); border: 1px solid rgba(136,120,168,0.28); }
+    .badge.muted    { background: rgba(85,93,107,0.12); color: var(--text-muted); border: 1px solid rgba(85,93,107,0.22); }
 
-    /* Scrollable container for user list */
-    .user-scroll {
-      max-height: 320px;
-      overflow-y: auto;
-      border: 1px solid var(--border);
+    /* ── priority list (used in overview + operations) ── */
+    .priority-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .priority-row {
+      display: grid;
+      grid-template-columns: 60px 80px 1fr auto;
+      gap: 0.75rem;
+      align-items: start;
+      padding: 0.7rem 1rem;
+      background: var(--surface);
+    }
+    .priority-row:hover { background: var(--elevated); }
+    .priority-id { font-size: 0.7rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .priority-action { font-size: 0.74rem; color: var(--text-primary); line-height: 1.5; }
+    .priority-due { font-size: 0.65rem; color: var(--text-muted); white-space: nowrap; }
+
+    /* ── wallets table ── */
+    .wallet-addr { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    /* ── error ── */
+    .error-msg {
+      color: var(--negative); font-size: 0.75rem;
+      padding: 1rem; text-align: center;
+      background: var(--surface); border: 1px solid rgba(176,104,104,0.25);
       border-radius: 4px;
     }
-    .user-scroll::-webkit-scrollbar { width: 4px; }
-    .user-scroll::-webkit-scrollbar-track { background: var(--surface); }
-    .user-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
-
-    /* Error state */
-    .error-msg {
-      color: var(--negative);
-      font-size: 0.75rem;
-      padding: 1rem;
-      text-align: center;
+    .empty {
+      color: var(--text-muted); font-size: 0.7rem;
+      padding: 1rem; text-align: center;
+      background: var(--surface); border: 1px dashed var(--border-strong);
+      border-radius: 4px;
     }
 
-    /* Responsive */
+    /* ── overview hero (sibyl token) ── */
+    .token-hero {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .token-headline {
+      background: var(--surface);
+      padding: 1.25rem 1.5rem;
+      display: flex; flex-direction: column; gap: 0.4rem;
+      justify-content: center;
+    }
+    .token-symbol { font-family: var(--font-display); font-size: 0.7rem; letter-spacing: 0.3em; color: var(--gold); }
+    .token-price  { font-size: 1.85rem; font-weight: 500; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+    .token-change { font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+    .token-change.positive { color: var(--positive); }
+    .token-change.negative { color: var(--negative); }
+    .token-stats { background: var(--surface); padding: 1.25rem 1.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .token-stat-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.2rem; }
+    .token-stat-val   { font-size: 0.95rem; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+    /* ── two-column row ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+    /* ── responsive ── */
+    @media (max-width: 900px) {
+      .token-hero { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+    }
     @media (max-width: 640px) {
       .dashboard { padding: 1rem 1rem 3rem; }
-      .dash-header { flex-direction: column; gap: 0.5rem; }
+      .dash-header { grid-template-columns: 1fr; gap: 0.85rem; }
+      .view-tabs { justify-self: start; width: 100%; justify-content: center; }
+      .dash-meta { justify-self: start; }
       .stat-grid { grid-template-columns: repeat(2, 1fr); }
       .rev-row { flex-wrap: wrap; }
       .rev-label { width: 100%; }
       .rev-val { width: 100%; text-align: left; margin-top: 0.25rem; }
       .fee-row { flex-wrap: wrap; gap: 0.75rem; }
+      .priority-row { grid-template-columns: 1fr; gap: 0.3rem; }
+      .priority-due { white-space: normal; }
+      .data-table { font-size: 0.7rem; }
+      .data-table th, .data-table td { padding: 0.4rem 0.5rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Auth gate -->
+  <!-- ── auth gate ── -->
   <div class="auth-gate" id="auth-gate">
-    <div class="auth-label">ping protocol</div>
+    <div class="auth-label">operator dashboard</div>
     <form id="auth-form" autocomplete="off">
       <input type="password" class="auth-input" id="auth-input" placeholder="password" autofocus>
     </form>
     <div class="auth-error" id="auth-error"></div>
   </div>
 
-  <!-- Loading state -->
+  <!-- ── loading ── -->
   <div class="loading" id="loading" style="display:none;">loading</div>
 
-  <!-- Dashboard -->
+  <!-- ── dashboard shell ── -->
   <div class="dashboard" id="dashboard">
-    <!-- Header -->
+
     <header class="dash-header">
-      <div class="dash-title"><span>PING</span> PROTOCOL &nbsp;<a href="/ping-growth" style="font-size:0.55rem;color:var(--accent);text-decoration:none;letter-spacing:0.1em;vertical-align:middle;border:1px solid rgba(107,139,165,0.25);padding:0.15rem 0.5rem;border-radius:2px;">GROWTH PLAN</a></div>
+      <div class="dash-title"><span>SIBYL</span> OPERATOR</div>
+
+      <nav class="view-tabs" role="tablist" aria-label="Dashboard view">
+        <button type="button" class="view-tab active" data-view="overview"   role="tab" aria-selected="true">overview</button>
+        <button type="button" class="view-tab"        data-view="ping"       role="tab" aria-selected="false">ping</button>
+        <button type="button" class="view-tab"        data-view="operations" role="tab" aria-selected="false">operations</button>
+      </nav>
+
       <div class="dash-meta">
         <span id="timestamp"></span>
         <div class="dash-refresh">
@@ -375,54 +422,160 @@
       </div>
     </header>
 
-    <!-- Revenue -->
-    <div class="section">
-      <div class="section-label">Revenue</div>
-      <div id="revenue-bars"></div>
-      <div class="fee-row" id="fee-info"></div>
-    </div>
+    <!-- ── OVERVIEW VIEW ── -->
+    <section class="view active" id="view-overview" role="tabpanel" aria-labelledby="overview">
+      <div class="section">
+        <div class="section-label">$SIBYL Token</div>
+        <div id="ov-token-hero"></div>
+      </div>
 
-    <!-- Messages -->
-    <div class="section">
-      <div class="section-label">Message Volume</div>
-      <div class="stat-grid" id="msg-stats"></div>
-    </div>
+      <div class="two-col">
+        <div class="section">
+          <div class="section-label">Treasury</div>
+          <div class="stat-grid" id="ov-treasury"></div>
+        </div>
+        <div class="section">
+          <div class="section-label">Ping (headline)</div>
+          <div class="stat-grid" id="ov-ping-headline"></div>
+        </div>
+      </div>
 
-    <!-- Users -->
-    <div class="section">
-      <div class="section-label">Users</div>
-      <div class="stat-grid" id="user-stats"></div>
-      <div class="user-scroll" id="user-list" style="margin-top:1rem;"></div>
-    </div>
+      <div class="section">
+        <div class="section-label">Urgent <span class="meta" id="ov-urgent-meta"></span></div>
+        <div id="ov-urgent"></div>
+      </div>
 
-    <!-- Relay -->
-    <div class="section">
-      <div class="section-label">Relay (x402 On-Ramp)</div>
-      <div class="stat-grid" id="relay-stats"></div>
-    </div>
+      <div class="section">
+        <div class="section-label">Top Priorities <span class="meta" id="ov-priority-meta"></span></div>
+        <div id="ov-priorities"></div>
+      </div>
+    </section>
 
-    <!-- Unit Economics -->
-    <div class="section">
-      <div class="section-label">Unit Economics</div>
-      <div class="stat-grid" id="unit-stats"></div>
-    </div>
+    <!-- ── PING VIEW ── -->
+    <section class="view" id="view-ping" role="tabpanel" aria-labelledby="ping">
+      <div class="section">
+        <div class="section-label">Money <span class="meta">revenue · fees · unit econ</span></div>
+        <div id="ping-revenue-bars"></div>
+        <div class="fee-row" id="ping-fee-info"></div>
+        <div class="stat-grid" id="ping-unit-stats" style="margin-top:1rem;"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Message Volume</div>
+        <div class="stat-grid" id="ping-msg-stats"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Users</div>
+        <div class="stat-grid" id="ping-user-stats"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Relay (x402 On-Ramp)</div>
+        <div class="stat-grid" id="ping-relay-stats"></div>
+      </div>
+    </section>
+
+    <!-- ── OPERATIONS VIEW ── -->
+    <section class="view" id="view-operations" role="tabpanel" aria-labelledby="operations">
+      <div class="section">
+        <div class="section-label">Wallets</div>
+        <div class="table-wrap"><table class="data-table" id="ops-wallets"></table></div>
+      </div>
+
+      <div class="two-col">
+        <div class="section">
+          <div class="section-label">Services</div>
+          <div class="table-wrap"><table class="data-table" id="ops-services"></table></div>
+        </div>
+        <div class="section">
+          <div class="section-label">Cron <span class="meta" id="ops-cron-meta"></span></div>
+          <div class="table-wrap"><table class="data-table" id="ops-cron"></table></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">x402 Endpoints</div>
+        <div class="table-wrap"><table class="data-table" id="ops-x402"></table></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Recent Revenue Events <span class="meta" id="ops-rev-meta"></span></div>
+        <div class="table-wrap table-scroll"><table class="data-table" id="ops-revenue"></table></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Priority List <span class="meta" id="ops-pri-meta"></span></div>
+        <div id="ops-priorities"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Completions <span class="meta" id="ops-comp-meta"></span></div>
+        <div class="table-wrap table-scroll"><table class="data-table" id="ops-completions"></table></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Skills <span class="meta" id="ops-skills-meta"></span></div>
+        <div class="table-wrap table-scroll"><table class="data-table" id="ops-skills"></table></div>
+      </div>
+    </section>
+
   </div>
 
   <script>
     (function () {
-      var REFRESH_MS = 300000; // 5 minutes
-      var key = new URLSearchParams(window.location.search).get('key') || sessionStorage.getItem('dash_key') || '';
-      var authEl = document.getElementById('auth-gate');
-      var loadEl = document.getElementById('loading');
-      var dashEl = document.getElementById('dashboard');
-      var countdownEl = document.getElementById('countdown');
-      var authForm = document.getElementById('auth-form');
-      var authInput = document.getElementById('auth-input');
-      var authError = document.getElementById('auth-error');
+      var REFRESH_MS = 300000; // 5 min
+      var SIBYL_TOKEN_CA = '0x797f214a2CD64a4963A91Fa21c8C55Ec3EBa4714';
+      var DEXSCREENER_URL = 'https://api.dexscreener.com/latest/dex/tokens/' + SIBYL_TOKEN_CA;
+
+      // ── DOM refs ──
+      var authEl       = document.getElementById('auth-gate');
+      var loadEl       = document.getElementById('loading');
+      var dashEl       = document.getElementById('dashboard');
+      var countdownEl  = document.getElementById('countdown');
+      var authForm     = document.getElementById('auth-form');
+      var authInput    = document.getElementById('auth-input');
+      var authError    = document.getElementById('auth-error');
+
+      // ── state ──
+      var key = new URLSearchParams(location.search).get('key') || sessionStorage.getItem('dash_key') || '';
+      var view = new URLSearchParams(location.search).get('view') || sessionStorage.getItem('dash_view') || 'overview';
       var timer = null;
       var nextRefresh = 0;
+      var lastData = null;
 
-      // Password form submit
+      // ── view toggle ──
+      function setView(v) {
+        if (!['overview','ping','operations'].includes(v)) v = 'overview';
+        view = v;
+        sessionStorage.setItem('dash_view', v);
+        // Update URL without page reload
+        var p = new URLSearchParams(location.search);
+        p.set('view', v);
+        history.replaceState({}, '', location.pathname + '?' + p.toString());
+        // Toggle DOM
+        document.querySelectorAll('.view').forEach(function (el) {
+          el.classList.toggle('active', el.id === 'view-' + v);
+        });
+        document.querySelectorAll('.view-tab').forEach(function (b) {
+          var on = b.dataset.view === v;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+      }
+
+      document.querySelectorAll('.view-tab').forEach(function (btn) {
+        btn.addEventListener('click', function () { setView(btn.dataset.view); });
+      });
+      // Keyboard shortcuts: 1/2/3
+      document.addEventListener('keydown', function (e) {
+        if (e.target.tagName === 'INPUT' || e.metaKey || e.ctrlKey || e.altKey) return;
+        if (e.key === '1') setView('overview');
+        if (e.key === '2') setView('ping');
+        if (e.key === '3') setView('operations');
+      });
+
+      // ── auth ──
       authForm.addEventListener('submit', function (e) {
         e.preventDefault();
         var val = authInput.value.trim();
@@ -432,147 +585,456 @@
         authError.textContent = '';
         authEl.style.display = 'none';
         loadEl.style.display = 'flex';
-        fetchData();
+        fetchAll();
       });
 
-      // Auto-load if key from URL or session
       if (key) {
         sessionStorage.setItem('dash_key', key);
         authEl.style.display = 'none';
         loadEl.style.display = 'flex';
-        fetchData();
+        fetchAll();
       }
 
-      function fetchData() {
-        fetch('/api/ping-stats?key=' + encodeURIComponent(key))
+      // ── data fetch (parallel) ──
+      function fetchAll() {
+        Promise.all([
+          fetchPingStats(),
+          fetchPortfolio(),
+          fetchDashboardData(),
+          fetchSibylToken(),
+        ]).then(function (results) {
+          var pingStats   = results[0];
+          var portfolio   = results[1];
+          var dashboard   = results[2];
+          var sibylToken  = results[3];
+
+          if (pingStats === 'unauthorized') return; // already handled
+
+          lastData = { pingStats: pingStats, portfolio: portfolio, dashboard: dashboard, sibylToken: sibylToken };
+          loadEl.style.display = 'none';
+          dashEl.classList.add('active');
+          setView(view); // apply persisted view
+          render(lastData);
+          scheduleRefresh();
+        }).catch(function (err) {
+          loadEl.style.display = 'none';
+          dashEl.classList.add('active');
+          dashEl.innerHTML = '<div class="error-msg">failed to load: ' + err.message + '</div>';
+        });
+      }
+
+      function fetchPingStats() {
+        return fetch('/api/ping-stats?key=' + encodeURIComponent(key))
           .then(function (r) {
             if (r.status === 401) {
               loadEl.style.display = 'none';
               dashEl.classList.remove('active');
               authEl.style.display = 'flex';
               authError.textContent = 'invalid key';
-              authInput.value = '';
-              authInput.focus();
+              authInput.value = ''; authInput.focus();
               sessionStorage.removeItem('dash_key');
-              return null;
+              return 'unauthorized';
             }
-            if (!r.ok) throw new Error('HTTP ' + r.status);
+            if (!r.ok) throw new Error('ping-stats HTTP ' + r.status);
             return r.json();
-          })
-          .then(function (data) {
-            if (!data) return;
-            loadEl.style.display = 'none';
-            dashEl.classList.add('active');
-            render(data);
-            scheduleRefresh();
-          })
-          .catch(function (err) {
-            loadEl.style.display = 'none';
-            dashEl.classList.add('active');
-            dashEl.innerHTML = '<div class="error-msg">failed to load: ' + err.message + '</div>';
           });
       }
+      function fetchPortfolio() {
+        return fetch('/api/portfolio').then(function (r) {
+          if (!r.ok) throw new Error('portfolio HTTP ' + r.status);
+          return r.json();
+        }).catch(function () { return null; });
+      }
+      function fetchDashboardData() {
+        return fetch('/dashboard-data.json?t=' + Date.now()).then(function (r) {
+          if (!r.ok) throw new Error('dashboard-data HTTP ' + r.status);
+          return r.json();
+        }).catch(function () { return null; });
+      }
+      function fetchSibylToken() {
+        return fetch(DEXSCREENER_URL).then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (!d.pairs || !d.pairs.length) return null;
+            // sort by liquidity USD desc, take primary pair
+            var sorted = d.pairs.slice().sort(function (a, b) {
+              return (b.liquidity && b.liquidity.usd || 0) - (a.liquidity && a.liquidity.usd || 0);
+            });
+            var p = sorted[0];
+            return {
+              price_usd:    parseFloat(p.priceUsd) || 0,
+              price_change_24h: p.priceChange && p.priceChange.h24 || 0,
+              volume_24h:   p.volume && p.volume.h24 || 0,
+              liquidity_usd: p.liquidity && p.liquidity.usd || 0,
+              fdv:          p.fdv || 0,
+              market_cap:   p.marketCap || p.fdv || 0,
+              pair_url:     p.url,
+              dex:          p.dexId,
+            };
+          }).catch(function () { return null; });
+      }
 
+      // ── refresh timer ──
       function scheduleRefresh() {
         nextRefresh = Date.now() + REFRESH_MS;
         if (timer) clearInterval(timer);
         timer = setInterval(function () {
           var remaining = Math.max(0, nextRefresh - Date.now());
-          if (remaining <= 0) {
-            fetchData();
-            return;
-          }
+          if (remaining <= 0) { fetchAll(); return; }
           var mins = Math.floor(remaining / 60000);
           var secs = Math.floor((remaining % 60000) / 1000);
           countdownEl.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
         }, 1000);
       }
 
+      // ── render entry ──
       function render(d) {
-        // Timestamp
-        var ts = new Date(d.timestamp);
         document.getElementById('timestamp').textContent =
-          ts.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+          new Date(d.pingStats.timestamp).toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
 
-        // Revenue bars
-        var maxEth = Math.max(d.revenue.gross_eth, 0.000001);
-        var revHtml = '';
-        revHtml += revRow('Gross fees', 'gross', d.revenue.gross_eth, d.revenue.gross_usd, maxEth);
-        revHtml += revRow('SIBYL costs', 'cost', d.revenue.sibyl_send_cost_eth + d.revenue.sibyl_broadcast_cost_eth, (d.revenue.sibyl_send_cost_eth + d.revenue.sibyl_broadcast_cost_eth) * d.eth_price, maxEth);
-        revHtml += revRow('Net revenue', 'net', d.revenue.net_eth, d.revenue.net_usd, maxEth);
-        document.getElementById('revenue-bars').innerHTML = revHtml;
-
-        // Fee info
-        document.getElementById('fee-info').innerHTML =
-          '<div class="fee-item">msg fee: <strong>' + d.fees.message_fee_eth + ' ETH</strong> ($' + d.fees.message_fee_usd + ')</div>' +
-          '<div class="fee-item">broadcast fee: <strong>' + d.fees.broadcast_fee_eth.toFixed(6) + ' ETH</strong> ($' + d.fees.broadcast_fee_usd + ')</div>' +
-          '<div class="fee-item">cost ratio: <strong>' + d.revenue.cost_ratio + '%</strong></div>' +
-          '<div class="fee-item">ETH: <strong>$' + d.eth_price.toLocaleString() + '</strong></div>';
-
-        // Message stats
-        document.getElementById('msg-stats').innerHTML =
-          statCard('Total msgs', d.messages.total) +
-          statCard('Inbound', d.messages.inbound_sibyl, 'to SIBYL') +
-          statCard('Outbound', d.messages.outbound_sibyl, 'from SIBYL') +
-          statCard('Broadcasts', d.messages.broadcasts) +
-          statCard('Unique senders', d.messages.unique_senders, 'to SIBYL');
-
-        // User stats
-        document.getElementById('user-stats').innerHTML =
-          statCard('Registered', d.users.total, '', 'gold') +
-          statCard('Agents', d.users.agents) +
-          statCard('Humans', d.users.humans) +
-          statCard('Agent ratio', d.users.total > 0 ? Math.round(d.users.agents / d.users.total * 100) + '%' : '0%');
-
-        // User directory
-        var tHtml = '<table class="user-table"><thead><tr><th>Username</th><th>Address</th><th>Type</th></tr></thead><tbody>';
-        for (var i = 0; i < d.users.directory.length; i++) {
-          var u = d.users.directory[i];
-          var badgeClass = u.is_agent ? 'agent' : 'human';
-          var badgeText = u.is_agent ? 'agent' : 'human';
-          tHtml += '<tr>';
-          tHtml += '<td>' + esc(u.username || '(unnamed)') + '</td>';
-          tHtml += '<td class="addr">' + u.address.slice(0, 6) + '...' + u.address.slice(-4) + '</td>';
-          tHtml += '<td><span class="badge ' + badgeClass + '">' + badgeText + '</span></td>';
-          tHtml += '</tr>';
-        }
-        tHtml += '</tbody></table>';
-        document.getElementById('user-list').innerHTML = tHtml;
-
-        // Relay stats
-        document.getElementById('relay-stats').innerHTML =
-          statCard('ETH', d.relay.eth.toFixed(4), '$' + d.relay.eth_usd) +
-          statCard('USDC', '$' + d.relay.usdc.toFixed(2));
-
-        // Unit economics
-        document.getElementById('unit-stats').innerHTML =
-          statCard('Rev / user', d.unit_economics.rev_per_user_eth.toFixed(6) + ' ETH', '$' + d.unit_economics.rev_per_user_usd) +
-          statCard('Net rev / user', d.unit_economics.net_rev_per_user_eth.toFixed(6) + ' ETH', '$' + d.unit_economics.net_rev_per_user_usd) +
-          statCard('Cost ratio', d.unit_economics.cost_ratio_pct + '%') +
-          statCard('Msgs / user', d.unit_economics.msgs_per_user);
+        renderOverview(d);
+        renderPing(d);
+        renderOps(d);
       }
 
+      // ── OVERVIEW ──
+      function renderOverview(d) {
+        // Token hero
+        var t = d.sibylToken;
+        var heroHtml = '';
+        if (t) {
+          var changeCls = t.price_change_24h >= 0 ? 'positive' : 'negative';
+          var changeSign = t.price_change_24h >= 0 ? '+' : '';
+          heroHtml =
+            '<div class="token-hero">' +
+              '<div class="token-headline">' +
+                '<div class="token-symbol">$SIBYL</div>' +
+                '<div class="token-price">$' + formatPrice(t.price_usd) + '</div>' +
+                '<div class="token-change ' + changeCls + '">' + changeSign + t.price_change_24h.toFixed(2) + '% 24h</div>' +
+              '</div>' +
+              '<div class="token-stats">' +
+                tokenStat('Market cap', '$' + abbrev(t.market_cap)) +
+                tokenStat('Liquidity',  '$' + abbrev(t.liquidity_usd)) +
+                tokenStat('24h volume', '$' + abbrev(t.volume_24h)) +
+                tokenStat('FDV',        '$' + abbrev(t.fdv)) +
+              '</div>' +
+            '</div>';
+        } else {
+          heroHtml = '<div class="empty">$SIBYL price feed unavailable</div>';
+        }
+        document.getElementById('ov-token-hero').innerHTML = heroHtml;
+
+        // Treasury
+        var treasuryEl = document.getElementById('ov-treasury');
+        if (d.portfolio && d.portfolio.treasury) {
+          var t2 = d.portfolio.treasury;
+          var operatorOwed = d.dashboard && d.dashboard.treasury && d.dashboard.treasury.operator_owed_usdc || 0;
+          treasuryEl.innerHTML =
+            statCard('Total',      '$' + nfmt(t2.total_usd),     '', 'gold') +
+            statCard('Deployable', '$' + nfmt(t2.deployable_usd), '60% rule') +
+            statCard('Deployed',   '$' + nfmt(t2.deployed_usd),  t2.positions + ' positions') +
+            statCard('Operator owed', '$' + nfmt(operatorOwed),  '', operatorOwed > 0 ? 'negative' : '');
+        } else {
+          treasuryEl.innerHTML = '<div class="empty">treasury data unavailable</div>';
+        }
+
+        // Ping headline
+        var p = d.pingStats;
+        document.getElementById('ov-ping-headline').innerHTML =
+          statCard('Total messages', nfmt(p.messages.total)) +
+          statCard('Users',          nfmt(p.users.total),     p.users.agents + ' agents · ' + p.users.humans + ' humans') +
+          statCard('Net revenue',    p.revenue.net_eth.toFixed(4) + ' ETH', '$' + nfmt(p.revenue.net_usd), p.revenue.net_eth >= 0 ? 'positive' : 'negative');
+
+        // Urgent
+        var dash = d.dashboard;
+        var urgent = (dash && dash.urgent) || [];
+        document.getElementById('ov-urgent-meta').textContent = urgent.length + ' items';
+        document.getElementById('ov-urgent').innerHTML = urgent.length
+          ? renderPriorityList(urgent)
+          : '<div class="empty">no critical or high-urgency items</div>';
+
+        // Top priorities (cap at 8 for overview)
+        var top = (dash && dash.priorities ? dash.priorities : []).slice(0, 8);
+        document.getElementById('ov-priority-meta').textContent = top.length + ' of ' + ((dash && dash.priorities && dash.priorities.length) || 0);
+        document.getElementById('ov-priorities').innerHTML = top.length
+          ? renderPriorityList(top)
+          : '<div class="empty">no priorities loaded</div>';
+      }
+
+      // ── PING ──
+      function renderPing(d) {
+        var p = d.pingStats;
+        var maxEth = Math.max(p.revenue.gross_eth, 0.000001);
+
+        var revHtml = '';
+        revHtml += revRow('Gross fees', 'gross', p.revenue.gross_eth, p.revenue.gross_usd, maxEth);
+        var costEth = p.revenue.sibyl_send_cost_eth + p.revenue.sibyl_broadcast_cost_eth;
+        revHtml += revRow('SIBYL costs', 'cost', costEth, costEth * p.eth_price, maxEth);
+        revHtml += revRow('Net revenue', 'net', p.revenue.net_eth, p.revenue.net_usd, maxEth);
+        document.getElementById('ping-revenue-bars').innerHTML = revHtml;
+
+        document.getElementById('ping-fee-info').innerHTML =
+          '<div class="fee-item">msg fee: <strong>' + p.fees.message_fee_eth + ' ETH</strong> ($' + p.fees.message_fee_usd + ')</div>' +
+          '<div class="fee-item">broadcast fee: <strong>' + p.fees.broadcast_fee_eth.toFixed(6) + ' ETH</strong> ($' + p.fees.broadcast_fee_usd + ')</div>' +
+          '<div class="fee-item">cost ratio: <strong>' + p.revenue.cost_ratio + '%</strong></div>' +
+          '<div class="fee-item">ETH: <strong>$' + p.eth_price.toLocaleString() + '</strong></div>';
+
+        // Unit econ (merged)
+        document.getElementById('ping-unit-stats').innerHTML =
+          statCard('Rev / user',     p.unit_economics.rev_per_user_eth.toFixed(6) + ' ETH', '$' + p.unit_economics.rev_per_user_usd) +
+          statCard('Net rev / user', p.unit_economics.net_rev_per_user_eth.toFixed(6) + ' ETH', '$' + p.unit_economics.net_rev_per_user_usd) +
+          statCard('Cost ratio',     p.unit_economics.cost_ratio_pct + '%') +
+          statCard('Msgs / user',    p.unit_economics.msgs_per_user);
+
+        document.getElementById('ping-msg-stats').innerHTML =
+          statCard('Total msgs', p.messages.total) +
+          statCard('Inbound',    p.messages.inbound_sibyl,  'to SIBYL') +
+          statCard('Outbound',   p.messages.outbound_sibyl, 'from SIBYL') +
+          statCard('Broadcasts', p.messages.broadcasts) +
+          statCard('Unique senders', p.messages.unique_senders, 'to SIBYL');
+
+        document.getElementById('ping-user-stats').innerHTML =
+          statCard('Registered', p.users.total, '', 'gold') +
+          statCard('Agents',     p.users.agents) +
+          statCard('Humans',     p.users.humans) +
+          statCard('Agent ratio', p.users.total > 0 ? Math.round(p.users.agents / p.users.total * 100) + '%' : '0%');
+
+        document.getElementById('ping-relay-stats').innerHTML =
+          statCard('ETH', p.relay.eth.toFixed(4), '$' + p.relay.eth_usd) +
+          statCard('USDC', '$' + p.relay.usdc.toFixed(2));
+      }
+
+      // ── OPERATIONS ──
+      function renderOps(d) {
+        var dash = d.dashboard;
+        var port = d.portfolio;
+        var p    = d.pingStats;
+
+        // Wallets — from /api/portfolio + relay from ping-stats
+        var walletsHtml = '<thead><tr><th>Wallet</th><th>Address</th><th class="num">ETH</th><th class="num">USDC</th><th class="num">Other</th></tr></thead><tbody>';
+        var walletDescriptors = [
+          { key: 'cold',      label: 'Cold (primary)',  addr: '0x4069ef1afC8A9b2a29117A3740fCAB2912499fBe' },
+          { key: 'bankr',     label: 'Bankr',           addr: '0xe3e14118238b5693c854674f7c276136a2dd311f' },
+          { key: 'stealth_1', label: 'Stealth 1',       addr: '0xDeDBD7AaA28F719D79c7AE677698c0C4A372a8E2' },
+          { key: 'stealth_2', label: 'Stealth 2',       addr: '0xD563a85c56a920043017A2F59db6F36FABa0d38d' },
+          { key: 'stealth_3', label: 'Stealth 3',       addr: '0xabE3ceAf64EE32262c387705916Dc25D28291a99' },
+          { key: 'stealth_4', label: 'Stealth 4',       addr: '0x9228ED96DC0d43cA8E3b69229e784428B9591d49' },
+          { key: 'relay',     label: 'Relay',           addr: '0xb91d82EBE1b90117B6C6c5990104B350d3E2f9e6' },
+        ];
+        for (var i = 0; i < walletDescriptors.length; i++) {
+          var w = walletDescriptors[i];
+          var ethVal = '—', usdcVal = '—', otherVal = '—';
+          if (w.key === 'relay' && p && p.relay) {
+            ethVal = p.relay.eth.toFixed(4);
+            usdcVal = '$' + p.relay.usdc.toFixed(2);
+          } else if (port && port.wallets && port.wallets[w.key]) {
+            var pw = port.wallets[w.key];
+            ethVal = (pw.eth || 0).toFixed(4);
+            if (pw.usdc !== undefined) usdcVal = '$' + nfmt(pw.usdc);
+            if (w.key === 'bankr') {
+              var others = [];
+              if (pw.weth)  others.push(pw.weth.toFixed(4) + ' WETH');
+              if (pw.tgate) others.push(nfmt(pw.tgate) + ' TGATE');
+              otherVal = others.length ? others.join(' · ') : '—';
+            }
+          }
+          walletsHtml += '<tr>' +
+            '<td>' + esc(w.label) + '</td>' +
+            '<td><a class="wallet-addr" href="https://basescan.org/address/' + w.addr + '" target="_blank" rel="noopener">' + w.addr.slice(0,6) + '...' + w.addr.slice(-4) + '</a></td>' +
+            '<td class="num">' + ethVal + '</td>' +
+            '<td class="num">' + usdcVal + '</td>' +
+            '<td>' + otherVal + '</td>' +
+          '</tr>';
+        }
+        walletsHtml += '</tbody>';
+        document.getElementById('ops-wallets').innerHTML = walletsHtml;
+
+        // Services
+        var services = (dash && dash.services) || [];
+        var svcHtml = '<thead><tr><th>Service</th><th>Type</th><th>Status</th><th>Purpose</th></tr></thead><tbody>';
+        for (var s = 0; s < services.length; s++) {
+          var sv = services[s];
+          var sCls = sv.status === 'active' || sv.status === 'running' ? 'active' : 'inactive';
+          svcHtml += '<tr>' +
+            '<td>' + esc(sv.name) + '</td>' +
+            '<td>' + esc(sv.type) + '</td>' +
+            '<td><span class="badge ' + sCls + '">' + esc(sv.status) + '</span></td>' +
+            '<td>' + esc(sv.purpose) + '</td>' +
+          '</tr>';
+        }
+        svcHtml += '</tbody>';
+        document.getElementById('ops-services').innerHTML = svcHtml;
+
+        // Cron
+        var crons = (dash && dash.cron_jobs) || [];
+        document.getElementById('ops-cron-meta').textContent = crons.length + ' jobs';
+        var cronHtml = '<thead><tr><th>Schedule</th><th>Job</th></tr></thead><tbody>';
+        for (var c = 0; c < crons.length; c++) {
+          cronHtml += '<tr>' +
+            '<td class="mono">' + esc(crons[c].schedule) + '</td>' +
+            '<td>' + esc(crons[c].label) + '</td>' +
+          '</tr>';
+        }
+        cronHtml += '</tbody>';
+        document.getElementById('ops-cron').innerHTML = cronHtml;
+
+        // x402 endpoints
+        var endpoints = (dash && dash.x402_endpoints) || [];
+        var epHtml = '<thead><tr><th>Endpoint</th><th class="num">Price</th><th>Purpose</th></tr></thead><tbody>';
+        for (var e = 0; e < endpoints.length; e++) {
+          var ep = endpoints[e];
+          epHtml += '<tr>' +
+            '<td class="mono">' + esc(ep.path) + '</td>' +
+            '<td class="num">$' + ep.price_usd.toFixed(2) + '</td>' +
+            '<td>' + esc(ep.purpose) + '</td>' +
+          '</tr>';
+        }
+        epHtml += '</tbody>';
+        document.getElementById('ops-x402').innerHTML = epHtml;
+
+        // Recent revenue events
+        var revEvents = (dash && dash.recent_revenue) || [];
+        document.getElementById('ops-rev-meta').textContent = 'last ' + revEvents.length;
+        var rHtml = '<thead><tr><th>Date</th><th>Type</th><th>Source</th><th>Detail</th></tr></thead><tbody>';
+        for (var r = 0; r < revEvents.length; r++) {
+          var ev = revEvents[r];
+          var detail = '';
+          if (ev.amount_usdc) detail += '$' + ev.amount_usdc + ' USDC';
+          else if (ev.usdc_received_treasury) detail += '$' + ev.usdc_received_treasury + ' USDC treasury';
+          else if (ev.in && ev.out) detail += ev.in + ' → ' + ev.out;
+          if (ev.note) detail += (detail ? ' · ' : '') + ev.note;
+          rHtml += '<tr>' +
+            '<td>' + esc(formatDate(ev.ts)) + '</td>' +
+            '<td>' + esc(ev.type || '—') + '</td>' +
+            '<td>' + esc(ev.source || '—') + '</td>' +
+            '<td>' + esc(detail || '—') + '</td>' +
+          '</tr>';
+        }
+        rHtml += '</tbody>';
+        document.getElementById('ops-revenue').innerHTML = rHtml;
+
+        // Priority list (full)
+        var pris = (dash && dash.priorities) || [];
+        document.getElementById('ops-pri-meta').textContent = pris.length + ' items';
+        document.getElementById('ops-priorities').innerHTML = pris.length
+          ? renderPriorityList(pris)
+          : '<div class="empty">no priorities loaded</div>';
+
+        // Completions
+        var comps = (dash && dash.completions) || [];
+        document.getElementById('ops-comp-meta').textContent = comps.length + ' milestones';
+        var cHtml = '<thead><tr><th>Date</th><th>Category</th><th>Title</th><th>Detail</th></tr></thead><tbody>';
+        for (var k = 0; k < comps.length; k++) {
+          var co = comps[k];
+          cHtml += '<tr>' +
+            '<td>' + esc(co.date) + '</td>' +
+            '<td><span class="badge ' + categoryBadgeClass(co.category) + '">' + esc(co.category) + '</span></td>' +
+            '<td>' + esc(co.title) + '</td>' +
+            '<td>' + esc(co.detail) + '</td>' +
+          '</tr>';
+        }
+        cHtml += '</tbody>';
+        document.getElementById('ops-completions').innerHTML = cHtml;
+
+        // Skills
+        var skills = (dash && dash.skills) || [];
+        document.getElementById('ops-skills-meta').textContent = skills.length + ' total';
+        var sHtml2 = '<thead><tr><th>Skill</th><th>Category</th></tr></thead><tbody>';
+        for (var sk = 0; sk < skills.length; sk++) {
+          var sl = skills[sk];
+          sHtml2 += '<tr>' +
+            '<td class="mono">' + esc(sl.name) + '</td>' +
+            '<td><span class="badge ' + categoryBadgeClass(sl.category) + '">' + esc(sl.category) + '</span></td>' +
+          '</tr>';
+        }
+        sHtml2 += '</tbody>';
+        document.getElementById('ops-skills').innerHTML = sHtml2;
+      }
+
+      // ── helpers ──
+      function statCard(label, value, sub, cls) {
+        return '<div class="stat-card">' +
+          '<div class="stat-label">' + esc(label) + '</div>' +
+          '<div class="stat-value' + (cls ? ' ' + cls : '') + '">' + (value === undefined ? '—' : value) + '</div>' +
+          (sub ? '<div class="stat-sub">' + esc(sub) + '</div>' : '') +
+        '</div>';
+      }
+      function tokenStat(label, value) {
+        return '<div>' +
+          '<div class="token-stat-label">' + esc(label) + '</div>' +
+          '<div class="token-stat-val">' + value + '</div>' +
+        '</div>';
+      }
       function revRow(label, cls, eth, usd, max) {
         var pct = max > 0 ? Math.min(100, (Math.abs(eth) / max) * 100) : 0;
         return '<div class="rev-row">' +
           '<div class="rev-label">' + label + '</div>' +
           '<div class="rev-bar-wrap"><div class="rev-bar ' + cls + '" style="width:' + pct + '%"></div></div>' +
           '<div class="rev-val"><span class="eth">' + eth.toFixed(6) + ' ETH</span><span class="usd">$' + usd.toFixed(2) + '</span></div>' +
-          '</div>';
+        '</div>';
       }
-
-      function statCard(label, value, sub, cls) {
-        return '<div class="stat-card">' +
-          '<div class="stat-label">' + label + '</div>' +
-          '<div class="stat-value' + (cls ? ' ' + cls : '') + '">' + value + '</div>' +
-          (sub ? '<div class="stat-sub">' + sub + '</div>' : '') +
+      function renderPriorityList(items) {
+        var html = '<div class="priority-list">';
+        for (var i = 0; i < items.length; i++) {
+          var it = items[i];
+          var u = (it.urgency || 'medium').toLowerCase();
+          var truncated = (it.action || '').length > 240
+            ? (it.action || '').slice(0, 237) + '...'
+            : (it.action || '');
+          html += '<div class="priority-row">' +
+            '<div class="priority-id">' + esc(it.id || '') + '</div>' +
+            '<div><span class="badge ' + u + '">' + esc(u) + '</span></div>' +
+            '<div class="priority-action">' + esc(truncated) + '</div>' +
+            '<div class="priority-due">' + esc(it.due || '—') + '</div>' +
           '</div>';
+        }
+        html += '</div>';
+        return html;
       }
-
+      function categoryBadgeClass(cat) {
+        var map = {
+          marketing: 'violet',
+          ping: 'accent',
+          talos: 'gold',
+          review: 'muted',
+          integration: 'accent',
+          onchain: 'gold',
+          creative: 'violet',
+          core: 'accent',
+          milestone: 'gold',
+          product: 'accent',
+          partnership: 'violet',
+          other: 'muted',
+        };
+        return map[cat] || 'muted';
+      }
       function esc(s) {
+        if (s === null || s === undefined) return '';
         var d = document.createElement('div');
-        d.textContent = s;
+        d.textContent = String(s);
         return d.innerHTML;
+      }
+      function nfmt(n) {
+        if (n === null || n === undefined || isNaN(n)) return '—';
+        return Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 });
+      }
+      function formatPrice(n) {
+        if (!n) return '0';
+        if (n < 0.01) return n.toFixed(6);
+        if (n < 1) return n.toFixed(4);
+        return n.toFixed(3);
+      }
+      function abbrev(n) {
+        if (!n) return '0';
+        if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+        if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+        if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+        return Number(n).toFixed(0);
+      }
+      function formatDate(ts) {
+        if (!ts) return '—';
+        var s = String(ts);
+        // YYYY-MM-DD or full ISO — keep first 10 chars if ISO
+        return s.length >= 10 ? s.slice(0, 10) : s;
       }
     })();
   </script>
