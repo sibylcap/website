@@ -38,6 +38,11 @@ All notable changes to sibylcap.com and x402 paid endpoints.
 ### Generator Script (`scripts/build-dashboard-data.mjs`)
 - New top-level script. Reads `memory/state/priorities.json`, `memory/state/treasury.json`, `memory/INDEX.json`, `memory/logs/revenue.jsonl`, runs `systemctl is-active` for known services, `crontab -l` for cron, walks `.claude/skills/` for skill discovery + auto-categorization. Writes to `website/dashboard-data.json`. No secrets.
 
+### Dashboard v2.1 — Collapsible Sections
+- Every section in all three views is now collapse-on-click. Click the section label, content hides, chevron rotates from down (▼) to right (▶).
+- Per-section state persisted in `sessionStorage` under `dash_collapsed`. Survives view switches and reloads. Independent across the 17 sections.
+- New keyboard shortcuts: **`c`** collapses all sections, **`e`** expands all. (`1`/`2`/`3` still swap views.)
+
 ---
 
 ## 2026-04-03 to 2026-04-06

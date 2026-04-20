@@ -174,9 +174,14 @@
       padding-bottom: 0.5rem;
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; gap: 0.5rem;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s;
     }
+    .section-label:hover { color: var(--text-secondary); }
     .section-label::before {
       content: ''; width: 6px; height: 1px; background: var(--gold);
+      flex-shrink: 0;
     }
     .section-label .meta {
       margin-left: auto;
@@ -186,6 +191,20 @@
       color: var(--text-muted);
       text-transform: none;
     }
+    .section-chevron {
+      width: 9px; height: 9px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+      margin-left: 0.6rem;
+      margin-top: -3px;
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+    .section.collapsed .section-chevron { transform: rotate(-45deg); margin-top: 2px; }
+    .section.collapsed .section-label { margin-bottom: 0; }
+    .section.collapsed > *:not(.section-label) { display: none !important; }
 
     /* ── stat grid ── */
     .stat-grid {
@@ -424,98 +443,98 @@
 
     <!-- ── OVERVIEW VIEW ── -->
     <section class="view active" id="view-overview" role="tabpanel" aria-labelledby="overview">
-      <div class="section">
-        <div class="section-label">$SIBYL Token</div>
+      <div class="section" data-section="ov-token">
+        <div class="section-label">$SIBYL Token<span class="section-chevron"></span></div>
         <div id="ov-token-hero"></div>
       </div>
 
       <div class="two-col">
-        <div class="section">
-          <div class="section-label">Treasury</div>
+        <div class="section" data-section="ov-treasury">
+          <div class="section-label">Treasury<span class="section-chevron"></span></div>
           <div class="stat-grid" id="ov-treasury"></div>
         </div>
-        <div class="section">
-          <div class="section-label">Ping (headline)</div>
+        <div class="section" data-section="ov-ping">
+          <div class="section-label">Ping (headline)<span class="section-chevron"></span></div>
           <div class="stat-grid" id="ov-ping-headline"></div>
         </div>
       </div>
 
-      <div class="section">
-        <div class="section-label">Urgent <span class="meta" id="ov-urgent-meta"></span></div>
+      <div class="section" data-section="ov-urgent">
+        <div class="section-label">Urgent <span class="meta" id="ov-urgent-meta"></span><span class="section-chevron"></span></div>
         <div id="ov-urgent"></div>
       </div>
 
-      <div class="section">
-        <div class="section-label">Top Priorities <span class="meta" id="ov-priority-meta"></span></div>
+      <div class="section" data-section="ov-priorities">
+        <div class="section-label">Top Priorities <span class="meta" id="ov-priority-meta"></span><span class="section-chevron"></span></div>
         <div id="ov-priorities"></div>
       </div>
     </section>
 
     <!-- ── PING VIEW ── -->
     <section class="view" id="view-ping" role="tabpanel" aria-labelledby="ping">
-      <div class="section">
-        <div class="section-label">Money <span class="meta">revenue · fees · unit econ</span></div>
+      <div class="section" data-section="ping-money">
+        <div class="section-label">Money <span class="meta">revenue · fees · unit econ</span><span class="section-chevron"></span></div>
         <div id="ping-revenue-bars"></div>
         <div class="fee-row" id="ping-fee-info"></div>
         <div class="stat-grid" id="ping-unit-stats" style="margin-top:1rem;"></div>
       </div>
 
-      <div class="section">
-        <div class="section-label">Message Volume</div>
+      <div class="section" data-section="ping-msgs">
+        <div class="section-label">Message Volume<span class="section-chevron"></span></div>
         <div class="stat-grid" id="ping-msg-stats"></div>
       </div>
 
-      <div class="section">
-        <div class="section-label">Users</div>
+      <div class="section" data-section="ping-users">
+        <div class="section-label">Users<span class="section-chevron"></span></div>
         <div class="stat-grid" id="ping-user-stats"></div>
       </div>
 
-      <div class="section">
-        <div class="section-label">Relay (x402 On-Ramp)</div>
+      <div class="section" data-section="ping-relay">
+        <div class="section-label">Relay (x402 On-Ramp)<span class="section-chevron"></span></div>
         <div class="stat-grid" id="ping-relay-stats"></div>
       </div>
     </section>
 
     <!-- ── OPERATIONS VIEW ── -->
     <section class="view" id="view-operations" role="tabpanel" aria-labelledby="operations">
-      <div class="section">
-        <div class="section-label">Wallets</div>
+      <div class="section" data-section="ops-wallets">
+        <div class="section-label">Wallets<span class="section-chevron"></span></div>
         <div class="table-wrap"><table class="data-table" id="ops-wallets"></table></div>
       </div>
 
       <div class="two-col">
-        <div class="section">
-          <div class="section-label">Services</div>
+        <div class="section" data-section="ops-services">
+          <div class="section-label">Services<span class="section-chevron"></span></div>
           <div class="table-wrap"><table class="data-table" id="ops-services"></table></div>
         </div>
-        <div class="section">
-          <div class="section-label">Cron <span class="meta" id="ops-cron-meta"></span></div>
+        <div class="section" data-section="ops-cron">
+          <div class="section-label">Cron <span class="meta" id="ops-cron-meta"></span><span class="section-chevron"></span></div>
           <div class="table-wrap"><table class="data-table" id="ops-cron"></table></div>
         </div>
       </div>
 
-      <div class="section">
-        <div class="section-label">x402 Endpoints</div>
+      <div class="section" data-section="ops-x402">
+        <div class="section-label">x402 Endpoints<span class="section-chevron"></span></div>
         <div class="table-wrap"><table class="data-table" id="ops-x402"></table></div>
       </div>
 
-      <div class="section">
-        <div class="section-label">Recent Revenue Events <span class="meta" id="ops-rev-meta"></span></div>
+      <div class="section" data-section="ops-revenue">
+        <div class="section-label">Recent Revenue Events <span class="meta" id="ops-rev-meta"></span><span class="section-chevron"></span></div>
         <div class="table-wrap table-scroll"><table class="data-table" id="ops-revenue"></table></div>
       </div>
 
-      <div class="section">
-        <div class="section-label">Priority List <span class="meta" id="ops-pri-meta"></span></div>
+      <div class="section" data-section="ops-priorities">
+        <div class="section-label">Priority List <span class="meta" id="ops-pri-meta"></span><span class="section-chevron"></span></div>
         <div id="ops-priorities"></div>
       </div>
 
-      <div class="section">
-        <div class="section-label">Completions <span class="meta" id="ops-comp-meta"></span></div>
+      <div class="section" data-section="ops-completions">
+        <div class="section-label">Completions <span class="meta" id="ops-comp-meta"></span><span class="section-chevron"></span></div>
         <div class="table-wrap table-scroll"><table class="data-table" id="ops-completions"></table></div>
       </div>
 
-      <div class="section">
-        <div class="section-label">Skills <span class="meta" id="ops-skills-meta"></span></div>
+      <div class="section" data-section="ops-skills">
+        <div class="section-label">Skills <span class="meta" id="ops-skills-meta"></span><span class="section-chevron"></span></div>
         <div class="table-wrap table-scroll"><table class="data-table" id="ops-skills"></table></div>
       </div>
     </section>
@@ -567,13 +586,60 @@
       document.querySelectorAll('.view-tab').forEach(function (btn) {
         btn.addEventListener('click', function () { setView(btn.dataset.view); });
       });
-      // Keyboard shortcuts: 1/2/3
+      // Keyboard shortcuts: 1/2/3 view, c collapse-all, e expand-all
       document.addEventListener('keydown', function (e) {
         if (e.target.tagName === 'INPUT' || e.metaKey || e.ctrlKey || e.altKey) return;
         if (e.key === '1') setView('overview');
         if (e.key === '2') setView('ping');
         if (e.key === '3') setView('operations');
+        if (e.key === 'c') setAllCollapsed(true);
+        if (e.key === 'e') setAllCollapsed(false);
       });
+
+      // ── section collapse (per-section, persisted) ──
+      function loadCollapsedState() {
+        try { return JSON.parse(sessionStorage.getItem('dash_collapsed') || '{}'); }
+        catch { return {}; }
+      }
+      function saveCollapsedState(state) {
+        sessionStorage.setItem('dash_collapsed', JSON.stringify(state));
+      }
+      function applyCollapsedState() {
+        var state = loadCollapsedState();
+        document.querySelectorAll('.section[data-section]').forEach(function (sec) {
+          var id = sec.dataset.section;
+          sec.classList.toggle('collapsed', !!state[id]);
+        });
+      }
+      function toggleSection(sec) {
+        var id = sec.dataset.section;
+        if (!id) return;
+        var state = loadCollapsedState();
+        var nowCollapsed = !sec.classList.contains('collapsed');
+        sec.classList.toggle('collapsed', nowCollapsed);
+        if (nowCollapsed) state[id] = true;
+        else delete state[id];
+        saveCollapsedState(state);
+      }
+      function setAllCollapsed(collapsed) {
+        var state = {};
+        document.querySelectorAll('.section[data-section]').forEach(function (sec) {
+          var id = sec.dataset.section;
+          sec.classList.toggle('collapsed', collapsed);
+          if (collapsed) state[id] = true;
+        });
+        saveCollapsedState(state);
+      }
+      // Wire click handlers (delegate so it works pre-render too)
+      document.addEventListener('click', function (e) {
+        var label = e.target.closest('.section-label');
+        if (!label) return;
+        var sec = label.closest('.section[data-section]');
+        if (!sec) return;
+        toggleSection(sec);
+      });
+      // Apply persisted state on initial paint
+      applyCollapsedState();
 
       // ── auth ──
       authForm.addEventListener('submit', function (e) {
