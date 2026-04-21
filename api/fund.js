@@ -8,7 +8,7 @@ var { createWalletClient, createPublicClient, http, fallback, parseEther, format
 var { base } = require('viem/chains');
 var { privateKeyToAccount } = require('viem/accounts');
 
-var RELAY_ADDRESS = '0xb91d82EBE1b90117B6C6c5990104B350d3E2f9e6';
+var RELAY_ADDRESS = '0x30FAfe372734cfD29b46bAf9bd0361ffFf779fDF';
 var SEND_AMOUNT = parseEther('0.001');
 var RPC_URLS = [
   'https://base-mainnet.g.alchemy.com/v2/RgNU6uKPEDG6b7LI14nKs',
