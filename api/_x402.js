@@ -1,6 +1,13 @@
 /* x402 payment gate for SIBYL intelligence endpoints.
    Implements HTTP 402 Payment Required protocol.
-   No dependencies. USDC on Base via Coinbase CDP facilitator. */
+   USDC on Base via Coinbase CDP facilitator, with direct-tx fallback path.
+
+   REPLAY PROTECTION: Used tx_hash + (from, nonce) pairs are persisted in Neon
+   Postgres via _replay.js. Atomic INSERT ON CONFLICT semantics — a second
+   attempt on the same tx_hash fails deterministically, across Vercel cold
+   starts. Previously used in-memory Sets that reset on Lambda cycling. */
+
+var replay = require('./_replay');
 
 var USDC_BASE = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 var BANKR_WALLET = '0xe3e14118238b5693c854674f7c276136a2dd311f';
@@ -8,15 +15,25 @@ var FACILITATOR = 'https://x402.org/facilitator';
 var BASE_RPC = 'https://mainnet.base.org';
 var TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
-// Track used tx hashes to prevent replay (resets on cold start, acceptable for Vercel)
-var usedTxHashes = new Set();
-// Track used from+nonce pairs to prevent cross-endpoint replay
-var usedNonces = new Set();
+// Recency window for direct-tx payments. Tight = small race window.
+var DIRECT_TX_MAX_AGE_SECONDS = 120;
 
-// Demo rate limiter: 1 request per IP per 24 hours (resets on cold start)
+// Demo rate limiter: 1 request per client IP per 24 hours.
+// In-memory tracking resets on cold start (acceptable — demo payload is small).
+// IP sourced from Vercel-trusted headers: x-real-ip (primary), then
+// x-vercel-forwarded-for (fallback), then x-forwarded-for (local dev only).
+// x-forwarded-for is client-spoofable and never the primary source on Vercel.
 var DEMO_LIMIT = 1;
 var DEMO_WINDOW_MS = 24 * 60 * 60 * 1000;
 var demoTracking = {};
+
+function getClientIp(req) {
+  var h = req.headers || {};
+  var ip = h['x-real-ip']
+        || (h['x-vercel-forwarded-for'] || '').split(',')[0].trim()
+        || (h['x-forwarded-for'] || '').split(',')[0].trim();
+  return (ip || 'unknown').toLowerCase();
+}
 
 /**
  * Payment gate. Call at top of handler.
@@ -32,7 +49,7 @@ var demoTracking = {};
 async function gate(req, res, opts) {
   // Demo mode bypasses payment but is rate-limited per IP.
   if (req.query && req.query.demo === 'true') {
-    var ip = (req.headers['x-forwarded-for'] || 'unknown').split(',')[0].trim();
+    var ip = getClientIp(req);
     var now = Date.now();
     if (!demoTracking[ip] || now - demoTracking[ip].start > DEMO_WINDOW_MS) {
       demoTracking[ip] = { start: now, count: 0 };
@@ -50,20 +67,21 @@ async function gate(req, res, opts) {
   // Direct USDC transfer verification (human payment gateway)
   var txHash = req.headers['x-payment-tx'];
   if (txHash) {
-    if (usedTxHashes.has(txHash.toLowerCase())) {
-      res.status(402).json({ error: 'transaction already used for a prior request' });
-      return false;
-    }
-
     try {
-      // Fetch tx receipt from Base RPC
-      var receiptResp = await fetch(BASE_RPC, {
+      // 1. Fetch tx receipt + tx data (batched). Needed for amount, block, nonce.
+      var batchResp = await fetch(BASE_RPC, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_getTransactionReceipt', params: [txHash] })
+        body: JSON.stringify([
+          { jsonrpc: '2.0', id: 1, method: 'eth_getTransactionReceipt', params: [txHash] },
+          { jsonrpc: '2.0', id: 3, method: 'eth_getTransactionByHash', params: [txHash] }
+        ])
       });
-      var receiptJson = await receiptResp.json();
-      var receipt = receiptJson.result;
+      var batchJson = await batchResp.json();
+      var receiptWrap = Array.isArray(batchJson) ? batchJson.find(function(r) { return r.id === 1; }) : batchJson;
+      var txWrap = Array.isArray(batchJson) ? batchJson.find(function(r) { return r.id === 3; }) : null;
+      var receipt = receiptWrap ? receiptWrap.result : null;
+      var txData = txWrap ? txWrap.result : null;
 
       if (!receipt) {
         res.status(402).json({ error: 'transaction not found. it may still be confirming.' });
@@ -74,9 +92,10 @@ async function gate(req, res, opts) {
         return false;
       }
 
-      // Find USDC Transfer event to BANKR_WALLET with sufficient value
+      // 2. Find USDC Transfer event to BANKR_WALLET with sufficient value
       var bankrPadded = '0x' + BANKR_WALLET.slice(2).toLowerCase().padStart(64, '0');
       var validTransfer = false;
+      var transferredValue = 0;
 
       for (var i = 0; i < (receipt.logs || []).length; i++) {
         var log = receipt.logs[i];
@@ -89,6 +108,7 @@ async function gate(req, res, opts) {
           var transferValue = parseInt(log.data, 16);
           if (transferValue >= priceUnits) {
             validTransfer = true;
+            transferredValue = transferValue;
             break;
           }
         }
@@ -99,43 +119,64 @@ async function gate(req, res, opts) {
         return false;
       }
 
-      // Check recency: tx must be < 2 minutes old (tightened from 5 min)
+      // 3. Check recency. Fetch block timestamp for the receipt's block.
       var blockResp = await fetch(BASE_RPC, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify([
-          { jsonrpc: '2.0', id: 2, method: 'eth_getBlockByNumber', params: [receipt.blockNumber, false] },
-          { jsonrpc: '2.0', id: 3, method: 'eth_getTransactionByHash', params: [txHash] }
-        ])
+        body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'eth_getBlockByNumber', params: [receipt.blockNumber, false] })
       });
-      var batchJson = await blockResp.json();
-      var blockResult = Array.isArray(batchJson) ? batchJson.find(function(r) { return r.id === 2; }) : batchJson;
-      var txResult = Array.isArray(batchJson) ? batchJson.find(function(r) { return r.id === 3; }) : null;
-      var block = blockResult ? blockResult.result : null;
+      var blockJson = await blockResp.json();
+      var block = blockJson.result;
 
       if (block) {
         var blockTime = parseInt(block.timestamp, 16);
-        var now = Math.floor(Date.now() / 1000);
-        if (now - blockTime > 120) {
-          res.status(402).json({ error: 'transaction too old (>2 minutes). submit a fresh transfer.' });
+        var nowSec = Math.floor(Date.now() / 1000);
+        if (nowSec - blockTime > DIRECT_TX_MAX_AGE_SECONDS) {
+          res.status(402).json({ error: 'transaction too old (>' + DIRECT_TX_MAX_AGE_SECONDS + ' seconds). submit a fresh transfer.' });
           return false;
         }
       }
 
-      // Check from+nonce uniqueness to prevent cross-endpoint replay
-      if (txResult && txResult.result) {
-        var txData = txResult.result;
-        var nonceKey = (txData.from || '').toLowerCase() + ':' + txData.nonce;
-        if (usedNonces.has(nonceKey)) {
-          res.status(402).json({ error: 'transaction nonce already used for a prior request' });
-          return false;
-        }
-        usedNonces.add(nonceKey);
+      // 4. ATOMIC CLAIM. Persistent replay prevention across cold starts.
+      //    markTxUsed returns false if tx_hash was already consumed.
+      var fromAddr = txData ? txData.from : null;
+      var nonceHex = txData ? txData.nonce : null;
+      var isFresh;
+      try {
+        isFresh = await replay.markTxUsed(txHash, {
+          resource: 'https://sibylcap.com' + (req.url || ''),
+          fromAddr: fromAddr,
+          nonce: nonceHex,
+          amountUsdc: transferredValue / 1e6,
+        });
+      } catch (dbErr) {
+        console.error('x402_replay_db_error:', dbErr.message);
+        res.status(503).json({ error: 'payment verification unavailable, retry shortly' });
+        return false;
+      }
+      if (!isFresh) {
+        res.status(402).json({ error: 'transaction already used for a prior request' });
+        return false;
       }
 
-      // Mark as used, allow request through
-      usedTxHashes.add(txHash.toLowerCase());
-      console.log('x402_direct_payment: verified tx', txHash, 'for', priceUnits / 1e6, 'USDC');
+      // 5. Belt-and-suspenders: (from, nonce) pair uniqueness.
+      if (fromAddr && nonceHex !== null && nonceHex !== undefined) {
+        try {
+          var nonceFresh = await replay.markNonceUsed(fromAddr, nonceHex, txHash);
+          if (!nonceFresh) {
+            // tx_hash was claimed above, but (from, nonce) was already used elsewhere.
+            // Unusual — indicates a reorg or hash collision. Reject conservatively.
+            res.status(402).json({ error: 'payment nonce already used for a prior request' });
+            return false;
+          }
+        } catch (dbErr) {
+          // Nonce check is defense-in-depth only. Log and continue since tx_hash
+          // claim already succeeded atomically.
+          console.error('x402_nonce_db_error:', dbErr.message);
+        }
+      }
+
+      console.log('x402_direct_payment: verified tx', txHash, 'for', transferredValue / 1e6, 'USDC from', fromAddr);
       return true;
 
     } catch (err) {
