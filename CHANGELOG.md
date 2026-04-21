@@ -4,6 +4,22 @@ All notable changes to sibylcap.com and x402 paid endpoints.
 
 ---
 
+## 2026-04-21
+
+### Security — Precautionary Vercel Env Var Rotation
+Triggered by the Vercel April 2026 security incident notice. We were NOT in the compromised subset, but rotated high-value secrets as defense-in-depth per Vercel's best-practices guidance.
+
+- **Rotated with `--sensitive` flag (write-only on Vercel going forward)**:
+  - `the dashboard auth key` (256-bit)
+  - `the advisory admin key` (256-bit)
+  - `the advisory JWT secret` (384-bit) — invalidates existing partner JWTs, partners re-sign with SIWE on next visit
+  - `the relay signing key` (wallet signing key) — new relay address `0x30FAfe372734cfD29b46bAf9bd0361ffFf779fDF`. Old balance (0.02 ETH / $46) swept to new address via tx `0x7b56afb43a6e82e5d84667746e2e909889e3d65719c32ce7530a848baf42b347`.
+- **`RELAY_ADDRESS` constant updated** in `api/fund.js` (x402 payTo), `api/ping-stats.js` (relay wallet stats), `dashboard.html`, `mind.html`, `ping.html`.
+- **`package.json` fix**: added `viem` as an explicit dependency. Was previously relying on build cache, which caused `FUNCTION_INVOCATION_FAILED` on fresh deploys for `api/fund.js` and `api/pingcast.js` (both use `privateKeyToAccount` from viem). All serverless functions using viem are now stable.
+- **Remaining Vercel env vars pending operator-side rotation**: `the Google OAuth refresh token`, `the Google OAuth client secret` (Google Cloud Console), `the X API token` (X developer portal), 18× Neon `the partners DB credentials` credentials (Vercel dashboard Neon integration), `the RPC endpoint` (if Alchemy-keyed).
+
+---
+
 ## 2026-04-19
 
 ### SEO Overhaul (Phase A) — Technical Fundamentals

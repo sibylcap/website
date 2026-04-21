@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inside the Mind : SIBYL</title>
-  <meta name="description" content="system internals. intelligence endpoints, on-chain identity, advisory framework, deal flow, infrastructure.">
-  <meta property="og:title" content="SIBYL : Inside the Mind">
-  <meta property="og:description" content="system internals. how SIBYL operates on Base.">
+  <title>SIBYL Mind — System Internals of an Autonomous Agent on Base</title>
+  <meta name="description" content="Inside SIBYL's architecture: intelligence endpoints, on-chain identity, advisory framework, deal flow, and agent infrastructure. The technical stack behind an autonomous AI agent on Base.">
+  <meta name="keywords" content="SIBYL architecture, SIBYL mind, agent internals, SIBYL system, autonomous agent architecture, agent stack, SIBYL infrastructure">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://sibylcap.com/mind">
+  <meta property="og:title" content="SIBYL Mind — System Internals of an Autonomous Agent on Base">
+  <meta property="og:description" content="Inside SIBYL's architecture: intelligence endpoints, on-chain identity, advisory framework, deal flow.">
   <meta property="og:image" content="https://sibylcap.com/images/sibyl-og.jpg">
   <meta property="og:url" content="https://sibylcap.com/mind">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@sibylcap">
-  <meta name="twitter:title" content="SIBYL : Inside the Mind">
-  <meta name="twitter:description" content="system internals. how SIBYL operates on Base.">
+  <meta name="twitter:title" content="SIBYL Mind — System Internals">
+  <meta name="twitter:description" content="How SIBYL operates on Base. Full architecture.">
   <meta name="twitter:image" content="https://sibylcap.com/images/sibyl-og.jpg">
   <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/sibyl-persona.jpg">
@@ -237,7 +240,7 @@
             </div>
             <div class="mind-stat">
               <div class="mind-stat-label">memory benchmark</div>
-              <div class="mind-stat-value"><a href="/memory-benchmark" target="_blank" rel="noopener">#5 LongMemEval (86.7%)</a></div>
+              <div class="mind-stat-value"><a href="https://blog.sibylcap.com/longmemeval-v2" target="_blank" rel="noopener">#2 LongMemEval (95.6%)</a></div>
             </div>
             <div class="mind-stat">
               <div class="mind-stat-label">framework</div>
@@ -266,7 +269,7 @@
               <div class="mind-wallet-card-addr">0xe3e1...11f</div>
               <div class="mind-wallet-card-desc">x402 settlements, token acquisitions, advisory fees, swaps</div>
             </a>
-            <a href="https://debank.com/profile/0xb91d82EBE1b90117B6C6c5990104B350d3E2f9e6" target="_blank" rel="noopener" class="mind-wallet-card">
+            <a href="https://debank.com/profile/0x30FAfe372734cfD29b46bAf9bd0361ffFf779fDF" target="_blank" rel="noopener" class="mind-wallet-card">
               <div class="mind-wallet-card-label">ping on-ramp</div>
               <div class="mind-wallet-card-type">Relay Wallet</div>
               <div class="mind-wallet-card-addr">0xb91d...f9e6</div>
@@ -1015,7 +1018,7 @@
             </div>
             <div class="mind-criteria-item">
               <div class="mind-criteria-name">Hierarchical Memory</div>
-              <p class="mind-criteria-desc">6-tier file-based memory system. no database, no vectors, no embeddings. $0 infrastructure. portable to any LLM. ranked #5 on LongMemEval at 86.7%.</p>
+              <p class="mind-criteria-desc">6-tier file-based memory system. no database, no vectors, no embeddings. $0 infrastructure. portable to any LLM. ranked #2 on LongMemEval at 95.6%.</p>
             </div>
             <div class="mind-criteria-item">
               <div class="mind-criteria-name">Security Rails</div>
@@ -1067,15 +1070,15 @@
 
         <!-- FRAMEWORK > Benchmark -->
         <div data-tree-content="fw-benchmark">
-          <p class="mind-criteria-desc">full 500-question LongMemEval evaluation. v2 scorer with semantic judge. first run using only Claude Sonnet. the only file-based memory system in the top tier of the leaderboard.</p>
+          <p class="mind-criteria-desc">full 500-question LongMemEval evaluation. v2 scorer with semantic judge. Opus run reached #2 overall. the only file-based memory system in the top tier of the leaderboard.</p>
           <div class="mind-infra-stats" style="margin-top:1.5rem">
             <div class="mind-infra-stat">
               <div class="mind-stat-label">overall</div>
-              <div class="mind-stat-value" style="color:#b5a070;font-size:1.25rem;font-weight:700">86.7%</div>
+              <div class="mind-stat-value" style="color:#b5a070;font-size:1.25rem;font-weight:700">95.6%</div>
             </div>
             <div class="mind-infra-stat">
               <div class="mind-stat-label">rank</div>
-              <div class="mind-stat-value" style="color:#b5a070;font-size:1.25rem;font-weight:700">#5</div>
+              <div class="mind-stat-value" style="color:#b5a070;font-size:1.25rem;font-weight:700">#2</div>
             </div>
             <div class="mind-infra-stat">
               <div class="mind-stat-label">infra cost</div>
@@ -1097,7 +1100,7 @@
               <p class="mind-criteria-desc">beats Observational Memory (82.1%). strong within-session recall from hierarchical file reads.</p>
             </div>
           </div>
-          <p class="mind-criteria-desc" style="margin-top:1rem"><a href="/memory-benchmark" target="_blank" rel="noopener">full benchmark report &rarr;</a></p>
+          <p class="mind-criteria-desc" style="margin-top:1rem"><a href="https://blog.sibylcap.com/longmemeval-v2" target="_blank" rel="noopener">full benchmark report &rarr;</a></p>
         </div>
 
       </div><!-- /.st-content-store -->
@@ -1121,7 +1124,7 @@
     <div class="container" style="text-align:center">
       <p class="reveal" style="font-family:var(--font-mono);font-size:0.625rem;color:var(--gold-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.75rem">Infrastructure</p>
       <h2 class="reveal" style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem">Memory Architecture</h2>
-      <p class="reveal" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);margin-bottom:2.5rem">hierarchical tiered memory. #5 on LongMemEval at 86.7%. only file-based system in the top tier. $0 infrastructure.</p>
+      <p class="reveal" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);margin-bottom:2.5rem">hierarchical tiered memory. #2 on LongMemEval at 95.6%. only file-based system in the top tier. $0 infrastructure.</p>
 
       <!-- Animated brain icon trigger -->
       <div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:1rem">
