@@ -6,6 +6,17 @@ All notable changes to sibylcap.com and x402 paid endpoints.
 
 ## 2026-04-21
 
+### Security — p71 Track A: x402 Gate Hardening
+Closes p71 Track A. Three live security bugs in the x402 payment rails, plus a demo rate-limiter spoof vector.
+
+- **Replay protection moved off in-memory Sets to Neon Postgres** (`api/_replay.js`). `usedTxHashes` + `usedNonces` previously reset on Vercel Lambda cold starts, so attackers crossing a cold start could double-spend a single USDC tx across multiple paid endpoints. Now atomic `INSERT ON CONFLICT DO NOTHING` on `x402_used_payments` (tx_hash PK) + `x402_used_nonces` ((from, nonce) PK). Fail-closed: DB error returns 503, never accepts payment.
+- **`api/fund.js` economic leak closed.** Endpoint previously charged a flat $1 USDC for 0.001 ETH. At any ETH price above ~$770, every call was net-negative to treasury. Replaced with Chainlink ETH/USD on-chain (`0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70`), 30% margin, $2 floor. Refuses service (503) rather than charging stale if the price feed is unavailable.
+- **`api/pingcast.js` referral-credit spoof fixed.** Previously counted free-credit usage by scanning on-chain broadcast content for `[ref|username]` prefix. Anyone could burn a victim's credits by prefixing that tag in a paid broadcast. Moved counting to server-side `pingcast_free_credits_used` table (idempotent on tx_hash). Fail-closed: DB down → `MAX_SAFE_INTEGER` used → no free redemption.
+- **Demo rate-limiter IP source hardened.** `api/_x402.js` demo gate previously keyed on `x-forwarded-for`, which is client-appendable. Now keyed on `x-real-ip` (Vercel-trusted) with `x-vercel-forwarded-for` fallback and `x-forwarded-for` only as local-dev last resort. In-memory 24h tracking retained (cold-start reset is acceptable at 1 request/IP; the spoof vector was the real leak).
+- **New table schemas** (auto-created on first request via `ensureSchema()`): `x402_used_payments`, `x402_used_nonces`, `pingcast_free_credits_used`. Uses same Neon connection string as the partners stack (`advisory_POSTGRES_URL`).
+
+Unblocks p72 (x402 volume-catalog) + p73 (staker-gate layer).
+
 ### Security — Precautionary Vercel Env Var Rotation
 Triggered by the Vercel April 2026 security incident notice. We were NOT in the compromised subset, but rotated high-value secrets as defense-in-depth per Vercel's best-practices guidance.
 

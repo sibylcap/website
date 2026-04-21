@@ -12,6 +12,7 @@
    grows and tiers increase. Never loses money on a broadcast. */
 
 var { gate } = require('./_x402');
+var replay = require('./_replay');
 var { createWalletClient, createPublicClient, http, fallback, formatEther } = require('viem');
 var { base } = require('viem/chains');
 var { privateKeyToAccount } = require('viem/accounts');
@@ -111,25 +112,20 @@ function calcFreeCredits(referralCount) {
   return 1 + Math.floor((referralCount - 1) / 10);
 }
 
-// Count free Pingcasts already redeemed by scanning broadcast logs for [ref|Username] tag
-async function countUsedFreeCredits(publicClient, username) {
-  var tag = '[ref|' + username + '] ';
+// Count free Pingcasts already redeemed by this username. Authoritative source:
+// server-side DB (pingcast_free_credits_used). Previous implementation scanned
+// on-chain broadcast content for [ref|username] prefix, which was spoofable —
+// anyone could burn another user's credits by prefixing that tag in a paid
+// broadcast. Moving to DB closes the spoof vector; the [ref|username] tag in
+// content is now purely cosmetic for inbox rendering.
+async function countUsedFreeCredits(_publicClient, username) {
   try {
-    var logs = await publicClient.getLogs({
-      address: DIAMOND_ADDRESS,
-      event: BROADCAST_EVENT,
-      fromBlock: REFERRALS_DEPLOY_BLOCK,
-      toBlock: 'latest',
-    });
-    var used = 0;
-    for (var i = 0; i < logs.length; i++) {
-      var content = logs[i].args.content || '';
-      if (content.indexOf(tag) === 0) used++;
-    }
-    return used;
+    return await replay.countReferralUsed(username);
   } catch (e) {
     console.error('pingcast_count_free_error:', e.message);
-    return 0;
+    // Fail-closed: if the DB is down, cannot safely grant free credits.
+    // Returning a large number blocks free redemption; caller falls back to paid path.
+    return Number.MAX_SAFE_INTEGER;
   }
 }
 
@@ -273,6 +269,16 @@ module.exports = async function handler(req, res) {
       }
 
       var result = await executeBroadcast(publicClient, freeContent);
+
+      // Authoritative server-side record of the redemption. Idempotent on tx_hash.
+      try {
+        await replay.recordReferralUse(name, result.hash);
+      } catch (dbErr) {
+        // Credit was consumed on-chain but not recorded in DB. Log loudly.
+        // Next call will under-count used (user gets a bonus credit). Acceptable
+        // vs over-counting (which would deny legitimate credit).
+        console.error('pingcast_free_record_error:', dbErr.message, 'tx:', result.hash);
+      }
 
       console.log('pingcast_free:', name, 'referrals:', count, 'credit', (used + 1) + '/' + earned, 'tx:', result.hash);
 
