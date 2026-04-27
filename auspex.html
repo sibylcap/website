@@ -42,7 +42,7 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #06070a;
@@ -64,8 +64,9 @@
       --green: #5a8a6a;
       --red: #b56262;
       --violet: #8878a8;
-      --font-display: 'Syne', sans-serif;
+      --font-display: 'Fraunces', 'Times New Roman', serif;
       --font-mono: 'IBM Plex Mono', monospace;
+      --display-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
       --ease: cubic-bezier(0.19, 1, 0.22, 1);
     }
 
@@ -79,7 +80,7 @@
     /* === NAV === */
     .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem clamp(1.5rem, 4vw, 4rem); background: rgba(6,7,10,0.9); border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); }
     .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-    .nav-logo { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.15em; }
+    .nav-logo { font-family: var(--font-display); font-size: 1rem; font-weight: 600; font-variation-settings: "opsz" 14, "SOFT" 20, "WONK" 0; color: var(--text-primary); letter-spacing: 0.18em; text-transform: uppercase; }
     .nav-logo a { color: var(--text-primary); }
     .nav-logo .sep { color: var(--text-muted); margin: 0 0.6rem; }
     .nav-logo .auspex { color: var(--gold); }
@@ -128,27 +129,30 @@
 
     h1.brand-mark {
       font-family: var(--font-display);
-      font-weight: 800;
+      font-weight: 700;
       font-size: clamp(4rem, 12vw, 9rem);
-      letter-spacing: -0.04em;
+      font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+      letter-spacing: -0.025em;
       line-height: 0.95;
       color: var(--gold);
       text-shadow: 0 0 80px rgba(196,168,98,0.2);
     }
     h2 {
       font-family: var(--font-display);
-      font-weight: 700;
-      font-size: clamp(1.6rem, 3.6vw, 2.6rem);
-      letter-spacing: -0.02em;
-      line-height: 1.15;
+      font-weight: 600;
+      font-size: clamp(1.7rem, 3.8vw, 2.8rem);
+      font-variation-settings: "opsz" 60, "SOFT" 30, "WONK" 0;
+      letter-spacing: -0.015em;
+      line-height: 1.18;
       margin-bottom: 1.5rem;
       color: var(--text-primary);
     }
     h3 {
       font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 1.05rem;
-      letter-spacing: -0.01em;
+      font-weight: 500;
+      font-size: 1.1rem;
+      font-variation-settings: "opsz" 24, "SOFT" 20, "WONK" 0;
+      letter-spacing: -0.005em;
       color: var(--text-primary);
       margin-bottom: 0.75rem;
     }
@@ -198,11 +202,13 @@
     .hero h1.brand-mark { margin-bottom: 1.25rem; }
     .hero-tagline {
       font-family: var(--font-display);
-      font-weight: 500;
-      font-size: clamp(1.25rem, 2.5vw, 1.85rem);
+      font-weight: 400;
+      font-style: italic;
+      font-size: clamp(1.35rem, 2.6vw, 2rem);
+      font-variation-settings: "opsz" 36, "SOFT" 40, "WONK" 1;
       color: var(--text-primary);
-      letter-spacing: -0.01em;
-      max-width: 22ch;
+      letter-spacing: -0.005em;
+      max-width: 24ch;
       margin-bottom: 2.5rem;
       line-height: 1.25;
     }
@@ -421,7 +427,7 @@
       border-top: 1px solid var(--border);
     }
     .demo-foot-item .label { display: block; font-size: 0.6rem; letter-spacing: 0.18em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem; }
-    .demo-foot-item .value { display: block; font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: var(--text-primary); }
+    .demo-foot-item .value { display: block; font-family: var(--font-display); font-size: 1.25rem; font-weight: 500; font-variation-settings: "opsz" 24, "SOFT" 30, "WONK" 0; color: var(--text-primary); }
     .demo-foot-item .value.gold { color: var(--gold); }
 
     .demo-controls {
@@ -470,10 +476,11 @@
       top: 1.25rem;
       right: 1.5rem;
       font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 800;
+      font-size: 1.75rem;
+      font-weight: 700;
+      font-variation-settings: "opsz" 36, "SOFT" 30, "WONK" 1;
       color: var(--gold);
-      opacity: 0.4;
+      opacity: 0.45;
     }
     .phase h3 { margin-bottom: 0.75rem; }
     .phase ul { list-style: none; padding: 0; margin-top: 0.75rem; }
@@ -554,19 +561,21 @@
     }
     .tier-name {
       font-family: var(--font-display);
-      font-size: 1.15rem;
-      font-weight: 600;
+      font-size: 1.25rem;
+      font-weight: 500;
+      font-variation-settings: "opsz" 28, "SOFT" 30, "WONK" 0;
       color: var(--text-primary);
-      letter-spacing: -0.01em;
+      letter-spacing: -0.005em;
       margin-bottom: 0.4rem;
     }
     .tier-tag { font-size: 0.625rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; }
     .tier-price {
       font-family: var(--font-display);
-      font-size: 2rem;
-      font-weight: 700;
+      font-size: 2.2rem;
+      font-weight: 600;
+      font-variation-settings: "opsz" 72, "SOFT" 30, "WONK" 0;
       color: var(--text-primary);
-      letter-spacing: -0.02em;
+      letter-spacing: -0.015em;
       line-height: 1;
       margin-bottom: 0.3rem;
     }
@@ -647,7 +656,7 @@
       margin-top: 2rem;
     }
     .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
-    .footer-brand { font-family: var(--font-display); font-weight: 700; color: var(--text-primary); letter-spacing: 0.12em; font-size: 0.85rem; }
+    .footer-brand { font-family: var(--font-display); font-weight: 600; font-variation-settings: "opsz" 14, "SOFT" 20, "WONK" 0; color: var(--text-primary); letter-spacing: 0.16em; font-size: 0.9rem; text-transform: uppercase; }
     .footer-brand .auspex { color: var(--gold); }
     .footer-meta { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.04em; }
     .footer-links { display: flex; gap: 1.25rem; }
@@ -1079,12 +1088,28 @@
       ['sports-rl', '0x4f2a..91c8', 'Auto-translated soccer commentary from 4 leagues. Translation quality not verified.', 'against', 'unverified pipeline · format risk'],
     ];
 
+    // Seed entries so the columns are populated on page load, before the live loop runs.
+    // These represent the previous epoch's tail — already-finalized votes the voter
+    // can audit. The live loop adds new submissions on top.
+    const SEED_FEED = [
+      { datanet: 'geopolitics', pub: '0x91dd..04ac', content: 'EU central bank policy divergence Q4. Three primary sources, all dated within 30 days. Original synthesis.', verdict: 'for', score: '0.81' },
+      { datanet: 'sports-rl', pub: '0xb12f..00aa', content: 'Olympic gymnastics scoring trajectories. 12K labeled events. Validated against published reference scores.', verdict: 'for', score: '0.86' },
+      { datanet: 'robotics-egocentric', pub: '0x4f2a..91c8', content: 'Bicycle assembly footage, 30 hr. No annotation. Operator inconsistent across sessions.', verdict: 'against', score: '0.28' },
+    ];
+    const SEED_LOG = [
+      { time: '04:12:08', verdict: 'for', datanet: 'geopolitics', detail: 'sourced · novel framing · publisher trending high' },
+      { time: '04:11:43', verdict: 'for', datanet: 'sports-rl', detail: 'format clean · large · matches schema' },
+      { time: '04:11:21', verdict: 'against', datanet: 'robotics-egocentric', detail: 'no annotation · publisher had two prior rejects' },
+      { time: '04:10:55', verdict: 'for', datanet: 'sports-rl', detail: 'cross-validated · sourced · novel' },
+      { time: '04:10:32', verdict: 'against', datanet: 'geopolitics', detail: 'duplicative · auto-veto on novelty' },
+    ];
+
     let demoState = {
       idx: 0,
       tickStart: 0,
       raf: null,
       playing: false,
-      stats: { read: 0, voted: 0, budget: 0 },
+      stats: { read: 3, voted: 2, budget: 3.0 }, // Initialized from seed
     };
 
     const feed = document.getElementById('feed');
@@ -1211,17 +1236,17 @@
 
     function resetDemo(silent) {
       demoState.idx = 0;
-      demoState.stats = { read: 0, voted: 0, budget: 0 };
+      // Reset to seed counters (3 reads, 2 voted, 3.0% budget — matching SEED_FEED)
+      demoState.stats = { read: 3, voted: 2, budget: 3.0 };
       feed.innerHTML = '';
       log.innerHTML = '';
-      statRead.textContent = '0';
-      statVoted.textContent = '0';
-      statBudget.textContent = '0%';
       timeEl.textContent = '00:00';
       weightEl.textContent = '100%';
       // bump epoch counter
       const cur = parseInt(epochEl.textContent, 10);
       epochEl.textContent = String(cur + (silent ? 1 : 0)).padStart(4, '0');
+      // Re-render seed so columns stay populated through reset
+      renderSeed();
       if (!silent) {
         pauseDemo();
         playBtn.textContent = 'play';
@@ -1235,19 +1260,54 @@
     });
     resetBtn.addEventListener('click', () => resetDemo(false));
 
-    // auto-start once visible (reduces friction, makes the page feel alive)
-    if ('IntersectionObserver' in window) {
-      const demoSection = document.querySelector('.demo-frame');
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting && !demoState.playing && demoState.idx === 0) {
-            setTimeout(startDemo, 600);
-            io.disconnect();
-          }
-        });
-      }, { threshold: 0.25 });
-      io.observe(demoSection);
+    // Pre-populate the feed and log with seed entries so columns are never empty.
+    // This runs immediately on script execution (script is at end of body, DOM is ready).
+    function renderSeed() {
+      // Seed feed (newest first)
+      for (let i = SEED_FEED.length - 1; i >= 0; i--) {
+        const s = SEED_FEED[i];
+        const cls = s.verdict === 'for' ? 'voted-for' : 'voted-against';
+        const pillCls = s.verdict === 'for' ? 'score-for' : 'score-against';
+        const el = document.createElement('div');
+        el.className = `submission ${cls}`;
+        el.innerHTML = `
+          <div class="row1">
+            <span class="datanet">${s.datanet}</span>
+            <span class="pubaddr">${s.pub}</span>
+          </div>
+          <div class="content">${s.content}</div>
+          <div class="row3">
+            <span class="agent-state">vote: ${s.verdict}</span>
+            <span class="score-pill ${pillCls}">${s.verdict === 'for' ? 'FOR' : 'AGAINST'} · ${s.score}</span>
+          </div>
+        `;
+        feed.appendChild(el);
+      }
+      // Seed log
+      SEED_LOG.forEach(s => {
+        const line = document.createElement('div');
+        line.className = 'log-line';
+        line.innerHTML = `
+          <span class="log-time">${s.time}</span>
+          <span class="log-action ${s.verdict}">${s.verdict.toUpperCase()}</span>
+          <span class="log-detail">${s.datanet} · ${s.detail}</span>
+        `;
+        log.appendChild(line);
+      });
+      // Update counters to reflect seed
+      statRead.textContent = demoState.stats.read;
+      statVoted.textContent = demoState.stats.voted;
+      statBudget.textContent = `${demoState.stats.budget.toFixed(1)}%`;
     }
+
+    renderSeed();
+
+    // Auto-start the live loop after a short delay so the seeded state is visible first.
+    // No IntersectionObserver gating — start regardless of scroll position so the page
+    // feels alive even on first paint.
+    setTimeout(() => {
+      if (!demoState.playing && demoState.idx === 0) startDemo();
+    }, 1200);
   </script>
 </body>
 </html>
