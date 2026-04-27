@@ -1028,6 +1028,14 @@
       <p style="margin-top:2rem;color:var(--text-secondary);font-size:0.7rem;">the convex precedent: convex took locked CRV, issued cvxCRV, controlled the underlying voting power, and built one of the most successful protocols in DeFi. auspex applies the same pattern with a different optimization target — agent-driven rubric application instead of bribe-driven vote markets.</p>
 
       <p style="color:var(--text-secondary);font-size:0.7rem;">three architectural questions for the reppo team: (1) does the protocol whitelist contracts as lockers? (2) can a contract holding veREPPO call <code>vote()</code> on behalf of itself? (3) do vote events emit enough detail for per-action audit? these determine the integration shape.</p>
+
+      <div style="margin-top:3rem;padding:2rem clamp(1.5rem,3vw,2.5rem);background:linear-gradient(135deg,rgba(196,168,98,0.06) 0%,rgba(196,168,98,0.02) 100%);border:1px solid rgba(196,168,98,0.25);border-radius:6px;">
+        <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:1rem;">operational footprint</div>
+        <h3 style="font-size:clamp(1.25rem,2.4vw,1.75rem);margin-bottom:1.25rem;">one contract. one sandbox. one agent. one rubric per epoch.</h3>
+        <p style="font-size:0.8125rem;color:var(--text-dim);max-width:65ch;">the pool is the unit of intelligence, not the voter. every depositor gets the same vote decisions and the same yield share — so they share the same agent. one autonomous sibyl-shaped process runs in a sandbox 24/7. it watches reppo's publisher events, applies the registered rubric, and calls <code>VoteManager.castVote()</code> within the early-decay window. one decision log. one on-chain event stream. one systemd unit to monitor.</p>
+        <p style="font-size:0.8125rem;color:var(--text-dim);max-width:65ch;">cross-publisher pattern detection compounds at the pool level — the agent sees the union of submissions across every datanet the pool participates in, not just any one voter's slice. the more capital flows in, the smarter the agent's reasoning gets, because the corpus it reads grows.</p>
+        <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;">scale model: <code>1 agent process per VoteManager contract</code>. the public auspex pool is one. each pro-tier private pool is another. tens of instances at scale, not thousands.</p>
+      </div>
     </div>
   </section>
 
