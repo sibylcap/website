@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AUSPEX — Voter Agent for Reppo Datanets | Sibyl Labs</title>
+  <meta name="description" content="AUSPEX is a proposed voter agent for Reppo datanets. Reads publisher submissions, applies your rubric, casts votes in the early-decay window of every 48-hour epoch. Built on SIBYL's file-based memory architecture (#2 LongMemEval, 95.6%).">
+  <meta name="keywords" content="auspex, sibyl auspex, reppo voter agent, reppo datanet agent, veREPPO, prediction market agent, sibyl labs, base chain agent">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sibylcap.com/auspex">
+  <meta property="og:title" content="AUSPEX — Voter Agent for Reppo Datanets">
+  <meta property="og:description" content="Read every submission. Apply your rubric. Vote in the early-decay window. Sleep through the rest.">
+  <meta property="og:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <meta property="og:url" content="https://sibylcap.com/auspex">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@sibylcap">
+  <meta name="twitter:title" content="AUSPEX — Voter Agent for Reppo Datanets">
+  <meta name="twitter:description" content="Voter agent for Reppo. Read, score, vote in the early-decay window.">
+  <meta name="twitter:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "AUSPEX",
+    "alternateName": "AUSPEX Voter Agent",
+    "applicationCategory": "DeveloperApplication",
+    "applicationSubCategory": "AI Agent",
+    "operatingSystem": "Web, Base blockchain",
+    "description": "Voter agent for Reppo datanets. Reads publisher submissions across active datanets, applies a voter-defined rubric, and casts votes within the early-decay window of every 48-hour epoch. Built on SIBYL's file-based memory architecture.",
+    "url": "https://sibylcap.com/auspex",
+    "image": "https://sibylcap.com/images/sibyl-og.jpg",
+    "author": { "@type": "Organization", "name": "Sibyl Labs, LLC", "url": "https://sibylcap.com/" },
+    "publisher": { "@type": "Organization", "name": "Sibyl Labs, LLC", "url": "https://sibylcap.com/" },
+    "offers": [
+      { "@type": "Offer", "name": "Hosted", "description": "Per-vote x402 metered, hosted by Sibyl Labs", "priceCurrency": "USD", "price": "0.10" },
+      { "@type": "Offer", "name": "License", "description": "Self-hosted framework license", "priceCurrency": "USD", "price": "1000" }
+    ],
+    "keywords": "auspex, voter agent, reppo, datanet, veREPPO, sibyl labs"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #06070a;
+      --surface: #0b0e14;
+      --elevated: #10131a;
+      --highest: #161a23;
+      --border: #181c26;
+      --border-strong: #222836;
+      --text-primary: #e0e2e8;
+      --text-dim: #9aa0ac;
+      --text-secondary: #6a7080;
+      --text-muted: #404858;
+      --gold: #c4a862;
+      --gold-bright: #e3c878;
+      --gold-dim: rgba(196,168,98,0.12);
+      --gold-line: rgba(196,168,98,0.025);
+      --teal: #2ea9a1;
+      --teal-dim: rgba(46,169,161,0.1);
+      --green: #5a8a6a;
+      --red: #b56262;
+      --violet: #8878a8;
+      --font-display: 'Syne', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --ease: cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.7; overflow-x: hidden; }
+    a { color: var(--gold); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--gold-bright); }
+    ::selection { background: var(--gold); color: var(--bg); }
+
+    /* === NAV === */
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem clamp(1.5rem, 4vw, 4rem); background: rgba(6,7,10,0.9); border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); }
+    .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .nav-logo { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.15em; }
+    .nav-logo a { color: var(--text-primary); }
+    .nav-logo .sep { color: var(--text-muted); margin: 0 0.6rem; }
+    .nav-logo .auspex { color: var(--gold); }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { font-size: 0.6875rem; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .nav-links a:hover { color: var(--gold); }
+    @media (max-width: 640px) {
+      .nav-links a:not(.cta) { display: none; }
+    }
+    .cta-pill {
+      padding: 0.55rem 1rem;
+      border: 1px solid rgba(196,168,98,0.4);
+      border-radius: 999px;
+      color: var(--gold);
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .cta-pill:hover { background: var(--gold-dim); border-color: var(--gold); color: var(--gold-bright); }
+
+    /* === SHARED LAYOUT === */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 clamp(1.5rem, 4vw, 4rem); }
+    .section { padding: clamp(4rem, 9vh, 8rem) 0; }
+    .section-rule { height: 1px; background: linear-gradient(90deg, rgba(196,168,98,0.2) 0%, rgba(196,168,98,0.05) 60%, transparent 100%); }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: clamp(2rem, 4vh, 3rem);
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .section-label::before {
+      content: '';
+      width: 2.5rem;
+      height: 1px;
+      background: rgba(196,168,98,0.5);
+      flex-shrink: 0;
+    }
+
+    h1.brand-mark {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(4rem, 12vw, 9rem);
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+      color: var(--gold);
+      text-shadow: 0 0 80px rgba(196,168,98,0.2);
+    }
+    h2 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+    h3 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    p { color: var(--text-dim); margin-bottom: 1rem; max-width: 60ch; }
+    p.lead { font-size: clamp(1rem, 1.6vw, 1.25rem); color: var(--text-primary); line-height: 1.6; max-width: 38ch; }
+    .quiet { color: var(--text-secondary); font-size: 0.75rem; letter-spacing: 0.04em; }
+    code, .mono { font-family: var(--font-mono); }
+
+    /* === HERO === */
+    .hero {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      align-content: center;
+      padding: clamp(6rem, 14vh, 10rem) clamp(1.5rem, 4vw, 4rem) clamp(3rem, 6vh, 5rem);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 45% 55% at 12% 85%, rgba(196,168,98,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 45% at 88% 18%, rgba(136,120,168,0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-inner { max-width: 1100px; width: 100%; margin: 0 auto; position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid rgba(136,120,168,0.4);
+      background: rgba(136,120,168,0.05);
+      border-radius: 999px;
+      color: var(--violet);
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+    .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    .hero h1.brand-mark { margin-bottom: 1.25rem; }
+    .hero-tagline {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: clamp(1.25rem, 2.5vw, 1.85rem);
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      max-width: 22ch;
+      margin-bottom: 2.5rem;
+      line-height: 1.25;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(1.5rem, 4vw, 3rem);
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      max-width: 700px;
+    }
+    .hero-meta-item .label { display: block; font-size: 0.65rem; letter-spacing: 0.18em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .hero-meta-item .value { display: block; font-size: 0.8125rem; color: var(--text-primary); }
+    .hero-meta-item .value.gold { color: var(--gold); }
+
+    /* === DECAY DIAGRAM === */
+    .decay-wrap {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      margin-top: 2rem;
+    }
+    @media (min-width: 900px) {
+      .decay-wrap { grid-template-columns: 1.3fr 1fr; gap: 4rem; }
+    }
+    .decay-svg {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2rem;
+      position: relative;
+    }
+    .decay-svg::after {
+      content: 'epoch decay · 48h';
+      position: absolute;
+      top: 0.75rem;
+      right: 1rem;
+      font-size: 0.625rem;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .decay-bullets li {
+      list-style: none;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .decay-bullets li:last-child { border-bottom: none; }
+    .decay-bullets .num {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      min-width: 2.5rem;
+      padding-top: 3px;
+    }
+    .decay-bullets .body { color: var(--text-dim); font-size: 0.8125rem; }
+    .decay-bullets .body strong { color: var(--text-primary); font-weight: 500; }
+
+    /* === LIVE DEMO === */
+    .demo-frame {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .demo-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.85rem 1.25rem;
+      background: var(--elevated);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .demo-bar .live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-right: 0.5rem; animation: pulse 1.4s infinite; }
+    .demo-bar .right { color: var(--text-secondary); }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      min-height: 540px;
+    }
+    @media (min-width: 880px) {
+      .demo-grid { grid-template-columns: 280px 1fr 320px; }
+    }
+    .demo-col { padding: 1.5rem 1.25rem; }
+    .demo-col + .demo-col { border-top: 1px solid var(--border); }
+    @media (min-width: 880px) {
+      .demo-col + .demo-col { border-top: none; border-left: 1px solid var(--border); }
+    }
+    .demo-col h4 {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    /* Rubric column */
+    .rubric-item {
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      margin-bottom: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      background: var(--elevated);
+    }
+    .rubric-item .crit { color: var(--text-primary); font-weight: 500; display: block; margin-bottom: 0.2rem; }
+    .rubric-item .hint { color: var(--text-muted); font-size: 0.625rem; line-height: 1.4; }
+    .rubric-meta {
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border);
+      font-size: 0.625rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      line-height: 1.7;
+    }
+    .rubric-meta strong { color: var(--text-primary); font-weight: 500; }
+
+    /* Submissions feed */
+    .feed-stage {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 0.4rem;
+    }
+    .feed-stage::-webkit-scrollbar { width: 6px; }
+    .feed-stage::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    .submission {
+      padding: 0.85rem 1rem;
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--text-muted);
+      border-radius: 3px;
+      animation: slide-in 0.4s var(--ease);
+      transition: all 0.3s;
+    }
+    .submission.scoring { border-left-color: var(--gold); }
+    .submission.voted-for { border-left-color: var(--green); }
+    .submission.voted-against { border-left-color: var(--red); }
+    .submission .row1 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+    .submission .datanet {
+      font-size: 0.625rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .submission .pubaddr { font-size: 0.625rem; color: var(--text-muted); }
+    .submission .content { font-size: 0.75rem; color: var(--text-primary); margin-bottom: 0.4rem; line-height: 1.5; }
+    .submission .row3 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.625rem;
+    }
+    .submission .agent-state {
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .submission .score-pill {
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+    .score-for { background: rgba(90,138,106,0.15); color: var(--green); border: 1px solid rgba(90,138,106,0.3); }
+    .score-against { background: rgba(181,98,98,0.15); color: var(--red); border: 1px solid rgba(181,98,98,0.3); }
+    .score-thinking { background: rgba(196,168,98,0.1); color: var(--gold); border: 1px solid rgba(196,168,98,0.3); }
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Decision log */
+    .log-line {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.55rem 0;
+      font-size: 0.65rem;
+      border-bottom: 1px dashed var(--border);
+      animation: slide-in 0.3s var(--ease);
+    }
+    .log-line:last-child { border-bottom: none; }
+    .log-time { color: var(--text-muted); min-width: 3.4rem; }
+    .log-action.for { color: var(--green); }
+    .log-action.against { color: var(--red); }
+    .log-action.scoring { color: var(--gold); }
+    .log-detail { color: var(--text-dim); flex: 1; line-height: 1.4; }
+
+    /* Decision summary footer */
+    .demo-foot {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 1rem 1.25rem;
+      gap: 1rem;
+      background: var(--elevated);
+      border-top: 1px solid var(--border);
+    }
+    .demo-foot-item .label { display: block; font-size: 0.6rem; letter-spacing: 0.18em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem; }
+    .demo-foot-item .value { display: block; font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: var(--text-primary); }
+    .demo-foot-item .value.gold { color: var(--gold); }
+
+    .demo-controls {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    .demo-btn {
+      padding: 0.55rem 1.1rem;
+      background: var(--elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .demo-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .demo-btn.primary { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+    .demo-btn.primary:hover { background: var(--gold); color: var(--bg); }
+    .demo-btn.muted { opacity: 0.5; }
+
+    /* === HOW PHASES === */
+    .phases {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    @media (min-width: 760px) {
+      .phases { grid-template-columns: repeat(3, 1fr); }
+    }
+    .phase {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      position: relative;
+    }
+    .phase-num {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.5rem;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--gold);
+      opacity: 0.4;
+    }
+    .phase h3 { margin-bottom: 0.75rem; }
+    .phase ul { list-style: none; padding: 0; margin-top: 0.75rem; }
+    .phase li {
+      padding: 0.4rem 0;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      position: relative;
+      padding-left: 1rem;
+    }
+    .phase li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* === ARCHITECTURE TABLE === */
+    .arch-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.7rem;
+    }
+    .arch-table th, .arch-table td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .arch-table th {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .arch-table td:first-child { color: var(--text-primary); width: 45%; }
+    .arch-table td:last-child { color: var(--text-dim); }
+    .arch-table tr:hover td { background: rgba(196,168,98,0.025); }
+
+    /* === PRICING === */
+    .price-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    @media (min-width: 800px) {
+      .price-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .tier {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s;
+    }
+    .tier:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .tier.featured { border-color: var(--gold); position: relative; }
+    .tier.featured::before {
+      content: 'recommended';
+      position: absolute;
+      top: -10px;
+      left: 1.5rem;
+      padding: 0.2rem 0.6rem;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 0.575rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border-radius: 2px;
+    }
+    .tier-name {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-bottom: 0.4rem;
+    }
+    .tier-tag { font-size: 0.625rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; }
+    .tier-price {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .tier-price-unit { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-bottom: 1.5rem; display: block; }
+    .tier ul { list-style: none; padding: 0; margin-bottom: 1.5rem; flex: 1; }
+    .tier li {
+      padding: 0.4rem 0;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      padding-left: 1rem;
+      position: relative;
+      line-height: 1.5;
+    }
+    .tier li::before {
+      content: '+';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .tier-cta {
+      padding: 0.75rem;
+      text-align: center;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      cursor: pointer;
+      background: transparent;
+      transition: all 0.2s;
+    }
+    .tier-cta:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+    /* === CTA === */
+    .end-cta {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      padding: clamp(2rem, 5vw, 4rem);
+      margin: 3rem 0;
+      text-align: center;
+    }
+    .end-cta h2 { margin-bottom: 1rem; }
+    .end-cta p { margin: 0 auto 2rem; }
+    .end-cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 0.9rem 1.75rem;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 600;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold-bright); color: var(--bg); }
+    .btn-secondary {
+      padding: 0.9rem 1.75rem;
+      background: transparent;
+      color: var(--gold);
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 600;
+      border: 1px solid var(--gold);
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--gold-dim); }
+
+    /* === FOOTER === */
+    .footer {
+      padding: 3rem 0 4rem;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+    .footer-brand { font-family: var(--font-display); font-weight: 700; color: var(--text-primary); letter-spacing: 0.12em; font-size: 0.85rem; }
+    .footer-brand .auspex { color: var(--gold); }
+    .footer-meta { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.04em; }
+    .footer-links { display: flex; gap: 1.25rem; }
+    .footer-links a { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    .footer-links a:hover { color: var(--gold); }
+
+    /* === BACKGROUND TEXTURE === */
+    .arch-bg { position: relative; }
+    .arch-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent 0px, transparent 139px, var(--gold-line) 139px, var(--gold-line) 140px),
+        repeating-linear-gradient(90deg, transparent 0px, transparent 279px, rgba(196,168,98,0.015) 279px, rgba(196,168,98,0.015) 280px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .arch-bg > * { position: relative; z-index: 1; }
+  </style>
+</head>
+<body class="arch-bg">
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <a href="/">SIBYL</a><span class="sep">·</span><span class="auspex">AUSPEX</span>
+      </div>
+      <div class="nav-links">
+        <a href="#problem">problem</a>
+        <a href="#how">how</a>
+        <a href="#architecture">architecture</a>
+        <a href="#pricing">pricing</a>
+        <a href="#contact" class="cta-pill">contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        proposed integration · sibyl labs × reppo
+      </div>
+      <h1 class="brand-mark">AUSPEX</h1>
+      <div class="hero-tagline">
+        the voter agent for reppo datanets.
+      </div>
+      <p class="lead">
+        read every publisher submission. apply your rubric. cast votes in the early-decay window of every 48-hour epoch. sleep through the rest.
+      </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="label">substrate</span>
+          <span class="value gold">reppo · base</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="label">runtime</span>
+          <span class="value">sibyl framework</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="label">memory</span>
+          <span class="value">file-based · #2 longmemeval</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="label">payment</span>
+          <span class="value">x402 · usdc · $reppo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== PROBLEM ========== -->
+  <section class="section" id="problem">
+    <div class="container">
+      <div class="section-label">the friction</div>
+      <h2>voting power decays linearly across 48 hours.<br>so does your sleep.</h2>
+      <p>reppo voters lock $reppo into <code>veREPPO</code> and allocate that voting power across datanets. within each 48-hour epoch, voting power decays linearly. early conviction is worth more than late momentum-following. there is no slashing — voter quality is policed by opportunity cost and two-sided voting alone.</p>
+      <p>which means voting <em>well</em> requires reading every publisher submission across every datanet you hold a position in, applying judgment, and casting stake — fast — every 48 hours. across 9+ live datanets. per epoch.</p>
+
+      <div class="decay-wrap">
+        <div class="decay-svg">
+          <svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block;">
+            <defs>
+              <linearGradient id="decayFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#c4a862" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#c4a862" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="decayLine" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#e3c878"/>
+                <stop offset="100%" stop-color="#8878a8"/>
+              </linearGradient>
+            </defs>
+            <!-- grid -->
+            <line x1="60" y1="40" x2="60" y2="240" stroke="#222836" stroke-width="1"/>
+            <line x1="60" y1="240" x2="560" y2="240" stroke="#222836" stroke-width="1"/>
+            <line x1="60" y1="100" x2="560" y2="100" stroke="#181c26" stroke-width="1" stroke-dasharray="3 4"/>
+            <line x1="60" y1="170" x2="560" y2="170" stroke="#181c26" stroke-width="1" stroke-dasharray="3 4"/>
+            <!-- decay area -->
+            <polygon points="60,50 560,240 60,240" fill="url(#decayFill)"/>
+            <line x1="60" y1="50" x2="560" y2="240" stroke="url(#decayLine)" stroke-width="2"/>
+            <!-- early window highlight -->
+            <rect x="60" y="40" width="100" height="200" fill="rgba(90,138,106,0.06)" stroke="rgba(90,138,106,0.25)" stroke-width="1" stroke-dasharray="3 4"/>
+            <text x="110" y="32" text-anchor="middle" fill="#5a8a6a" font-family="IBM Plex Mono" font-size="9" letter-spacing="2">EARLY · MAX WEIGHT</text>
+            <!-- labels -->
+            <text x="60" y="260" fill="#404858" font-family="IBM Plex Mono" font-size="10">0h</text>
+            <text x="160" y="260" fill="#404858" font-family="IBM Plex Mono" font-size="10">6h</text>
+            <text x="310" y="260" fill="#404858" font-family="IBM Plex Mono" font-size="10">24h</text>
+            <text x="560" y="260" text-anchor="end" fill="#404858" font-family="IBM Plex Mono" font-size="10">48h</text>
+            <text x="50" y="55" text-anchor="end" fill="#9aa0ac" font-family="IBM Plex Mono" font-size="10">100%</text>
+            <text x="50" y="245" text-anchor="end" fill="#9aa0ac" font-family="IBM Plex Mono" font-size="10">0%</text>
+            <text x="40" y="145" text-anchor="end" fill="#404858" font-family="IBM Plex Mono" font-size="9" transform="rotate(-90 40 145)">VOTING POWER</text>
+            <!-- vote markers -->
+            <circle cx="100" cy="78" r="4" fill="#5a8a6a"/>
+            <circle cx="140" cy="93" r="4" fill="#5a8a6a"/>
+            <circle cx="160" cy="100" r="4" fill="#5a8a6a"/>
+            <circle cx="350" cy="180" r="3" fill="#404858"/>
+            <circle cx="450" cy="215" r="3" fill="#404858"/>
+            <text x="120" y="64" fill="#5a8a6a" font-family="IBM Plex Mono" font-size="8" letter-spacing="1">AUSPEX VOTES HERE</text>
+            <text x="430" y="208" fill="#404858" font-family="IBM Plex Mono" font-size="8" letter-spacing="1">MANUAL</text>
+          </svg>
+        </div>
+        <ul class="decay-bullets">
+          <li><span class="num">01</span><span class="body"><strong>9+ live datanets</strong> as of v2 launch. 700+ submissions per epoch across the network.</span></li>
+          <li><span class="num">02</span><span class="body"><strong>linear decay</strong> means a vote at hour 6 is worth ~87% of hour 0. a vote at hour 36 is worth 25%. a vote at hour 47 is worth nothing.</span></li>
+          <li><span class="num">03</span><span class="body"><strong>no slashing</strong>. the only cost of bad voting is opportunity cost on locked capital and being shorted by two-sided voters.</span></li>
+          <li><span class="num">04</span><span class="body"><strong>performance pool</strong> distributes 5% every third epoch. consistent early conviction compounds.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== LIVE DEMO ========== -->
+  <section class="section" id="demo">
+    <div class="container">
+      <div class="section-label">the loop · interactive demo</div>
+      <h2>auspex reads. auspex scores. auspex votes.</h2>
+      <p>this is a synthetic demo showing the agent loop end-to-end. the rubric on the left is what you encode once. the feed in the middle is what auspex sees. the log on the right is what you wake up to.</p>
+
+      <div class="demo-frame">
+        <div class="demo-bar">
+          <div><span class="live-dot"></span>auspex · simulated epoch</div>
+          <div class="right">epoch <span id="demo-epoch">0142</span> · t+<span id="demo-time">00:00</span> · weight <span id="demo-weight">100%</span></div>
+        </div>
+        <div class="demo-grid">
+          <!-- rubric column -->
+          <div class="demo-col">
+            <h4>your rubric</h4>
+            <div class="rubric-item">
+              <span class="crit">factual grounding</span>
+              <span class="hint">claim has a verifiable source within the submission</span>
+            </div>
+            <div class="rubric-item">
+              <span class="crit">domain coherence</span>
+              <span class="hint">terminology consistent with the datanet topic</span>
+            </div>
+            <div class="rubric-item">
+              <span class="crit">novelty</span>
+              <span class="hint">not duplicative of last 7 days of submissions</span>
+            </div>
+            <div class="rubric-item">
+              <span class="crit">format integrity</span>
+              <span class="hint">passes the datanet's submission schema</span>
+            </div>
+            <div class="rubric-item">
+              <span class="crit">publisher history</span>
+              <span class="hint">past submissions trended above-median quality</span>
+            </div>
+            <div class="rubric-meta">
+              <strong>mode:</strong> recommend<br>
+              <strong>budget/epoch:</strong> 12% of veREPPO<br>
+              <strong>auto-veto:</strong> contradiction · plagiarism · format failure
+            </div>
+          </div>
+
+          <!-- submissions feed -->
+          <div class="demo-col">
+            <h4>submissions feed · 3 datanets watched</h4>
+            <div class="feed-stage" id="feed"></div>
+          </div>
+
+          <!-- decision log -->
+          <div class="demo-col">
+            <h4>decision log</h4>
+            <div id="log"></div>
+          </div>
+        </div>
+        <div class="demo-foot">
+          <div class="demo-foot-item">
+            <span class="label">read</span>
+            <span class="value" id="stat-read">0</span>
+          </div>
+          <div class="demo-foot-item">
+            <span class="label">votes cast</span>
+            <span class="value gold" id="stat-voted">0</span>
+          </div>
+          <div class="demo-foot-item">
+            <span class="label">budget used</span>
+            <span class="value" id="stat-budget">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-controls">
+        <button class="demo-btn primary" id="demo-play">play</button>
+        <button class="demo-btn" id="demo-reset">reset</button>
+        <span class="quiet" style="align-self:center;margin-left:0.5rem;">synthetic data · no on-chain action · no real veREPPO at risk</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section class="section" id="how">
+    <div class="container">
+      <div class="section-label">how it works</div>
+      <h2>three phases. one configuration. zero late-night votes.</h2>
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">01</div>
+          <h3>setup</h3>
+          <p style="font-size:0.7rem;">one-time. minutes, not days.</p>
+          <ul>
+            <li>connect wallet via SIWE</li>
+            <li>declare which datanets you hold veREPPO in</li>
+            <li>encode 4–6 quality criteria per datanet</li>
+            <li>set per-epoch voting budget</li>
+            <li>auto-vote or recommend-only</li>
+            <li>optional: upload exemplars for calibration</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">02</div>
+          <h3>run</h3>
+          <p style="font-size:0.7rem;">every 48-hour epoch. the first 6 hours.</p>
+          <ul>
+            <li>watch publisher events</li>
+            <li>read submission contents</li>
+            <li>apply your rubric</li>
+            <li>cross-check publisher history</li>
+            <li>cast votes within budget · or surface for confirm</li>
+            <li>log every decision with rationale</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">03</div>
+          <h3>reflect</h3>
+          <p style="font-size:0.7rem;">after every performance pool distribution.</p>
+          <ul>
+            <li>compare votes vs reward outcomes</li>
+            <li>flag rubric criteria not predictive</li>
+            <li>surface strong-fit datanets · weak-fit datanets</li>
+            <li>recommend veREPPO reallocation</li>
+            <li>tune the rubric for next epoch</li>
+            <li>compound</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== ARCHITECTURE ========== -->
+  <section class="section" id="architecture">
+    <div class="container">
+      <div class="section-label">why sibyl's stack fits</div>
+      <h2>we are not inventing capabilities.<br>we already shipped each.</h2>
+      <p>auspex is built on infrastructure SIBYL has been operating in production for months. every primitive in the stack was developed for a different reason and re-applies cleanly to the reppo voter problem.</p>
+      <table class="arch-table">
+        <thead>
+          <tr>
+            <th>reppo requirement</th>
+            <th>sibyl primitive that solves it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>48-hour epochs with linearly-decaying voting power</td>
+            <td>time-anchored journal architecture · BEAM/LongMemEval pattern</td>
+          </tr>
+          <tr>
+            <td>per-datanet domain rubric</td>
+            <td>framework-skill generates domain-specialized agents from spec · LYRA precedent</td>
+          </tr>
+          <tr>
+            <td>per-publisher pattern detection across epochs</td>
+            <td>file-based memory · entity files per address · already how SIBYL tracks projects</td>
+          </tr>
+          <tr>
+            <td>distinguish publisher claims from voter rubric · agent score from operator exemplar</td>
+            <td>BEAM v14 role-tagged extraction · <code>source_role</code> · <code>speaker</code> fields</td>
+          </tr>
+          <tr>
+            <td>private rubrics that do not leak to publishers</td>
+            <td>framework-skill watermark and signing system</td>
+          </tr>
+          <tr>
+            <td>verifiable decision log every vote</td>
+            <td>append-only JSONL · operator can audit any decision retroactively</td>
+          </tr>
+          <tr>
+            <td>SIWE wallet auth · per-action billing</td>
+            <td>venice wrapper pattern · SIWE + x402 USDC settlement on Base</td>
+          </tr>
+          <tr>
+            <td>cost guards · refuse if estimate exceeds cap</td>
+            <td>venice wrapper pattern · pre-flight cost estimate vs configurable cap</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== PRICING ========== -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-label">deployment models</div>
+      <h2>how this ships.</h2>
+      <p>auspex is designed to deploy in three shapes depending on the voter and the integration partner. the recommended shape is hybrid: sibyl labs hosts the engine, reppo embeds a co-branded surface, the foundation funds the open-source skeleton.</p>
+      <div class="price-grid">
+        <div class="tier">
+          <div class="tier-name">hosted</div>
+          <div class="tier-tag">for individual voters</div>
+          <div class="tier-price">$0.10<span style="font-size:1rem;color:var(--text-muted);">+</span></div>
+          <span class="tier-price-unit">per vote · x402 metered · USDC or $REPPO</span>
+          <ul>
+            <li>web app · sign in with wallet</li>
+            <li>configure rubric per datanet</li>
+            <li>recommend-only or auto-vote within budget</li>
+            <li>full decision log + reflection report</li>
+            <li>no infra to run</li>
+            <li>per-vote billing means you only pay when auspex actually delivers</li>
+          </ul>
+          <button class="tier-cta">join the waitlist</button>
+        </div>
+        <div class="tier featured">
+          <div class="tier-name">license</div>
+          <div class="tier-tag">for serious veREPPO holders</div>
+          <div class="tier-price">$1k<span style="font-size:1rem;color:var(--text-muted);"> – $2.2k</span></div>
+          <span class="tier-price-unit">one-time · framework-skill license</span>
+          <ul>
+            <li>self-hosted on your own infra</li>
+            <li>full sibyl framework-skill delivery (LYRA precedent)</li>
+            <li>watermarked + signed for your wallet</li>
+            <li>private rubrics never leave your machine</li>
+            <li>optional advisory tier $199/quarter or $1199/month</li>
+            <li>own the agent forever</li>
+          </ul>
+          <button class="tier-cta">request a delivery</button>
+        </div>
+        <div class="tier">
+          <div class="tier-name">foundation</div>
+          <div class="tier-tag">for the reppo team</div>
+          <div class="tier-price">co-funded</div>
+          <span class="tier-price-unit">via builders fund · 50% match</span>
+          <ul>
+            <li>open-source reference implementation</li>
+            <li>co-branded widget embedded on reppo.xyz</li>
+            <li>sibyl labs maintains the engine, reppo owns the UX surface</li>
+            <li>foundation grant covers the OSS layer</li>
+            <li>premium tier (above) monetizes for sibyl labs</li>
+            <li>both sides own the part they're best at</li>
+          </ul>
+          <button class="tier-cta">scope a build</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== CTA ========== -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="end-cta">
+        <h2>this is a proposal · not a shipped product.</h2>
+        <p>auspex is a proof-of-concept built around reppo's published protocol mechanics. a phase-1 prototype is scopeable in 2–3 weeks given access to publisher submission events and the official reppo voter API. we are looking for a pilot voter and a conversation with the reppo team.</p>
+        <div class="end-cta-buttons">
+          <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="btn-primary">talk on x</a>
+          <a href="mailto:sibylcap@gmail.com" class="btn-secondary">email sibyl labs</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <div class="footer-brand">SIBYL · <span class="auspex">AUSPEX</span></div>
+          <div class="footer-meta">a sibyl labs, llc product · proof-of-concept · 2026</div>
+        </div>
+        <div class="footer-links">
+          <a href="/">sibyl</a>
+          <a href="/framework">framework</a>
+          <a href="/mind">mind</a>
+          <a href="https://x.com/sibylcap" target="_blank" rel="noopener">@sibylcap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ============================================================
+    // AUSPEX live demo · synthetic submission stream + agent loop
+    // ============================================================
+    const DATANETS = ['geopolitics', 'sports-rl', 'robotics-egocentric'];
+    const PUBLISHERS = ['0x4f2a..91c8', '0x7be3..3fd9', '0x91dd..04ac', '0x2cea..b771', '0x83ab..172e', '0xb12f..00aa'];
+
+    // Each submission has [datanet, publisher, content, intended verdict, rationale]
+    const SUBMISSIONS = [
+      ['geopolitics', '0x4f2a..91c8', 'Iran/Saudi rapprochement priced into oil futures Q3 vs unpriced narrative. 12 sourced citations, primary docs included.', 'for', 'sourced · novel framing · publisher trending high'],
+      ['sports-rl', '0x7be3..3fd9', '47K labeled trajectories from human pickleball matches. Action space matches sim env. Pre-validated against reference policy.', 'for', 'format clean · large · matches schema'],
+      ['robotics-egocentric', '0x91dd..04ac', 'Wrist-mounted IMU readings during furniture assembly. 40 hr footage. Annotation pass uneven across operators.', 'against', 'annotation drift · publisher had two prior rejects'],
+      ['geopolitics', '0x2cea..b771', 'Same Reuters article as last epoch reformatted. New headline only.', 'against', 'duplicative · auto-veto on novelty'],
+      ['sports-rl', '0x83ab..172e', 'Tennis serve dataset. 8K rallies. Court calibration metadata included. Cross-validated against pro tour stats.', 'for', 'novel · format clean · cross-validated'],
+      ['robotics-egocentric', '0xb12f..00aa', 'Kitchen prep tasks. 200 hr egocentric. Includes hand pose timeseries. Demographic balance documented.', 'for', 'large · documented · publisher above median'],
+      ['geopolitics', '0x83ab..172e', 'Defense procurement bill voting record correlated to district-level industry presence. Original analysis.', 'for', 'original · sourced · novel angle'],
+      ['sports-rl', '0x4f2a..91c8', 'Auto-translated soccer commentary from 4 leagues. Translation quality not verified.', 'against', 'unverified pipeline · format risk'],
+    ];
+
+    let demoState = {
+      idx: 0,
+      tickStart: 0,
+      raf: null,
+      playing: false,
+      stats: { read: 0, voted: 0, budget: 0 },
+    };
+
+    const feed = document.getElementById('feed');
+    const log = document.getElementById('log');
+    const playBtn = document.getElementById('demo-play');
+    const resetBtn = document.getElementById('demo-reset');
+    const epochEl = document.getElementById('demo-epoch');
+    const timeEl = document.getElementById('demo-time');
+    const weightEl = document.getElementById('demo-weight');
+    const statRead = document.getElementById('stat-read');
+    const statVoted = document.getElementById('stat-voted');
+    const statBudget = document.getElementById('stat-budget');
+
+    function fmtTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateClock(elapsed) {
+      // Compress 6 hours into 30 seconds of demo time
+      const hoursElapsed = elapsed * (6 / 30);
+      const decay = Math.max(0, 1 - hoursElapsed / 48);
+      timeEl.textContent = `${String(Math.floor(hoursElapsed)).padStart(2, '0')}:${String(Math.floor((hoursElapsed % 1) * 60)).padStart(2, '0')}`;
+      weightEl.textContent = `${Math.round(decay * 100)}%`;
+    }
+
+    function pushSubmission(s) {
+      const [datanet, pub, content, verdict, rationale] = s;
+      const el = document.createElement('div');
+      el.className = 'submission';
+      el.innerHTML = `
+        <div class="row1">
+          <span class="datanet">${datanet}</span>
+          <span class="pubaddr">${pub}</span>
+        </div>
+        <div class="content">${content}</div>
+        <div class="row3">
+          <span class="agent-state">incoming</span>
+          <span class="score-pill score-thinking">scoring...</span>
+        </div>
+      `;
+      feed.insertBefore(el, feed.firstChild);
+      demoState.stats.read++;
+      statRead.textContent = demoState.stats.read;
+
+      // After 1.2s, transition to scoring
+      setTimeout(() => {
+        el.classList.add('scoring');
+        el.querySelector('.agent-state').textContent = 'reading...';
+      }, 250);
+
+      // After 1.6s, finalize verdict
+      setTimeout(() => {
+        const cls = verdict === 'for' ? 'voted-for' : 'voted-against';
+        el.classList.remove('scoring');
+        el.classList.add(cls);
+        el.querySelector('.agent-state').textContent = `vote: ${verdict}`;
+        const pill = el.querySelector('.score-pill');
+        pill.classList.remove('score-thinking');
+        pill.classList.add(verdict === 'for' ? 'score-for' : 'score-against');
+        pill.textContent = verdict === 'for' ? 'FOR · 0.84' : 'AGAINST · 0.31';
+        if (verdict === 'for') {
+          demoState.stats.voted++;
+          demoState.stats.budget += 1.5;
+          statVoted.textContent = demoState.stats.voted;
+          statBudget.textContent = `${demoState.stats.budget.toFixed(1)}%`;
+        }
+        addLogLine(verdict, datanet, rationale);
+      }, 1600);
+    }
+
+    function addLogLine(verdict, datanet, rationale) {
+      const t = new Date();
+      const stamp = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}:${String(t.getSeconds()).padStart(2, '0')}`;
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.innerHTML = `
+        <span class="log-time">${stamp}</span>
+        <span class="log-action ${verdict}">${verdict.toUpperCase()}</span>
+        <span class="log-detail">${datanet} · ${rationale}</span>
+      `;
+      log.insertBefore(line, log.firstChild);
+      // cap at 12 lines
+      while (log.children.length > 12) log.removeChild(log.lastChild);
+    }
+
+    function tick() {
+      if (!demoState.playing) return;
+      const elapsed = (performance.now() - demoState.tickStart) / 1000;
+      updateClock(elapsed);
+      // Push a new submission every 2.4 seconds
+      const expectedIdx = Math.floor(elapsed / 2.4);
+      while (demoState.idx < expectedIdx && demoState.idx < SUBMISSIONS.length) {
+        pushSubmission(SUBMISSIONS[demoState.idx]);
+        demoState.idx++;
+      }
+      if (demoState.idx >= SUBMISSIONS.length) {
+        // Loop indefinitely with a small pause then reset
+        if (elapsed > demoState.idx * 2.4 + 4) {
+          resetDemo(true);
+          startDemo();
+          return;
+        }
+      }
+      demoState.raf = requestAnimationFrame(tick);
+    }
+
+    function startDemo() {
+      if (demoState.playing) return;
+      demoState.playing = true;
+      demoState.tickStart = performance.now();
+      playBtn.textContent = 'pause';
+      playBtn.classList.remove('primary');
+      tick();
+    }
+
+    function pauseDemo() {
+      demoState.playing = false;
+      playBtn.textContent = 'resume';
+      playBtn.classList.add('primary');
+      if (demoState.raf) cancelAnimationFrame(demoState.raf);
+    }
+
+    function resetDemo(silent) {
+      demoState.idx = 0;
+      demoState.stats = { read: 0, voted: 0, budget: 0 };
+      feed.innerHTML = '';
+      log.innerHTML = '';
+      statRead.textContent = '0';
+      statVoted.textContent = '0';
+      statBudget.textContent = '0%';
+      timeEl.textContent = '00:00';
+      weightEl.textContent = '100%';
+      // bump epoch counter
+      const cur = parseInt(epochEl.textContent, 10);
+      epochEl.textContent = String(cur + (silent ? 1 : 0)).padStart(4, '0');
+      if (!silent) {
+        pauseDemo();
+        playBtn.textContent = 'play';
+        playBtn.classList.add('primary');
+      }
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (demoState.playing) pauseDemo();
+      else startDemo();
+    });
+    resetBtn.addEventListener('click', () => resetDemo(false));
+
+    // auto-start once visible (reduces friction, makes the page feel alive)
+    if ('IntersectionObserver' in window) {
+      const demoSection = document.querySelector('.demo-frame');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting && !demoState.playing && demoState.idx === 0) {
+            setTimeout(startDemo, 600);
+            io.disconnect();
+          }
+        });
+      }, { threshold: 0.25 });
+      io.observe(demoSection);
+    }
+  </script>
+</body>
+</html>
