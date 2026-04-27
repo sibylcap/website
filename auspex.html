@@ -927,8 +927,8 @@
   <section class="section" id="profiles">
     <div class="container">
       <div class="section-label">launch profiles</div>
-      <h2>five voting strategies at launch.<br>more as the market reveals what works.</h2>
-      <p>each profile is a registered voting strategy with its own rubric, its own agent, and its own on-chain policy hash. depositors pick the one they trust. capital chooses which strategies the vault speaks loudest with. the five profiles below span the dominant axes — precision vs recall, breadth vs depth, generalist vs specialist.</p>
+      <h2>three archetypes. five strategies.<br>calibrated against measured network volume.</h2>
+      <p>each profile is a registered voting strategy with its own rubric, its own agent, and its own on-chain policy hash. depositors pick the one matching their conviction. the five launch profiles span three archetypes — one balanced, one high-volume concentrated, three specialists — calibrated against the actual datanet volume on reppo today, covering ~83% of measurable activity at launch.</p>
 
       <!-- Pie chart: example veREPPO allocation across launch profiles -->
       <div style="display:grid;grid-template-columns:1fr;gap:2.5rem;align-items:center;margin-top:3rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:clamp(1.5rem,3vw,2.5rem);" class="profile-pie-wrap">
@@ -944,23 +944,23 @@
                 </filter>
               </defs>
               <g filter="url(#pie-shadow)">
-                <!-- Slice 1: Strict Verifier 28% (gold) -->
-                <path d="M 200 200 L 200 50 A 150 150 0 0 1 347.34 228.10 Z" fill="#c4a862" stroke="#06070a" stroke-width="2"/>
-                <!-- Slice 2: Novelty Hunter 22% (teal) -->
-                <path d="M 200 200 L 347.34 228.10 A 150 150 0 0 1 200 350 Z" fill="#2ea9a1" stroke="#06070a" stroke-width="2"/>
-                <!-- Slice 3: Volume Maximizer 20% (violet) -->
-                <path d="M 200 200 L 200 350 A 150 150 0 0 1 57.34 246.35 Z" fill="#8878a8" stroke="#06070a" stroke-width="2"/>
-                <!-- Slice 4: Quality Maximizer 18% (warning amber) -->
-                <path d="M 200 200 L 57.34 246.35 A 150 150 0 0 1 97.33 90.64 Z" fill="#b5944a" stroke="#06070a" stroke-width="2"/>
-                <!-- Slice 5: Domain Specialist 12% (slate blue) -->
+                <!-- Slice 1: Balanced Generalist 32% (gold) — start -90°, end 25.2° -->
+                <path d="M 200 200 L 200 50 A 150 150 0 0 1 335.72 263.87 Z" fill="#c4a862" stroke="#06070a" stroke-width="2"/>
+                <!-- Slice 2: High-Volume Concentrator 24% (teal) — end 111.6° -->
+                <path d="M 200 200 L 335.72 263.87 A 150 150 0 0 1 144.78 339.46 Z" fill="#2ea9a1" stroke="#06070a" stroke-width="2"/>
+                <!-- Slice 3: DeFi/Crypto Specialist 18% (violet) — end 176.4° -->
+                <path d="M 200 200 L 144.78 339.46 A 150 150 0 0 1 50.28 209.42 Z" fill="#8878a8" stroke="#06070a" stroke-width="2"/>
+                <!-- Slice 4: MCP Tooling Specialist 14% (warning amber) — end 226.8° -->
+                <path d="M 200 200 L 50.28 209.42 A 150 150 0 0 1 97.33 90.64 Z" fill="#b5944a" stroke="#06070a" stroke-width="2"/>
+                <!-- Slice 5: Geopolitics Analyst 12% (slate blue) — end 270° -->
                 <path d="M 200 200 L 97.33 90.64 A 150 150 0 0 1 200 50 Z" fill="#5a7a9a" stroke="#06070a" stroke-width="2"/>
               </g>
-              <!-- Percentage labels on each slice -->
-              <text x="281" y="138" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="22" font-weight="700">28%</text>
-              <text x="267" y="286" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="20" font-weight="700">22%</text>
-              <text x="138" y="290" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="19" font-weight="700">20%</text>
-              <text x="98" y="180" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="18" font-weight="700">18%</text>
-              <text x="161" y="108" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="15" font-weight="700">12%</text>
+              <!-- Percentage labels on each slice (positioned at 0.7r from center, midpoint angle of each slice) -->
+              <text x="289" y="144" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="22" font-weight="700">32%</text>
+              <text x="239" y="298" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="20" font-weight="700">24%</text>
+              <text x="115" y="262" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="19" font-weight="700">18%</text>
+              <text x="102" y="161" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="17" font-weight="700">14%</text>
+              <text x="161" y="102" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="15" font-weight="700">12%</text>
               <!-- Inner ring for dramatic effect -->
               <circle cx="200" cy="200" r="48" fill="#06070a" stroke="rgba(196,168,98,0.3)" stroke-width="1"/>
               <text x="200" y="195" text-anchor="middle" fill="#c4a862" font-family="IBM Plex Mono" font-size="9" letter-spacing="2">VAULT</text>
@@ -968,30 +968,45 @@
             </svg>
           </div>
           <div style="display:flex;flex-direction:column;gap:0.85rem;">
-            <div style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;">example veREPPO allocation · single epoch</div>
+            <div style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;">projected veREPPO allocation · single epoch</div>
             <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
               <span style="display:inline-block;width:14px;height:14px;background:#c4a862;border-radius:2px;flex-shrink:0;"></span>
-              <span style="color:var(--text-primary);font-weight:500;flex:1;">Strict Verifier</span>
-              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">28%</span>
+              <span style="display:flex;flex-direction:column;flex:1;">
+                <span style="color:var(--text-primary);font-weight:500;">Balanced Generalist</span>
+                <span style="font-size:0.6rem;color:var(--text-muted);letter-spacing:0.06em;">archetype: balanced</span>
+              </span>
+              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">32%</span>
             </div>
             <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
               <span style="display:inline-block;width:14px;height:14px;background:#2ea9a1;border-radius:2px;flex-shrink:0;"></span>
-              <span style="color:var(--text-primary);font-weight:500;flex:1;">Novelty Hunter</span>
-              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">22%</span>
+              <span style="display:flex;flex-direction:column;flex:1;">
+                <span style="color:var(--text-primary);font-weight:500;">High-Volume Concentrator</span>
+                <span style="font-size:0.6rem;color:var(--text-muted);letter-spacing:0.06em;">archetype: concentrated</span>
+              </span>
+              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">24%</span>
             </div>
             <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
               <span style="display:inline-block;width:14px;height:14px;background:#8878a8;border-radius:2px;flex-shrink:0;"></span>
-              <span style="color:var(--text-primary);font-weight:500;flex:1;">Volume Maximizer</span>
-              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">20%</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
-              <span style="display:inline-block;width:14px;height:14px;background:#b5944a;border-radius:2px;flex-shrink:0;"></span>
-              <span style="color:var(--text-primary);font-weight:500;flex:1;">Quality Maximizer</span>
+              <span style="display:flex;flex-direction:column;flex:1;">
+                <span style="color:var(--text-primary);font-weight:500;">Crypto/DeFi Specialist</span>
+                <span style="font-size:0.6rem;color:var(--text-muted);letter-spacing:0.06em;">archetype: specialist · multi-datanet</span>
+              </span>
               <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">18%</span>
             </div>
             <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
+              <span style="display:inline-block;width:14px;height:14px;background:#b5944a;border-radius:2px;flex-shrink:0;"></span>
+              <span style="display:flex;flex-direction:column;flex:1;">
+                <span style="color:var(--text-primary);font-weight:500;">MCP Tooling Specialist</span>
+                <span style="font-size:0.6rem;color:var(--text-muted);letter-spacing:0.06em;">archetype: specialist · single datanet</span>
+              </span>
+              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">14%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
               <span style="display:inline-block;width:14px;height:14px;background:#5a7a9a;border-radius:2px;flex-shrink:0;"></span>
-              <span style="color:var(--text-primary);font-weight:500;flex:1;">Domain Specialist · Geopolitics</span>
+              <span style="display:flex;flex-direction:column;flex:1;">
+                <span style="color:var(--text-primary);font-weight:500;">Geopolitics Analyst</span>
+                <span style="font-size:0.6rem;color:var(--text-muted);letter-spacing:0.06em;">archetype: specialist · single datanet</span>
+              </span>
               <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">12%</span>
             </div>
             <div style="margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--border);font-size:0.7rem;color:var(--text-secondary);line-height:1.6;">every pod's vault vote is the sum of profile intentions weighted by these shares. shares update in real time as depositors stake or switch profiles. the slices are the market.</div>
@@ -1005,88 +1020,81 @@
       </style>
 
       <div style="display:grid;grid-template-columns:1fr;gap:1.25rem;margin-top:2.5rem;">
-        <!-- Profile 1: Strict Verifier -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
-          <div>
-            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-              <h3 style="margin:0;">strict verifier</h3>
-              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">precision-first</span>
-            </div>
-            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">factual grounding above all. heavy weight on verifiable claims, cited sources, and format integrity. votes against unverifiable or duplicative submissions. low FOR rate, near-zero false positives.</p>
-            <div style="font-size:0.7rem;color:var(--text-secondary);">
-              <strong style="color:var(--text-primary);">rubric weights:</strong>
-              factual grounding 40% · format integrity 30% · source citations 20% · novelty 10% ·
-              <strong style="color:var(--text-primary);">auto-veto:</strong> unverifiable claims, format failures, duplicates
-            </div>
+        <!-- Profile 1: Balanced Generalist (archetype: balanced) -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;border-left:3px solid #c4a862;" class="profile-card">
+          <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+            <h3 style="margin:0;">balanced generalist</h3>
+            <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#c4a862;">archetype: balanced</span>
+          </div>
+          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">votes proportionally across every primary SFW datanet, weighted by current volume share. cross-domain general criteria. the index across the network — broad exposure without picking a theme.</p>
+          <div style="font-size:0.7rem;color:var(--text-secondary);">
+            <strong style="color:var(--text-primary);">rubric:</strong>
+            factual grounding · format integrity · source citations · novelty (cross-domain, datanet-agnostic) ·
+            <strong style="color:var(--text-primary);">coverage:</strong> ~85% of SFW network volume ·
+            <strong style="color:var(--text-primary);">target voter:</strong> broad exposure, no specific thesis
           </div>
         </div>
 
-        <!-- Profile 2: Novelty Hunter -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
-          <div>
-            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-              <h3 style="margin:0;">novelty hunter</h3>
-              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">discovery-first</span>
-            </div>
-            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">the most valuable training data is the data nobody else has. heavy weight on novelty, original framing, and underrepresented sources. lower threshold for FOR. tolerant of imperfect format if the substance is fresh.</p>
-            <div style="font-size:0.7rem;color:var(--text-secondary);">
-              <strong style="color:var(--text-primary);">rubric weights:</strong>
-              novelty 50% · originality of perspective 25% · framing 15% · format 10% ·
-              <strong style="color:var(--text-primary);">target voter:</strong> someone betting on edge data
-            </div>
+        <!-- Profile 2: High-Volume Concentrator (archetype: concentrated) -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;border-left:3px solid #2ea9a1;" class="profile-card">
+          <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+            <h3 style="margin:0;">high-volume concentrator</h3>
+            <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#2ea9a1;">archetype: concentrated</span>
+          </div>
+          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">concentrates votes on the 2–3 highest-volume datanets where reward density is greatest. accepts concentration risk for higher expected yield. follows volume in real time.</p>
+          <div style="font-size:0.7rem;color:var(--text-secondary);">
+            <strong style="color:var(--text-primary);">scope:</strong> top-3 datanets by current epoch volume (today: MCP tools, geopolitics, workflow) ·
+            <strong style="color:var(--text-primary);">rubric:</strong> per-datanet best-of-breed criteria, prioritizes most active datanet in epoch ·
+            <strong style="color:var(--text-primary);">target voter:</strong> yield-focused, conviction in dominant datanets
           </div>
         </div>
 
-        <!-- Profile 3: Domain Specialist (Geopolitics) -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
-          <div>
-            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-              <h3 style="margin:0;">domain specialist · geopolitics</h3>
-              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">depth-first</span>
-            </div>
-            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">calibrated to the geopolitics datanet. weights primary-source citations, original analysis, publisher track record on this datanet, and recency of cited events. the deepest read on a single market, not a generalist.</p>
-            <div style="font-size:0.7rem;color:var(--text-secondary);">
-              <strong style="color:var(--text-primary);">rubric weights:</strong>
-              primary-source citations 35% · original analysis 25% · publisher history 20% · event recency 20% ·
-              <strong style="color:var(--text-primary);">scope:</strong> geopolitics datanet only
-            </div>
+        <!-- Profile 3: Crypto/DeFi Specialist (archetype: specialist · multi-datanet thematic) -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;border-left:3px solid #8878a8;" class="profile-card">
+          <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+            <h3 style="margin:0;">crypto/DeFi specialist</h3>
+            <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#8878a8;">archetype: specialist · thematic</span>
+          </div>
+          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">specializes across the crypto-economic cluster — DeFi protocols, tokenomics data, RL trading environments. SIBYL's natural turf. on-chain verifiability is the dominant criterion.</p>
+          <div style="font-size:0.7rem;color:var(--text-secondary);">
+            <strong style="color:var(--text-primary);">scope:</strong> DeFi protocols + tokenomics + RL trading envs (~31M combined volume) ·
+            <strong style="color:var(--text-primary);">rubric weights:</strong> on-chain verifiability 35% · protocol fundamentals 25% · reproducibility 20% · tokenomic structure 20% ·
+            <strong style="color:var(--text-primary);">target voter:</strong> crypto-native, on-chain natives
           </div>
         </div>
 
-        <!-- Profile 4: Volume Maximizer -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
-          <div>
-            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-              <h3 style="margin:0;">volume maximizer</h3>
-              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">recall-first</span>
-            </div>
-            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">vote on every pod that crosses a low quality threshold. maximize coverage of the early-decay window. broad participation in performance pool distribution at the cost of tighter precision per vote.</p>
-            <div style="font-size:0.7rem;color:var(--text-secondary);">
-              <strong style="color:var(--text-primary);">rubric:</strong>
-              composite-score threshold 0.4 (low) · vote on ~80% of submissions · light auto-veto only on auto-detect spam ·
-              <strong style="color:var(--text-primary);">target voter:</strong> wide pool exposure
-            </div>
+        <!-- Profile 4: MCP Tooling Specialist (archetype: specialist · single datanet) -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;border-left:3px solid #b5944a;" class="profile-card">
+          <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+            <h3 style="margin:0;">MCP tooling specialist</h3>
+            <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#b5944a;">archetype: specialist · single datanet</span>
+          </div>
+          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">deep specialization on the highest per-pod weight datanet on the network — agent tooling and MCP integrations. ~89M vote volume in recent epochs. the bet on agent infrastructure as the dominant theme.</p>
+          <div style="font-size:0.7rem;color:var(--text-secondary);">
+            <strong style="color:var(--text-primary);">scope:</strong> MCP tools datanet only (89M volume, top-1) ·
+            <strong style="color:var(--text-primary);">rubric weights:</strong> tool/API schema correctness 30% · integration completeness 25% · documentation clarity 20% · agent-utility 25% ·
+            <strong style="color:var(--text-primary);">target voter:</strong> bullish on agent tooling, deep technical
           </div>
         </div>
 
-        <!-- Profile 5: Quality Maximizer -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
-          <div>
-            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-              <h3 style="margin:0;">quality maximizer</h3>
-              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">hit-rate-first</span>
-            </div>
-            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">vote only on the top 20% of pods by composite score. miss many submissions, but rarely vote wrong. optimize hit rate over coverage. complementary to volume maximizer in a balanced portfolio.</p>
-            <div style="font-size:0.7rem;color:var(--text-secondary);">
-              <strong style="color:var(--text-primary);">rubric:</strong>
-              composite-score threshold 0.85 (high) · vote on ~20% of submissions · multi-axis veto strict ·
-              <strong style="color:var(--text-primary);">target voter:</strong> conviction over coverage
-            </div>
+        <!-- Profile 5: Geopolitics Analyst (archetype: specialist · single datanet) -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;border-left:3px solid #5a7a9a;" class="profile-card">
+          <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+            <h3 style="margin:0;">geopolitics analyst</h3>
+            <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#5a7a9a;">archetype: specialist · single datanet</span>
+          </div>
+          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">deep specialization on the most active datanet by pod count (120 pods, ~44M vote volume). primary-source rigor over volume. publisher track record matters.</p>
+          <div style="font-size:0.7rem;color:var(--text-secondary);">
+            <strong style="color:var(--text-primary);">scope:</strong> geopolitics datanet only (44M volume, top-2 by volume, top-1 by activity) ·
+            <strong style="color:var(--text-primary);">rubric weights:</strong> primary-source citations 35% · original analysis 25% · publisher history 20% · event recency 20% ·
+            <strong style="color:var(--text-primary);">target voter:</strong> values primary research and current events
           </div>
         </div>
       </div>
 
       <p style="margin-top:2rem;color:var(--text-secondary);font-size:0.7rem;">profile registry is on-chain. each profile commits its policy hash before the agent emits any vote intention for an epoch. depositors verify the rubric they're backing has not silently changed. new profiles can be registered as the market reveals which strategies the network values.</p>
+
+      <p style="margin-top:0.75rem;color:var(--text-secondary);font-size:0.7rem;">brand discipline: every launch profile explicitly excludes the adult content datanet from its rubric scope. this is a permanent SIBYL stance, not a per-epoch policy.</p>
     </div>
   </section>
 
