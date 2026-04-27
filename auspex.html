@@ -930,6 +930,80 @@
       <h2>five voting strategies at launch.<br>more as the market reveals what works.</h2>
       <p>each profile is a registered voting strategy with its own rubric, its own agent, and its own on-chain policy hash. depositors pick the one they trust. capital chooses which strategies the vault speaks loudest with. the five profiles below span the dominant axes — precision vs recall, breadth vs depth, generalist vs specialist.</p>
 
+      <!-- Pie chart: example veREPPO allocation across launch profiles -->
+      <div style="display:grid;grid-template-columns:1fr;gap:2.5rem;align-items:center;margin-top:3rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:clamp(1.5rem,3vw,2.5rem);" class="profile-pie-wrap">
+        <div style="display:grid;grid-template-columns:1fr;gap:2rem;align-items:center;" class="profile-pie-grid">
+          <div style="position:relative;max-width:360px;width:100%;margin:0 auto;">
+            <svg viewBox="0 0 400 400" style="width:100%;height:auto;display:block;" aria-label="Example veREPPO allocation pie chart">
+              <defs>
+                <filter id="pie-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+                  <feOffset dx="0" dy="2" result="offsetblur"/>
+                  <feComponentTransfer><feFuncA type="linear" slope="0.4"/></feComponentTransfer>
+                  <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <g filter="url(#pie-shadow)">
+                <!-- Slice 1: Strict Verifier 28% (gold) -->
+                <path d="M 200 200 L 200 50 A 150 150 0 0 1 347.34 228.10 Z" fill="#c4a862" stroke="#06070a" stroke-width="2"/>
+                <!-- Slice 2: Novelty Hunter 22% (teal) -->
+                <path d="M 200 200 L 347.34 228.10 A 150 150 0 0 1 200 350 Z" fill="#2ea9a1" stroke="#06070a" stroke-width="2"/>
+                <!-- Slice 3: Volume Maximizer 20% (violet) -->
+                <path d="M 200 200 L 200 350 A 150 150 0 0 1 57.34 246.35 Z" fill="#8878a8" stroke="#06070a" stroke-width="2"/>
+                <!-- Slice 4: Quality Maximizer 18% (warning amber) -->
+                <path d="M 200 200 L 57.34 246.35 A 150 150 0 0 1 97.33 90.64 Z" fill="#b5944a" stroke="#06070a" stroke-width="2"/>
+                <!-- Slice 5: Domain Specialist 12% (slate blue) -->
+                <path d="M 200 200 L 97.33 90.64 A 150 150 0 0 1 200 50 Z" fill="#5a7a9a" stroke="#06070a" stroke-width="2"/>
+              </g>
+              <!-- Percentage labels on each slice -->
+              <text x="281" y="138" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="22" font-weight="700">28%</text>
+              <text x="267" y="286" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="20" font-weight="700">22%</text>
+              <text x="138" y="290" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="19" font-weight="700">20%</text>
+              <text x="98" y="180" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="18" font-weight="700">18%</text>
+              <text x="161" y="108" text-anchor="middle" fill="#06070a" font-family="Fraunces" font-size="15" font-weight="700">12%</text>
+              <!-- Inner ring for dramatic effect -->
+              <circle cx="200" cy="200" r="48" fill="#06070a" stroke="rgba(196,168,98,0.3)" stroke-width="1"/>
+              <text x="200" y="195" text-anchor="middle" fill="#c4a862" font-family="IBM Plex Mono" font-size="9" letter-spacing="2">VAULT</text>
+              <text x="200" y="212" text-anchor="middle" fill="#9aa0ac" font-family="IBM Plex Mono" font-size="8" letter-spacing="1">veREPPO</text>
+            </svg>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.85rem;">
+            <div style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;">example veREPPO allocation · single epoch</div>
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
+              <span style="display:inline-block;width:14px;height:14px;background:#c4a862;border-radius:2px;flex-shrink:0;"></span>
+              <span style="color:var(--text-primary);font-weight:500;flex:1;">Strict Verifier</span>
+              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">28%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
+              <span style="display:inline-block;width:14px;height:14px;background:#2ea9a1;border-radius:2px;flex-shrink:0;"></span>
+              <span style="color:var(--text-primary);font-weight:500;flex:1;">Novelty Hunter</span>
+              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">22%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
+              <span style="display:inline-block;width:14px;height:14px;background:#8878a8;border-radius:2px;flex-shrink:0;"></span>
+              <span style="color:var(--text-primary);font-weight:500;flex:1;">Volume Maximizer</span>
+              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">20%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
+              <span style="display:inline-block;width:14px;height:14px;background:#b5944a;border-radius:2px;flex-shrink:0;"></span>
+              <span style="color:var(--text-primary);font-weight:500;flex:1;">Quality Maximizer</span>
+              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">18%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
+              <span style="display:inline-block;width:14px;height:14px;background:#5a7a9a;border-radius:2px;flex-shrink:0;"></span>
+              <span style="color:var(--text-primary);font-weight:500;flex:1;">Domain Specialist · Geopolitics</span>
+              <span style="color:var(--gold);font-family:var(--font-mono);font-size:0.7rem;">12%</span>
+            </div>
+            <div style="margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--border);font-size:0.7rem;color:var(--text-secondary);line-height:1.6;">every pod's vault vote is the sum of profile intentions weighted by these shares. shares update in real time as depositors stake or switch profiles. the slices are the market.</div>
+          </div>
+        </div>
+      </div>
+      <style>
+        @media (min-width: 760px) {
+          .profile-pie-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+      </style>
+
       <div style="display:grid;grid-template-columns:1fr;gap:1.25rem;margin-top:2.5rem;">
         <!-- Profile 1: Strict Verifier -->
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
