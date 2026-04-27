@@ -683,7 +683,8 @@
       </div>
       <div class="nav-links">
         <a href="#problem">problem</a>
-        <a href="#how">how</a>
+        <a href="#vault">vault</a>
+        <a href="#profiles">profiles</a>
         <a href="#contract">contract</a>
         <a href="#contact" class="cta-pill">contact</a>
       </div>
@@ -695,14 +696,14 @@
     <div class="hero-inner">
       <div class="hero-badge">
         <span class="dot"></span>
-        proposed integration · sibyl labs × reppo
+        in development · sibyl labs × reppo
       </div>
       <h1 class="brand-mark">AUSPEX</h1>
       <div class="hero-tagline">
-        the voter agent for reppo datanets.
+        the voting vault for reppo.
       </div>
       <p class="lead">
-        read every publisher submission. apply your rubric. cast votes in the early-decay window of every 48-hour epoch. sleep through the rest.
+        stake $REPPO. pick a voting profile. the vault aggregates every depositor's veREPPO power into one weighted vote per pod. multiple strategies. one efficient cast. yield distributed pro-rata.
       </p>
       <div class="hero-meta">
         <div class="hero-meta-item">
@@ -711,15 +712,15 @@
         </div>
         <div class="hero-meta-item">
           <span class="label">model</span>
-          <span class="value">staked vote manager</span>
+          <span class="value">profile-weighted vault</span>
         </div>
         <div class="hero-meta-item">
           <span class="label">wrapper</span>
           <span class="value">$REPPO → auREPPO</span>
         </div>
         <div class="hero-meta-item">
-          <span class="label">yield</span>
-          <span class="value">pool rewards · pro-rata</span>
+          <span class="label">aggregation</span>
+          <span class="value">veREPPO-power weighted</span>
         </div>
       </div>
     </div>
@@ -871,51 +872,147 @@
   <div class="container"><div class="section-rule"></div></div>
 
   <!-- ========== HOW IT WORKS ========== -->
-  <section class="section" id="how">
+  <section class="section" id="vault">
     <div class="container">
-      <div class="section-label">how it works</div>
-      <h2>three phases. one configuration. zero late-night votes.</h2>
+      <div class="section-label">how the vault works</div>
+      <h2>stake. pick a profile. let the vault vote on your behalf.</h2>
+      <p>auspex is not a single-rubric pool. it is a market for voting strategies. each profile is a registered rubric run by its own agent. depositors back the profile they trust with their veREPPO power. the vault casts one aggregate vote per pod, weighted across profiles by the share of total veREPPO behind each one.</p>
       <div class="phases">
         <div class="phase">
           <div class="phase-num">01</div>
-          <h3>setup</h3>
-          <p style="font-size:0.7rem;">one-time. minutes, not days.</p>
+          <h3>stake + select</h3>
+          <p style="font-size:0.7rem;">one-time per deposit. switch profiles any time, no cost.</p>
           <ul>
-            <li>connect wallet via SIWE</li>
-            <li>declare which datanets you hold veREPPO in</li>
-            <li>encode 4–6 quality criteria per datanet</li>
-            <li>set per-epoch voting budget</li>
-            <li>auto-vote or recommend-only</li>
-            <li>optional: upload exemplars for calibration</li>
+            <li>connect wallet</li>
+            <li>browse registered profiles + their rubrics</li>
+            <li>pick the profile your veREPPO will back</li>
+            <li>choose deposit amount + lock duration</li>
+            <li>receive auREPPO proportional to amount × duration</li>
+            <li>switchProfile() at any time, no unstake required</li>
           </ul>
         </div>
         <div class="phase">
           <div class="phase-num">02</div>
-          <h3>run</h3>
-          <p style="font-size:0.7rem;">every 48-hour epoch. the first 6 hours.</p>
+          <h3>vault votes</h3>
+          <p style="font-size:0.7rem;">every 48-hour epoch. early-decay window covered automatically.</p>
           <ul>
-            <li>watch publisher events</li>
-            <li>read submission contents</li>
-            <li>apply your rubric</li>
-            <li>cross-check publisher history</li>
-            <li>cast votes within budget · or surface for confirm</li>
-            <li>log every decision with rationale</li>
+            <li>each profile's agent reads incoming pods</li>
+            <li>each profile scores pods per its rubric</li>
+            <li>vault aggregates: <code>Σ (intention × veREPPO share)</code></li>
+            <li>net direction + magnitude is cast as one on-chain vote</li>
+            <li>per-profile intentions logged for full transparency</li>
+            <li>no manual review, no late votes, no missed pods</li>
           </ul>
         </div>
         <div class="phase">
           <div class="phase-num">03</div>
-          <h3>reflect</h3>
+          <h3>yield + switch</h3>
           <p style="font-size:0.7rem;">after every performance pool distribution.</p>
           <ul>
-            <li>compare votes vs reward outcomes</li>
-            <li>flag rubric criteria not predictive</li>
-            <li>surface strong-fit datanets · weak-fit datanets</li>
-            <li>recommend veREPPO reallocation</li>
-            <li>tune the rubric for next epoch</li>
-            <li>compound</li>
+            <li>performance pool rewards distributed pro-rata to auREPPO holders</li>
+            <li>per-profile performance metrics published on-chain</li>
+            <li>see how your profile compared to vault average</li>
+            <li>switch profiles if your trusted strategy underperformed</li>
+            <li>capital reallocates to better-performing profiles automatically</li>
+            <li>the vault gets smarter as the market chooses better profiles</li>
           </ul>
         </div>
       </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== PROFILES ========== -->
+  <section class="section" id="profiles">
+    <div class="container">
+      <div class="section-label">launch profiles</div>
+      <h2>five voting strategies at launch.<br>more as the market reveals what works.</h2>
+      <p>each profile is a registered voting strategy with its own rubric, its own agent, and its own on-chain policy hash. depositors pick the one they trust. capital chooses which strategies the vault speaks loudest with. the five profiles below span the dominant axes — precision vs recall, breadth vs depth, generalist vs specialist.</p>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:1.25rem;margin-top:2.5rem;">
+        <!-- Profile 1: Strict Verifier -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+              <h3 style="margin:0;">strict verifier</h3>
+              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">precision-first</span>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">factual grounding above all. heavy weight on verifiable claims, cited sources, and format integrity. votes against unverifiable or duplicative submissions. low FOR rate, near-zero false positives.</p>
+            <div style="font-size:0.7rem;color:var(--text-secondary);">
+              <strong style="color:var(--text-primary);">rubric weights:</strong>
+              factual grounding 40% · format integrity 30% · source citations 20% · novelty 10% ·
+              <strong style="color:var(--text-primary);">auto-veto:</strong> unverifiable claims, format failures, duplicates
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile 2: Novelty Hunter -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+              <h3 style="margin:0;">novelty hunter</h3>
+              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">discovery-first</span>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">the most valuable training data is the data nobody else has. heavy weight on novelty, original framing, and underrepresented sources. lower threshold for FOR. tolerant of imperfect format if the substance is fresh.</p>
+            <div style="font-size:0.7rem;color:var(--text-secondary);">
+              <strong style="color:var(--text-primary);">rubric weights:</strong>
+              novelty 50% · originality of perspective 25% · framing 15% · format 10% ·
+              <strong style="color:var(--text-primary);">target voter:</strong> someone betting on edge data
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile 3: Domain Specialist (Geopolitics) -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+              <h3 style="margin:0;">domain specialist · geopolitics</h3>
+              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">depth-first</span>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">calibrated to the geopolitics datanet. weights primary-source citations, original analysis, publisher track record on this datanet, and recency of cited events. the deepest read on a single market, not a generalist.</p>
+            <div style="font-size:0.7rem;color:var(--text-secondary);">
+              <strong style="color:var(--text-primary);">rubric weights:</strong>
+              primary-source citations 35% · original analysis 25% · publisher history 20% · event recency 20% ·
+              <strong style="color:var(--text-primary);">scope:</strong> geopolitics datanet only
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile 4: Volume Maximizer -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+              <h3 style="margin:0;">volume maximizer</h3>
+              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">recall-first</span>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">vote on every pod that crosses a low quality threshold. maximize coverage of the early-decay window. broad participation in performance pool distribution at the cost of tighter precision per vote.</p>
+            <div style="font-size:0.7rem;color:var(--text-secondary);">
+              <strong style="color:var(--text-primary);">rubric:</strong>
+              composite-score threshold 0.4 (low) · vote on ~80% of submissions · light auto-veto only on auto-detect spam ·
+              <strong style="color:var(--text-primary);">target voter:</strong> wide pool exposure
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile 5: Quality Maximizer -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr;gap:1rem;" class="profile-card">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+              <h3 style="margin:0;">quality maximizer</h3>
+              <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">hit-rate-first</span>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">vote only on the top 20% of pods by composite score. miss many submissions, but rarely vote wrong. optimize hit rate over coverage. complementary to volume maximizer in a balanced portfolio.</p>
+            <div style="font-size:0.7rem;color:var(--text-secondary);">
+              <strong style="color:var(--text-primary);">rubric:</strong>
+              composite-score threshold 0.85 (high) · vote on ~20% of submissions · multi-axis veto strict ·
+              <strong style="color:var(--text-primary);">target voter:</strong> conviction over coverage
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-top:2rem;color:var(--text-secondary);font-size:0.7rem;">profile registry is on-chain. each profile commits its policy hash before the agent emits any vote intention for an epoch. depositors verify the rubric they're backing has not silently changed. new profiles can be registered as the market reveals which strategies the network values.</p>
     </div>
   </section>
 
@@ -968,8 +1065,8 @@
             <td>venice wrapper pattern · pre-flight cost estimate vs configurable cap, JSONL audit log per call</td>
           </tr>
           <tr>
-            <td>on-chain staked vote management · transferable yield-bearing wrapper</td>
-            <td>convex pattern (locked CRV → cvxCRV) applied to veREPPO → auREPPO</td>
+            <td>multi-profile staked vote management · transferable wrapper</td>
+            <td>convex pattern (CRV → cvxCRV) extended to N profiles per vault, veREPPO-weighted aggregation</td>
           </tr>
         </tbody>
       </table>
@@ -982,54 +1079,68 @@
   <section class="section" id="contract">
     <div class="container">
       <div class="section-label">on-chain architecture</div>
-      <h2>the auspex vote manager.<br>stake $REPPO. earn auREPPO. agent votes.</h2>
-      <p>auspex is not a voter tool sold as a license. it is a smart contract pool. voters stake $REPPO into the auspex vote manager. the contract holds the underlying veREPPO voting power. depositors receive <code>auREPPO</code> — a transferable yield-bearing wrapper, like cvxCRV is for locked CRV. the agent has one job: cast votes within a registered policy. the contract distributes performance pool rewards back to auREPPO holders, net of a small fee.</p>
+      <h2>the auspex vault.<br>profile registry. veREPPO-weighted aggregation. one cast per pod.</h2>
+      <p>auspex is a smart contract vault. depositors stake $REPPO with a chosen lock duration, select a voting profile their veREPPO will back, and receive <code>auREPPO</code> — a transferable yield-bearing wrapper, like cvxCRV is for locked CRV. each profile is a registered voting strategy run by its own agent. when a pod arrives, every profile's agent emits a vote intention. the vault aggregates them into one weighted vote: <code>Σ (intention × profile_veREPPO_share)</code>. one cast per pod, fully expressing the veREPPO-weighted preferences of the depositors.</p>
 
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:clamp(1.5rem,3vw,2.5rem);margin-top:2rem;font-family:var(--font-mono);font-size:0.7rem;line-height:1.7;">
         <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:1.25rem;">contract surface · sketch</div>
-        <pre style="color:var(--text-dim);white-space:pre-wrap;margin:0;font-family:var(--font-mono);font-size:0.7rem;">contract AuspexVoteManager {
-  // permissions are scoped narrowly
-  agent  → castVote(datanet, submission, support)        only
-  owner  → updatePolicy(bytes32 policyHash)              only
-  user   → deposit(amount, lockDuration) returns shares
-  user   → withdraw(shares) when underlying lock matures
+        <pre style="color:var(--text-dim);white-space:pre-wrap;margin:0;font-family:var(--font-mono);font-size:0.7rem;">contract AuspexVault {
+  // profile registry — strategies the vault can execute
+  struct Profile { bytes32 policyHash; address agent; bool active; }
+  mapping(bytes32 =&gt; Profile) public profiles;
+  bytes32[] public profileIds;
 
-  // every vote is auditable on-chain
-  event VoteCast(datanet, submission, support, policyHash)
-  event PolicyUpdated(oldHash, newHash, epoch)
+  // user → profile their veREPPO is backing
+  mapping(address =&gt; bytes32) public userProfile;
+  mapping(bytes32 =&gt; uint256) public profileVeReppo;   // running sum
+
+  // permissions scoped narrowly
+  user           → deposit(amount, lockDuration, profileId) returns auREPPO
+  user           → switchProfile(newProfileId)              // no-cost rebalance
+  user           → withdraw(shares)                          // when lock matures
+  profile.agent  → submitIntention(profileId, podId, dir, magnitude)
+  anyone         → aggregateAndCast(podId)                   // permissionless trigger
+  owner          → registerProfile(name, policyHash, agent)
+  owner          → deactivateProfile(profileId)              // stops new deposits
+
+  // aggregation is deterministic from on-chain state
+  cast = Σ over profiles p:
+           intentions[p][podId].direction * intentions[p][podId].magnitude * profileVeReppo[p]
+  if abs(cast) &gt; THRESHOLD * totalVeReppo:
+    reppoVoting.vote(podId, sign(cast), abs(cast))
+
+  // full transparency in events
+  event Deposited(user, amount, duration, profileId, veReppoMinted)
+  event ProfileSwitched(user, oldProfile, newProfile, veReppoMoved)
+  event IntentionSubmitted(profileId, podId, direction, magnitude, policyHash)
+  event VoteCast(podId, direction, magnitude, profileBreakdown)
   event RewardsDistributed(gross, fee, netToStakers)
-
-  // worst case if the agent key is compromised
-  → bad votes for one epoch
-  → not stolen funds
 }</pre>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr;gap:1rem;margin-top:2rem;" class="arch-callouts">
         <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;">
-          <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">agent permissions</div>
-          <p style="margin:0;font-size:0.75rem;">cast-vote only. not withdraw. not policy change. compromise = bad votes for one epoch, not lost capital.</p>
+          <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">scoped permissions</div>
+          <p style="margin:0;font-size:0.75rem;">each profile's agent can only emit intentions for its own profile. compromise of one agent key corrupts that profile's intentions for one epoch — not the aggregate vote, not deposits, not other profiles.</p>
         </div>
         <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;">
           <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">policy transparency</div>
-          <p style="margin:0;font-size:0.75rem;">every epoch's rubric is committed as a hash on-chain. depositors can verify what the agent is configured to do before they stake.</p>
+          <p style="margin:0;font-size:0.75rem;">every profile's policy hash is committed on-chain before it emits any intention for an epoch. depositors verify the rubric they're backing has not silently changed. the aggregation math is deterministic from on-chain state — anyone can verify the cast.</p>
         </div>
         <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;">
-          <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">network effects</div>
-          <p style="margin:0;font-size:0.75rem;">one pool with many voters means one agent reasoning over cross-publisher patterns no individual voter could see. pool grows smarter as it grows larger.</p>
+          <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">capital chooses strategy</div>
+          <p style="margin:0;font-size:0.75rem;">the vault doesn't impose a rubric. it executes the veREPPO-weighted preferences of its depositors. better-performing profiles attract more deposits → larger aggregate weight. capital is the curator of curators.</p>
         </div>
       </div>
 
-      <p style="margin-top:2rem;color:var(--text-secondary);font-size:0.7rem;">the convex precedent: convex took locked CRV, issued cvxCRV, controlled the underlying voting power, and built one of the most successful protocols in DeFi. auspex applies the same pattern with a different optimization target — agent-driven rubric application instead of bribe-driven vote markets.</p>
-
-      <p style="color:var(--text-secondary);font-size:0.7rem;">three architectural questions for the reppo team: (1) does the protocol whitelist contracts as lockers? (2) can a contract holding veREPPO call <code>vote()</code> on behalf of itself? (3) do vote events emit enough detail for per-action audit? these determine the integration shape.</p>
+      <p style="margin-top:2rem;color:var(--text-secondary);font-size:0.7rem;">the convex precedent: convex took locked CRV, issued cvxCRV, controlled the underlying voting power, and built one of the most successful protocols in DeFi. auspex applies the same pattern with a different optimization target — multi-strategy agent voting weighted by depositor preference, instead of bribe-driven vote markets.</p>
 
       <div style="margin-top:3rem;padding:2rem clamp(1.5rem,3vw,2.5rem);background:linear-gradient(135deg,rgba(196,168,98,0.06) 0%,rgba(196,168,98,0.02) 100%);border:1px solid rgba(196,168,98,0.25);border-radius:6px;">
         <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:1rem;">operational footprint</div>
-        <h3 style="font-size:clamp(1.25rem,2.4vw,1.75rem);margin-bottom:1.25rem;">one contract. one sandbox. one agent. one rubric per epoch.</h3>
-        <p style="font-size:0.8125rem;color:var(--text-dim);max-width:65ch;">the pool is the unit of intelligence, not the voter. every depositor gets the same vote decisions and the same yield share — so they share the same agent. one autonomous sibyl-shaped process runs in a sandbox 24/7. it watches reppo's publisher events, applies the registered rubric, and calls <code>VoteManager.castVote()</code> within the early-decay window. one decision log. one on-chain event stream. one systemd unit to monitor.</p>
-        <p style="font-size:0.8125rem;color:var(--text-dim);max-width:65ch;">cross-publisher pattern detection compounds at the pool level — the agent sees the union of submissions across every datanet the pool participates in, not just any one voter's slice. the more capital flows in, the smarter the agent's reasoning gets, because the corpus it reads grows.</p>
-        <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;">scale model: <code>1 agent process per VoteManager contract</code>. the public auspex pool is one. each pro-tier private pool is another. tens of instances at scale, not thousands.</p>
+        <h3 style="font-size:clamp(1.25rem,2.4vw,1.75rem);margin-bottom:1.25rem;">N profiles. N agents. one vault. one cast per pod.</h3>
+        <p style="font-size:0.8125rem;color:var(--text-dim);max-width:65ch;">each profile is its own sibyl-shaped agent process running in a sandbox 24/7. all profiles read the same pod stream from reppo. each emits intentions per its own rubric. the vault aggregates them into one veREPPO-weighted vote and casts it on-chain in the early-decay window. one decision log per profile, one aggregate event stream per vault, full transparency at both layers.</p>
+        <p style="font-size:0.8125rem;color:var(--text-dim);max-width:65ch;">cross-profile diversity preserves the prediction-market property reppo cares about. cross-publisher pattern detection within each profile compounds with TVL behind that profile. the more capital flows toward a profile, the more its rubric drives the aggregate vote — and the more pressure there is on it to perform, because depositors can switch profiles any time.</p>
+        <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;">scale model: <code>N agent processes per AuspexVault</code>, where N grows as new profiles register. five at launch. tens at maturity. each agent is light — one rubric, one signer, one journal.</p>
       </div>
     </div>
   </section>
@@ -1041,8 +1152,8 @@
   <section class="section" id="contact">
     <div class="container">
       <div class="end-cta">
-        <h2>this is a proposal · not a shipped product.</h2>
-        <p>auspex is a proof-of-concept built around reppo's published protocol mechanics. a phase-1 prototype is scopeable in 2–3 weeks given access to publisher submission events and the official reppo voter API. we are looking for a pilot voter and a conversation with the reppo team.</p>
+        <h2>vault build in development · sibyl labs × reppo.</h2>
+        <p>the auspex vault is being built in partnership with the reppo team. multi-profile voting, veREPPO-weighted aggregation, on-chain transparency, agent-driven curation. five launch profiles. open registry for more. depositor capital chooses which strategies the vault speaks loudest with. follow along, or talk to us about an early-depositor profile.</p>
         <div class="end-cta-buttons">
           <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="btn-primary">talk on x</a>
           <a href="mailto:sibylcap@gmail.com" class="btn-secondary">email sibyl labs</a>
@@ -1057,7 +1168,7 @@
       <div class="footer-inner">
         <div>
           <div class="footer-brand">SIBYL · <span class="auspex">AUSPEX</span></div>
-          <div class="footer-meta">a sibyl labs, llc product · proof-of-concept · 2026</div>
+          <div class="footer-meta">a sibyl labs, llc product · in development with reppo · 2026</div>
         </div>
         <div class="footer-links">
           <a href="/">sibyl</a>
