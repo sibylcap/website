@@ -1041,30 +1041,48 @@
 
   <div class="container"><div class="section-rule"></div></div>
 
-  <!-- ========== PRICING ========== -->
+  <!-- ========== OPTIONS / PRICING ========== -->
   <section class="section" id="pricing">
     <div class="container">
-      <div class="section-label">three buyers · three products</div>
-      <h2>voters buy outcome. operators buy infrastructure.<br>they are not the same purchase.</h2>
-      <p>auspex separates the consumer surface from the infrastructure surface. veREPPO holders stake into a managed pool. large holders configure private pools. the underlying agent framework is a separate b2b product sold to network operators — it is not pitched to individual voters.</p>
+      <div class="section-label">three approaches · pick the right shape</div>
+      <h2>spectrum of integration.<br>low commitment to bespoke. one agent runtime under all three.</h2>
+      <p>auspex offers three distinct integration shapes for reppo to choose from. they differ on custody, distribution, and user commitment — but all three run on the same sibyl-shaped agent infrastructure. the framework that powers the agent is sold separately to teams building their own agents.</p>
       <div class="price-grid">
+        <div class="tier">
+          <div class="tier-name">connect</div>
+          <div class="tier-tag">"built by sibyl labs" · operated by reppo</div>
+          <div class="tier-price">$500<span style="font-size:1rem;color:var(--text-muted);"> – $1.5k</span></div>
+          <span class="tier-price-unit">30–50% off LYRA framework rate · paid in $REPPO + USDC</span>
+          <ul>
+            <li>one-click "enable auspex" button on reppo's voter dashboard</li>
+            <li>sibyl labs builds the agent · reppo operates it on their infra</li>
+            <li>session-key delegation: agent has <code>vote()</code> permission only · scoped TTL + budget</li>
+            <li>non-custodial · $REPPO never moves from the user wallet</li>
+            <li>default rubric tuned by sibyl labs · owned by reppo post-handoff</li>
+            <li>fastest user experience · zero staking commitment for voters</li>
+            <li>partnership pricing: cash discount offset by $REPPO position. we win when the network wins.</li>
+            <li>optional ongoing tuning advisory tier available</li>
+          </ul>
+          <button class="tier-cta">deliver to reppo</button>
+        </div>
         <div class="tier featured">
-          <div class="tier-name">auspex pool</div>
-          <div class="tier-tag">for veREPPO holders</div>
+          <div class="tier-name">pool</div>
+          <div class="tier-tag">for veREPPO holders · staked aggregation</div>
           <div class="tier-price">10–15%</div>
           <span class="tier-price-unit">performance fee · net of pool rewards</span>
           <ul>
             <li>stake $REPPO → receive auREPPO (yield-bearing wrapper)</li>
-            <li>agent votes on your behalf using its rubric</li>
-            <li>performance pool rewards distributed pro-rata</li>
+            <li>contract holds underlying veREPPO · convex pattern</li>
+            <li>one agent reasons across all submissions for the entire pool</li>
+            <li>performance pool rewards distributed pro-rata to auREPPO holders</li>
             <li>fee taken on net rewards only · zero upfront</li>
-            <li>no infra · no rubric authoring · no decision log to read</li>
             <li>auREPPO transferable · exit liquidity not gated by lock</li>
+            <li>cross-publisher pattern detection compounds with TVL</li>
           </ul>
           <button class="tier-cta">join the waitlist</button>
         </div>
         <div class="tier">
-          <div class="tier-name">auspex pro</div>
+          <div class="tier-name">pro</div>
           <div class="tier-tag">for treasuries · DAOs · large holders</div>
           <div class="tier-price">0.5–1%<span style="font-size:1rem;color:var(--text-muted);"> + 10%</span></div>
           <span class="tier-price-unit">mgmt fee on TVL · performance fee on net</span>
@@ -1075,29 +1093,67 @@
             <li>monthly performance reports vs benchmark</li>
             <li>direct line to sibyl labs for tuning</li>
             <li>SLA on early-window voting coverage</li>
+            <li>dedicated agent instance per private vault</li>
           </ul>
           <button class="tier-cta">scope a private pool</button>
-        </div>
-        <div class="tier">
-          <div class="tier-name">foundation</div>
-          <div class="tier-tag">for the reppo team</div>
-          <div class="tier-price">co-built</div>
-          <span class="tier-price-unit">embedded on reppo.xyz · ecosystem grant</span>
-          <ul>
-            <li>auspex pool embedded as a co-branded widget on reppo.xyz</li>
-            <li>builders fund grant funds the OSS reference contracts</li>
-            <li>sibyl labs maintains the engine and the agent</li>
-            <li>reppo team owns the UX surface and the distribution</li>
-            <li>both sides earn from network growth</li>
-            <li>separate framework conversation: <a href="/framework">/framework</a></li>
-          </ul>
-          <button class="tier-cta">talk to the team</button>
         </div>
       </div>
 
       <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.5rem;margin-top:2.5rem;">
+        <div style="color:var(--gold);font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.75rem;">how connect, pool, and pro differ at the contract layer</div>
+        <table class="arch-table" style="margin-top:0.5rem;">
+          <thead>
+            <tr>
+              <th></th>
+              <th>connect</th>
+              <th>pool</th>
+              <th>pro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>who operates the agent</td>
+              <td><strong style="color:var(--gold);">reppo</strong> (we deliver it)</td>
+              <td>sibyl labs</td>
+              <td>sibyl labs (per customer)</td>
+            </tr>
+            <tr>
+              <td>custody</td>
+              <td>user keeps $REPPO</td>
+              <td>contract holds locked $REPPO</td>
+              <td>private contract holds locked $REPPO</td>
+            </tr>
+            <tr>
+              <td>delegation</td>
+              <td>session key · vote() only</td>
+              <td>agent → VoteManager.castVote()</td>
+              <td>agent → private VoteManager.castVote()</td>
+            </tr>
+            <tr>
+              <td>compensation to sibyl labs</td>
+              <td>one-time delivery + $REPPO position</td>
+              <td>10–15% perf fee on net pool yield</td>
+              <td>0.5–1% mgmt + 10% perf fee</td>
+            </tr>
+            <tr>
+              <td>governance leverage</td>
+              <td>none · per-user delegation</td>
+              <td>aggregated · disclosed on-chain</td>
+              <td>aggregated · private vault</td>
+            </tr>
+            <tr>
+              <td>agent footprint</td>
+              <td>1 agent process · N session keys</td>
+              <td>1 agent · 1 contract</td>
+              <td>1 agent · 1 private contract</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.5rem;margin-top:1.5rem;">
         <div style="color:var(--gold);font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.75rem;">framework licensing — sold separately</div>
-        <p style="margin:0;font-size:0.75rem;color:var(--text-dim);">the underlying agent runtime — file-based memory, MCP wiring, personality stack, operational rules — is its own product, sold to teams building agents on reppo and elsewhere (LYRA precedent). voters do not need it. they need the pool. operators need the framework. <a href="/framework">/framework</a> is where that conversation lives.</p>
+        <p style="margin:0;font-size:0.75rem;color:var(--text-dim);">the underlying agent runtime — file-based memory, MCP wiring, personality stack, operational rules — is its own product. sold to teams building their own agents on reppo (builders fund grantees) and elsewhere (LYRA precedent, $1k–$2.2k per delivery). voters do not need the framework. they need a working pool or a connect widget. operators need the framework. <a href="/framework">/framework</a> is where that conversation lives.</p>
       </div>
     </div>
   </section>
