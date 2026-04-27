@@ -688,7 +688,7 @@
       <div class="nav-links">
         <a href="#problem">problem</a>
         <a href="#how">how</a>
-        <a href="#architecture">architecture</a>
+        <a href="#contract">contract</a>
         <a href="#pricing">pricing</a>
         <a href="#contact" class="cta-pill">contact</a>
       </div>
@@ -715,16 +715,16 @@
           <span class="value gold">reppo · base</span>
         </div>
         <div class="hero-meta-item">
-          <span class="label">runtime</span>
-          <span class="value">sibyl framework</span>
+          <span class="label">model</span>
+          <span class="value">staked vote manager</span>
         </div>
         <div class="hero-meta-item">
-          <span class="label">memory</span>
-          <span class="value">file-based · #2 longmemeval</span>
+          <span class="label">wrapper</span>
+          <span class="value">$REPPO → auREPPO</span>
         </div>
         <div class="hero-meta-item">
-          <span class="label">payment</span>
-          <span class="value">x402 · usdc · $reppo</span>
+          <span class="label">economics</span>
+          <span class="value">10–15% perf fee on net</span>
         </div>
       </div>
     </div>
@@ -965,12 +965,16 @@
             <td>append-only JSONL · operator can audit any decision retroactively</td>
           </tr>
           <tr>
-            <td>SIWE wallet auth · per-action billing</td>
-            <td>venice wrapper pattern · SIWE + x402 USDC settlement on Base</td>
+            <td>SIWE wallet auth for pool management UI · pro tier configuration</td>
+            <td>venice wrapper pattern · SIWE message signing, 5-min TTL, chainId 8453</td>
           </tr>
           <tr>
-            <td>cost guards · refuse if estimate exceeds cap</td>
-            <td>venice wrapper pattern · pre-flight cost estimate vs configurable cap</td>
+            <td>per-epoch agent compute budget · refuse if estimate exceeds cap</td>
+            <td>venice wrapper pattern · pre-flight cost estimate vs configurable cap, JSONL audit log per call</td>
+          </tr>
+          <tr>
+            <td>on-chain staked vote management · transferable yield-bearing wrapper</td>
+            <td>convex pattern (locked CRV → cvxCRV) applied to veREPPO → auREPPO</td>
           </tr>
         </tbody>
       </table>
@@ -979,58 +983,113 @@
 
   <div class="container"><div class="section-rule"></div></div>
 
+  <!-- ========== CONTRACT ARCHITECTURE ========== -->
+  <section class="section" id="contract">
+    <div class="container">
+      <div class="section-label">on-chain architecture</div>
+      <h2>the auspex vote manager.<br>stake $REPPO. earn auREPPO. agent votes.</h2>
+      <p>auspex is not a voter tool sold as a license. it is a smart contract pool. voters stake $REPPO into the auspex vote manager. the contract holds the underlying veREPPO voting power. depositors receive <code>auREPPO</code> — a transferable yield-bearing wrapper, like cvxCRV is for locked CRV. the agent has one job: cast votes within a registered policy. the contract distributes performance pool rewards back to auREPPO holders, net of a small fee.</p>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:clamp(1.5rem,3vw,2.5rem);margin-top:2rem;font-family:var(--font-mono);font-size:0.7rem;line-height:1.7;">
+        <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:1.25rem;">contract surface · sketch</div>
+        <pre style="color:var(--text-dim);white-space:pre-wrap;margin:0;font-family:var(--font-mono);font-size:0.7rem;">contract AuspexVoteManager {
+  // permissions are scoped narrowly
+  agent  → castVote(datanet, submission, support)        only
+  owner  → updatePolicy(bytes32 policyHash)              only
+  user   → deposit(amount, lockDuration) returns shares
+  user   → withdraw(shares) when underlying lock matures
+
+  // every vote is auditable on-chain
+  event VoteCast(datanet, submission, support, policyHash)
+  event PolicyUpdated(oldHash, newHash, epoch)
+  event RewardsDistributed(gross, fee, netToStakers)
+
+  // worst case if the agent key is compromised
+  → bad votes for one epoch
+  → not stolen funds
+}</pre>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:1rem;margin-top:2rem;" class="arch-callouts">
+        <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;">
+          <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">agent permissions</div>
+          <p style="margin:0;font-size:0.75rem;">cast-vote only. not withdraw. not policy change. compromise = bad votes for one epoch, not lost capital.</p>
+        </div>
+        <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;">
+          <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">policy transparency</div>
+          <p style="margin:0;font-size:0.75rem;">every epoch's rubric is committed as a hash on-chain. depositors can verify what the agent is configured to do before they stake.</p>
+        </div>
+        <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;">
+          <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">network effects</div>
+          <p style="margin:0;font-size:0.75rem;">one pool with many voters means one agent reasoning over cross-publisher patterns no individual voter could see. pool grows smarter as it grows larger.</p>
+        </div>
+      </div>
+
+      <p style="margin-top:2rem;color:var(--text-secondary);font-size:0.7rem;">the convex precedent: convex took locked CRV, issued cvxCRV, controlled the underlying voting power, and built one of the most successful protocols in DeFi. auspex applies the same pattern with a different optimization target — agent-driven rubric application instead of bribe-driven vote markets.</p>
+
+      <p style="color:var(--text-secondary);font-size:0.7rem;">three architectural questions for the reppo team: (1) does the protocol whitelist contracts as lockers? (2) can a contract holding veREPPO call <code>vote()</code> on behalf of itself? (3) do vote events emit enough detail for per-action audit? these determine the integration shape.</p>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
   <!-- ========== PRICING ========== -->
   <section class="section" id="pricing">
     <div class="container">
-      <div class="section-label">deployment models</div>
-      <h2>how this ships.</h2>
-      <p>auspex is designed to deploy in three shapes depending on the voter and the integration partner. the recommended shape is hybrid: sibyl labs hosts the engine, reppo embeds a co-branded surface, the foundation funds the open-source skeleton.</p>
+      <div class="section-label">three buyers · three products</div>
+      <h2>voters buy outcome. operators buy infrastructure.<br>they are not the same purchase.</h2>
+      <p>auspex separates the consumer surface from the infrastructure surface. veREPPO holders stake into a managed pool. large holders configure private pools. the underlying agent framework is a separate b2b product sold to network operators — it is not pitched to individual voters.</p>
       <div class="price-grid">
-        <div class="tier">
-          <div class="tier-name">hosted</div>
-          <div class="tier-tag">for individual voters</div>
-          <div class="tier-price">$0.10<span style="font-size:1rem;color:var(--text-muted);">+</span></div>
-          <span class="tier-price-unit">per vote · x402 metered · USDC or $REPPO</span>
+        <div class="tier featured">
+          <div class="tier-name">auspex pool</div>
+          <div class="tier-tag">for veREPPO holders</div>
+          <div class="tier-price">10–15%</div>
+          <span class="tier-price-unit">performance fee · net of pool rewards</span>
           <ul>
-            <li>web app · sign in with wallet</li>
-            <li>configure rubric per datanet</li>
-            <li>recommend-only or auto-vote within budget</li>
-            <li>full decision log + reflection report</li>
-            <li>no infra to run</li>
-            <li>per-vote billing means you only pay when auspex actually delivers</li>
+            <li>stake $REPPO → receive auREPPO (yield-bearing wrapper)</li>
+            <li>agent votes on your behalf using its rubric</li>
+            <li>performance pool rewards distributed pro-rata</li>
+            <li>fee taken on net rewards only · zero upfront</li>
+            <li>no infra · no rubric authoring · no decision log to read</li>
+            <li>auREPPO transferable · exit liquidity not gated by lock</li>
           </ul>
           <button class="tier-cta">join the waitlist</button>
         </div>
-        <div class="tier featured">
-          <div class="tier-name">license</div>
-          <div class="tier-tag">for serious veREPPO holders</div>
-          <div class="tier-price">$1k<span style="font-size:1rem;color:var(--text-muted);"> – $2.2k</span></div>
-          <span class="tier-price-unit">one-time · framework-skill license</span>
+        <div class="tier">
+          <div class="tier-name">auspex pro</div>
+          <div class="tier-tag">for treasuries · DAOs · large holders</div>
+          <div class="tier-price">0.5–1%<span style="font-size:1rem;color:var(--text-muted);"> + 10%</span></div>
+          <span class="tier-price-unit">mgmt fee on TVL · performance fee on net</span>
           <ul>
-            <li>self-hosted on your own infra</li>
-            <li>full sibyl framework-skill delivery (LYRA precedent)</li>
-            <li>watermarked + signed for your wallet</li>
-            <li>private rubrics never leave your machine</li>
-            <li>optional advisory tier $199/quarter or $1199/month</li>
-            <li>own the agent forever</li>
+            <li>private vote manager instance</li>
+            <li>custom rubric configured to your domain priorities</li>
+            <li>policy hash registered on-chain · public or private</li>
+            <li>monthly performance reports vs benchmark</li>
+            <li>direct line to sibyl labs for tuning</li>
+            <li>SLA on early-window voting coverage</li>
           </ul>
-          <button class="tier-cta">request a delivery</button>
+          <button class="tier-cta">scope a private pool</button>
         </div>
         <div class="tier">
           <div class="tier-name">foundation</div>
           <div class="tier-tag">for the reppo team</div>
-          <div class="tier-price">co-funded</div>
-          <span class="tier-price-unit">via builders fund · 50% match</span>
+          <div class="tier-price">co-built</div>
+          <span class="tier-price-unit">embedded on reppo.xyz · ecosystem grant</span>
           <ul>
-            <li>open-source reference implementation</li>
-            <li>co-branded widget embedded on reppo.xyz</li>
-            <li>sibyl labs maintains the engine, reppo owns the UX surface</li>
-            <li>foundation grant covers the OSS layer</li>
-            <li>premium tier (above) monetizes for sibyl labs</li>
-            <li>both sides own the part they're best at</li>
+            <li>auspex pool embedded as a co-branded widget on reppo.xyz</li>
+            <li>builders fund grant funds the OSS reference contracts</li>
+            <li>sibyl labs maintains the engine and the agent</li>
+            <li>reppo team owns the UX surface and the distribution</li>
+            <li>both sides earn from network growth</li>
+            <li>separate framework conversation: <a href="/framework">/framework</a></li>
           </ul>
-          <button class="tier-cta">scope a build</button>
+          <button class="tier-cta">talk to the team</button>
         </div>
+      </div>
+
+      <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.5rem;margin-top:2.5rem;">
+        <div style="color:var(--gold);font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.75rem;">framework licensing — sold separately</div>
+        <p style="margin:0;font-size:0.75rem;color:var(--text-dim);">the underlying agent runtime — file-based memory, MCP wiring, personality stack, operational rules — is its own product, sold to teams building agents on reppo and elsewhere (LYRA precedent). voters do not need it. they need the pool. operators need the framework. <a href="/framework">/framework</a> is where that conversation lives.</p>
       </div>
     </div>
   </section>
