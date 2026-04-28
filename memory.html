@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sibyl Memory — Agentic Memory Infrastructure for Teams | Sibyl Labs</title>
+  <meta name="description" content="Sibyl Memory is a portfolio of memory products for teams. Per-user platform memory, operator memory, conversational continuity, agent reputation, org memory. Built on the file-based architecture that scored #2 on LongMemEval (95.6%, only file-based system in the top tier).">
+  <meta name="keywords" content="agent memory, memory infrastructure, file-based memory, LongMemEval, multi-tenant memory, agentic memory, sibyl memory, sibyl labs">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sibylcap.com/memory">
+  <meta property="og:title" content="Sibyl Memory — Agentic Memory Infrastructure">
+  <meta property="og:description" content="Five memory products for teams. Built on the architecture that scored #2 on LongMemEval (file-based, no vector DB).">
+  <meta property="og:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <meta property="og:url" content="https://sibylcap.com/memory">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@sibylcap">
+  <meta name="twitter:title" content="Sibyl Memory — Agentic Memory Infrastructure">
+  <meta name="twitter:description" content="Five memory products for teams. File-based, no vectors. #2 on LongMemEval.">
+  <meta name="twitter:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Sibyl Memory",
+    "alternateName": "Sibyl Memory Infrastructure",
+    "applicationCategory": "DeveloperApplication",
+    "applicationSubCategory": "Memory Infrastructure",
+    "operatingSystem": "Web, Node.js",
+    "description": "Memory infrastructure for teams: per-user platform memory, operator memory, conversational continuity, agent reputation, org memory. File-based architecture validated at #2 on LongMemEval (95.6%, only file-based system in the top tier).",
+    "url": "https://sibylcap.com/memory",
+    "image": "https://sibylcap.com/images/sibyl-og.jpg",
+    "author": { "@type": "Organization", "name": "Sibyl Labs, LLC", "url": "https://sibylcap.com/" },
+    "publisher": { "@type": "Organization", "name": "Sibyl Labs, LLC", "url": "https://sibylcap.com/" }
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #06070a;
+      --surface: #0b0e14;
+      --elevated: #10131a;
+      --highest: #161a23;
+      --border: #181c26;
+      --border-strong: #222836;
+      --text-primary: #e0e2e8;
+      --text-dim: #9aa0ac;
+      --text-secondary: #6a7080;
+      --text-muted: #404858;
+      --gold: #c4a862;
+      --gold-bright: #e3c878;
+      --gold-dim: rgba(196,168,98,0.12);
+      --gold-line: rgba(196,168,98,0.025);
+      --teal: #2ea9a1;
+      --teal-dim: rgba(46,169,161,0.1);
+      --green: #5a8a6a;
+      --red: #b56262;
+      --violet: #8878a8;
+      --slate: #5a7a9a;
+      --amber: #b5944a;
+      --font-display: 'Fraunces', 'Times New Roman', serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --ease: cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.7; overflow-x: hidden; }
+    a { color: var(--gold); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--gold-bright); }
+    ::selection { background: var(--gold); color: var(--bg); }
+    code { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-primary); background: rgba(196,168,98,0.08); padding: 0.05rem 0.3rem; border-radius: 2px; }
+
+    /* === NAV === */
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem clamp(1.5rem, 4vw, 4rem); background: rgba(6,7,10,0.9); border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); }
+    .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .nav-logo { font-family: var(--font-display); font-size: 1rem; font-weight: 600; font-variation-settings: "opsz" 14, "SOFT" 20, "WONK" 0; color: var(--text-primary); letter-spacing: 0.18em; text-transform: uppercase; }
+    .nav-logo a { color: var(--text-primary); }
+    .nav-logo .sep { color: var(--text-muted); margin: 0 0.6rem; }
+    .nav-logo .sub { color: var(--gold); }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { font-size: 0.6875rem; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .nav-links a:hover { color: var(--gold); }
+    @media (max-width: 640px) {
+      .nav-links a:not(.cta) { display: none; }
+    }
+    .cta-pill {
+      padding: 0.55rem 1rem;
+      border: 1px solid rgba(196,168,98,0.4);
+      border-radius: 999px;
+      color: var(--gold);
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .cta-pill:hover { background: var(--gold-dim); border-color: var(--gold); color: var(--gold-bright); }
+
+    /* === LAYOUT === */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 clamp(1.5rem, 4vw, 4rem); }
+    .section { padding: clamp(4rem, 9vh, 8rem) 0; }
+    .section-rule { height: 1px; background: linear-gradient(90deg, rgba(196,168,98,0.2) 0%, rgba(196,168,98,0.05) 60%, transparent 100%); }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: clamp(2rem, 4vh, 3rem);
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .section-label::before { content: ''; width: 2.5rem; height: 1px; background: rgba(196,168,98,0.5); flex-shrink: 0; }
+
+    h1.brand-mark {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+      letter-spacing: -0.025em;
+      line-height: 0.95;
+      color: var(--gold);
+      text-shadow: 0 0 80px rgba(196,168,98,0.2);
+    }
+    h2 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(1.7rem, 3.8vw, 2.8rem);
+      font-variation-settings: "opsz" 60, "SOFT" 30, "WONK" 0;
+      letter-spacing: -0.015em;
+      line-height: 1.18;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+    h3 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 1.1rem;
+      font-variation-settings: "opsz" 24, "SOFT" 20, "WONK" 0;
+      letter-spacing: -0.005em;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    p { color: var(--text-dim); margin-bottom: 1rem; max-width: 60ch; }
+    p.lead { font-size: clamp(1rem, 1.6vw, 1.25rem); color: var(--text-primary); line-height: 1.6; max-width: 38ch; }
+    .quiet { color: var(--text-secondary); font-size: 0.75rem; letter-spacing: 0.04em; }
+
+    /* === HERO === */
+    .hero {
+      min-height: 100vh; min-height: 100dvh;
+      display: grid; align-content: center;
+      padding: clamp(6rem, 14vh, 10rem) clamp(1.5rem, 4vw, 4rem) clamp(3rem, 6vh, 5rem);
+      position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 45% 55% at 12% 85%, rgba(196,168,98,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 45% at 88% 18%, rgba(46,169,161,0.04) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .hero-inner { max-width: 1100px; width: 100%; margin: 0 auto; position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid rgba(46,169,161,0.4);
+      background: rgba(46,169,161,0.05);
+      border-radius: 999px; color: var(--teal);
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+    .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .hero h1.brand-mark { margin-bottom: 1.25rem; }
+    .hero-tagline {
+      font-family: var(--font-display); font-weight: 400; font-style: italic;
+      font-size: clamp(1.35rem, 2.6vw, 2rem);
+      font-variation-settings: "opsz" 36, "SOFT" 40, "WONK" 1;
+      color: var(--text-primary); letter-spacing: -0.005em;
+      max-width: 28ch; margin-bottom: 2.5rem; line-height: 1.25;
+    }
+    .hero-meta {
+      display: flex; flex-wrap: wrap; gap: clamp(1.5rem, 4vw, 3rem);
+      padding-top: 2rem; border-top: 1px solid var(--border); max-width: 750px;
+    }
+    .hero-meta-item .label { display: block; font-size: 0.65rem; letter-spacing: 0.18em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .hero-meta-item .value { display: block; font-size: 0.8125rem; color: var(--text-primary); }
+    .hero-meta-item .value.gold { color: var(--gold); }
+
+    /* === CATALOG === */
+    .catalog-grid {
+      display: grid; grid-template-columns: 1fr; gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+    @media (min-width: 760px) { .catalog-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1100px) { .catalog-grid { grid-template-columns: repeat(2, 1fr); } }
+    .catalog-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--text-muted);
+      border-radius: 6px;
+      padding: 1.5rem 1.75rem;
+      transition: all 0.2s;
+    }
+    .catalog-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+    .catalog-card.featured {
+      border-left-color: var(--gold);
+      background: linear-gradient(135deg, rgba(196,168,98,0.04) 0%, rgba(196,168,98,0.01) 100%);
+    }
+    .catalog-card .head {
+      display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.6rem; flex-wrap: wrap;
+    }
+    .catalog-card h3 { margin: 0; }
+    .catalog-card .status {
+      font-size: 0.575rem; letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 0.15rem 0.5rem; border-radius: 2px;
+    }
+    .status-pilot     { background: rgba(196,168,98,0.15); color: var(--gold); border: 1px solid rgba(196,168,98,0.3); }
+    .status-live      { background: rgba(90,138,106,0.15); color: var(--green); border: 1px solid rgba(90,138,106,0.3); }
+    .status-planned   { background: rgba(106,112,128,0.15); color: var(--text-secondary); border: 1px solid var(--border); }
+    .catalog-card .target {
+      display: block; font-size: 0.625rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 0.75rem;
+    }
+    .catalog-card p { font-size: 0.8125rem; color: var(--text-dim); margin-bottom: 0.75rem; max-width: none; }
+    .catalog-card .who { font-size: 0.7rem; color: var(--text-secondary); }
+    .catalog-card .who strong { color: var(--text-primary); font-weight: 500; }
+
+    /* === FEATURED REPPO BLOCK === */
+    .featured-detail {
+      background: linear-gradient(135deg, rgba(196,168,98,0.06) 0%, rgba(196,168,98,0.02) 100%);
+      border: 1px solid rgba(196,168,98,0.25);
+      border-radius: 6px;
+      padding: clamp(1.75rem, 3vw, 2.5rem);
+      margin-top: 2rem;
+    }
+    .featured-detail .featured-label {
+      color: var(--gold); font-size: 0.625rem; letter-spacing: 0.18em; text-transform: uppercase;
+      margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .featured-detail h3 { font-size: clamp(1.4rem, 2.6vw, 1.85rem); margin-bottom: 1rem; }
+    .featured-detail .layer-list { margin-top: 1.5rem; }
+    .featured-detail .layer {
+      display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: baseline;
+      padding: 0.85rem 0; border-bottom: 1px dashed var(--border);
+    }
+    .featured-detail .layer:last-child { border-bottom: none; }
+    .featured-detail .layer .num {
+      font-family: var(--font-display); font-size: 1.25rem; font-weight: 700;
+      font-variation-settings: "opsz" 24, "SOFT" 30, "WONK" 1;
+      color: var(--gold); min-width: 2rem;
+    }
+    .featured-detail .layer .body { font-size: 0.8rem; color: var(--text-primary); }
+    .featured-detail .layer .body span { color: var(--text-secondary); font-size: 0.7rem; }
+    .featured-detail .layer .price {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--gold); white-space: nowrap;
+    }
+
+    /* === ARCHITECTURE === */
+    .arch-block {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+      padding: clamp(1.5rem, 3vw, 2.5rem); margin-top: 2rem;
+    }
+    .arch-block pre {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--text-dim); white-space: pre-wrap; line-height: 1.6;
+      overflow-x: auto;
+    }
+    .arch-callouts {
+      display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 2rem;
+    }
+    @media (min-width: 760px) { .arch-callouts { grid-template-columns: repeat(3, 1fr); } }
+    .arch-callout {
+      background: var(--elevated); border: 1px solid var(--border); border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+    }
+    .arch-callout .head {
+      color: var(--gold); font-size: 0.625rem; letter-spacing: 0.18em; text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .arch-callout p { margin: 0; font-size: 0.75rem; }
+
+    /* === SCALE TABLE === */
+    .scale-table {
+      width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: 0.7rem;
+    }
+    .scale-table th, .scale-table td {
+      padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .scale-table th {
+      font-family: var(--font-mono); font-size: 0.625rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--gold); font-weight: 500;
+    }
+    .scale-table td:first-child { color: var(--text-primary); font-weight: 500; }
+    .scale-table td { color: var(--text-dim); }
+    .scale-table tr:hover td { background: rgba(196,168,98,0.025); }
+
+    /* === BENCHMARK BANNER === */
+    .bench-banner {
+      background: linear-gradient(135deg, rgba(46,169,161,0.06) 0%, rgba(46,169,161,0.02) 100%);
+      border: 1px solid rgba(46,169,161,0.25);
+      border-radius: 6px;
+      padding: 1.5rem 1.75rem;
+      margin-top: 2rem;
+      display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .bench-banner .num {
+      font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 700;
+      font-variation-settings: "opsz" 72, "SOFT" 30;
+      color: var(--teal); line-height: 1;
+    }
+    .bench-banner .text { flex: 1; min-width: 200px; font-size: 0.8rem; color: var(--text-dim); }
+    .bench-banner .text strong { color: var(--text-primary); font-weight: 500; }
+
+    /* === CTA === */
+    .end-cta {
+      background: var(--surface); border: 1px solid var(--border-strong);
+      border-radius: 6px; padding: clamp(2rem, 5vw, 4rem);
+      margin: 3rem 0; text-align: center;
+    }
+    .end-cta h2 { margin-bottom: 1rem; }
+    .end-cta p { margin: 0 auto 2rem; }
+    .end-cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 0.9rem 1.75rem; background: var(--gold); color: var(--bg);
+      font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600;
+      border-radius: 3px; transition: all 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold-bright); color: var(--bg); }
+    .btn-secondary {
+      padding: 0.9rem 1.75rem; background: transparent; color: var(--gold);
+      font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600;
+      border: 1px solid var(--gold); border-radius: 3px; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--gold-dim); }
+
+    /* === FOOTER === */
+    .footer { padding: 3rem 0 4rem; border-top: 1px solid var(--border); margin-top: 2rem; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+    .footer-brand { font-family: var(--font-display); font-weight: 600; font-variation-settings: "opsz" 14, "SOFT" 20, "WONK" 0; color: var(--text-primary); letter-spacing: 0.16em; font-size: 0.9rem; text-transform: uppercase; }
+    .footer-brand .sub { color: var(--gold); }
+    .footer-meta { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.04em; }
+    .footer-links { display: flex; gap: 1.25rem; }
+    .footer-links a { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    .footer-links a:hover { color: var(--gold); }
+
+    /* === BACKGROUND TEXTURE === */
+    .arch-bg { position: relative; }
+    .arch-bg::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent 0px, transparent 139px, var(--gold-line) 139px, var(--gold-line) 140px),
+        repeating-linear-gradient(90deg, transparent 0px, transparent 279px, rgba(196,168,98,0.015) 279px, rgba(196,168,98,0.015) 280px);
+      pointer-events: none; z-index: 0;
+    }
+    .arch-bg > * { position: relative; z-index: 1; }
+  </style>
+</head>
+<body class="arch-bg">
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <a href="/">SIBYL</a><span class="sep">·</span><span class="sub">MEMORY</span>
+      </div>
+      <div class="nav-links">
+        <a href="#catalog">catalog</a>
+        <a href="#featured">featured</a>
+        <a href="#architecture">architecture</a>
+        <a href="#scale">scale</a>
+        <a href="#contact" class="cta-pill">contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        agentic memory infrastructure · for teams
+      </div>
+      <h1 class="brand-mark">SIBYL MEMORY</h1>
+      <div class="hero-tagline">
+        five memory products. one architecture. zero vector databases.
+      </div>
+      <p class="lead">
+        most teams need persistent memory for their agents and users. very few want to own the architecture. sibyl labs builds memory products that drop in: per-user platform memory, operator memory, conversational continuity, agent reputation, and org memory. all on the file-based architecture that scored #2 on LongMemEval.
+      </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="label">benchmark</span>
+          <span class="value gold">#2 LongMemEval · 95.6%</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="label">architecture</span>
+          <span class="value">file-based · multi-tenant</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="label">products</span>
+          <span class="value">five at launch</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="label">scale target</span>
+          <span class="value">100K+ active users per platform</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== CATALOG ========== -->
+  <section class="section" id="catalog">
+    <div class="container">
+      <div class="section-label">the catalog</div>
+      <h2>five memory products. each solves a different team problem.</h2>
+      <p>same underlying architecture across all five — file-based, no vectors, no embeddings, multi-tenant by namespace. different schemas, different access patterns, different buyers.</p>
+
+      <div class="catalog-grid">
+
+        <div class="catalog-card featured">
+          <div class="head">
+            <h3>user profile memory</h3>
+            <span class="status status-pilot">pilot proposed · reppo</span>
+          </div>
+          <span class="target">for consumer platforms with active users</span>
+          <p>per-user persistent memory at platform scale. tracks history, extracts patterns, surfaces back to users via your UI. each user gets an isolated namespace. helps users understand themselves and improve over time.</p>
+          <div class="who"><strong>buyers:</strong> prediction markets, social platforms, agent platforms, crypto apps · <strong>scope:</strong> 1k → 1M+ active users per platform</div>
+        </div>
+
+        <div class="catalog-card">
+          <div class="head">
+            <h3>operator memory</h3>
+            <span class="status status-live">live · LYRA precedent</span>
+          </div>
+          <span class="target">for autonomous agent founders</span>
+          <p>full-stack memory for one operator. priorities, journal, entities, scars, relationships, arc. the same shape SIBYL uses to operate herself, packaged for delivery. drop-in for agent founders who want production-grade memory without building it.</p>
+          <div class="who"><strong>buyers:</strong> agent founders building autonomous agents · <strong>scope:</strong> single-tenant per operator, multi-month operational continuity</div>
+        </div>
+
+        <div class="catalog-card">
+          <div class="head">
+            <h3>conversational continuity</h3>
+            <span class="status status-planned">planned v1</span>
+          </div>
+          <span class="target">for AI app builders</span>
+          <p>cross-session memory for LLM apps. the "remember yesterday i said X" primitive most chat products lack. drop-in replacement for vector RAG-based memory with substantially lower cost and stronger temporal reasoning.</p>
+          <div class="who"><strong>buyers:</strong> AI app builders, chat product startups · <strong>scope:</strong> per-user threads, cross-session continuity</div>
+        </div>
+
+        <div class="catalog-card">
+          <div class="head">
+            <h3>agent reputation</h3>
+            <span class="status status-planned">planned v1</span>
+          </div>
+          <span class="target">for compliance-needing agents</span>
+          <p>append-only decision log with full rationale. hash-anchored to chain on demand. exportable for audit. designed for agents whose decisions need to be defensible: trading, advisory, fintech, anywhere wrong outputs become liability.</p>
+          <div class="who"><strong>buyers:</strong> trading agents, advisory agents, fintech agents · <strong>scope:</strong> per-agent decision history with cryptographic anchoring</div>
+        </div>
+
+        <div class="catalog-card">
+          <div class="head">
+            <h3>org memory</h3>
+            <span class="status status-planned">planned v1</span>
+          </div>
+          <span class="target">for DAOs · async-first orgs · foundations</span>
+          <p>multi-actor memory with role-tagged extraction. solves "we keep forgetting our own decisions" for distributed teams. preserves who said what, when, in which thread, with what context. the institutional knowledge your wiki keeps not capturing.</p>
+          <div class="who"><strong>buyers:</strong> DAOs, foundations, async-first orgs · <strong>scope:</strong> shared namespace per org, role-tagged contributions</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== FEATURED: REPPO USER PROFILE MEMORY ========== -->
+  <section class="section" id="featured">
+    <div class="container">
+      <div class="section-label">featured · pilot proposed</div>
+      <h2>user profile memory.<br>built for reppo's voter base, applicable to every platform after.</h2>
+      <p>reppo has 91k+ users casting votes on prediction markets. each vote is signal: a preference, a conviction, a track record. today that signal lives in their backend as raw events. with the memory layer, each user has a profile that grows with their behavior, surfaces back to them in reppo's UI, and helps them improve.</p>
+
+      <div class="featured-detail">
+        <div class="featured-label">three layers · pick the depth that fits</div>
+        <h3>the product, in three layers</h3>
+        <div class="layer-list">
+          <div class="layer">
+            <div class="num">01</div>
+            <div class="body">
+              <strong>storage + read API.</strong>
+              <span>per-user namespace. append-only vote history, feedback rationale, performance metrics. reppo's UI plugs in via REST. zero LLM cost.</span>
+            </div>
+            <div class="price">$0.10 / MAU</div>
+          </div>
+          <div class="layer">
+            <div class="num">02</div>
+            <div class="body">
+              <strong>+ agent enrichment.</strong>
+              <span>periodic batch profile extraction. "user overvotes early-epoch," "publisher Y has been wrong every time you backed them," "datanet X aligns with your conviction style." pre-computed recommendations.</span>
+            </div>
+            <div class="price">$0.50 / MAU</div>
+          </div>
+          <div class="layer">
+            <div class="num">03</div>
+            <div class="body">
+              <strong>+ conversational interface.</strong>
+              <span>users chat with their own memory through reppo's UX. "what's my best datanet?" "should i switch strategies?" on-demand agent runtime per query.</span>
+            </div>
+            <div class="price">$1.00 / MAU</div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-top:2rem;">at reppo's current 91k users with 50% active = 45k MAU, the enrichment tier is ~$22.5k/mo. at projected 1M users × 50% = 500k MAU, the same tier is ~$250k/mo. growth flows directly through to predictable b2b revenue.</p>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== ARCHITECTURE ========== -->
+  <section class="section" id="architecture">
+    <div class="container">
+      <div class="section-label">how it scales</div>
+      <h2>memory is the state. agents are stateless.</h2>
+      <p>the multi-tenant pattern: per-user file namespace + ephemeral agent runtime + thin metadata index for routing. each request spins up a fresh agent that loads exactly the requesting user's memory tree, processes the turn, writes back, exits. memory persists. agents don't.</p>
+
+      <div class="arch-block">
+        <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:1rem;">architecture · sketch</div>
+        <pre>          ┌─────────────────────────────────────────┐
+          │              API server                  │
+          │   /auth/{nonce,verify}                    │
+          │   /chat   /profile   /summary  /history   │
+          │   /extract  (Layer 2 batch)               │
+          └─────────────┬─────────────────────────────┘
+                        │
+          ┌─────────────┴─────────────┐
+          ▼                           ▼
+    ┌────────────┐             ┌─────────────────┐
+    │ index      │             │ Ephemeral agent │
+    │ (file      │             │ per request     │
+    │  routing)  │             │ ↓ loads memory  │
+    │ users      │             │ ↓ calls LLM     │
+    │ sessions   │             │ ↓ writes back   │
+    └────────────┘             │ ↓ exits         │
+                               └────────┬────────┘
+                                        │
+                                        ▼
+                       ┌─────────────────────────────────┐
+                       │ users/&lt;wallet&gt;/                  │
+                       │   profile.json                   │
+                       │   summary.md                     │
+                       │   conversations/&lt;date&gt;.jsonl     │
+                       │   entities/people/*.json         │
+                       │   entities/topics/*.json         │
+                       └─────────────────────────────────┘</pre>
+      </div>
+
+      <div class="arch-callouts">
+        <div class="arch-callout">
+          <div class="head">storage isolation</div>
+          <p>per-user namespace = filesystem-trivial multi-tenancy. user A's agent literally cannot read user B's files. no application-level access control bugs possible.</p>
+        </div>
+        <div class="arch-callout">
+          <div class="head">stateless compute</div>
+          <p>1000 concurrent users does NOT mean 1000 long-running agent processes. each request spins up an ephemeral agent — load memory, do work, exit. peak concurrency is realistic (10–50), not user count.</p>
+        </div>
+        <div class="arch-callout">
+          <div class="head">no vector tax</div>
+          <p>file-based + grep means zero embedding-API cost, zero vector-DB hosting cost. competitors pay $0.10–0.30 per active user just in infra before LLM. we don't.</p>
+        </div>
+      </div>
+
+      <div class="bench-banner">
+        <div class="num">95.6%</div>
+        <div class="text">
+          <strong>the architecture is benchmark-validated.</strong> the same shape that scored #2 on LongMemEval (95.6% Opus, only file-based system in the top tier) is the substrate underneath every product in the catalog. read the writeup at <a href="https://blog.sibylcap.com/longmemeval-v2">blog.sibylcap.com/longmemeval-v2</a>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== SCALE ========== -->
+  <section class="section" id="scale">
+    <div class="container">
+      <div class="section-label">cost / scale envelope</div>
+      <h2>scale tiers, demonstrated.</h2>
+      <p>the prototype runs the full architecture on commodity hardware. each tier is a clean upgrade path — same API surface, same memory shape, more storage and more agent slots.</p>
+
+      <table class="scale-table">
+        <thead>
+          <tr>
+            <th>tier</th>
+            <th>active users</th>
+            <th>storage</th>
+            <th>compute</th>
+            <th>infra cost (rough)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>POC</td><td>100</td><td>500MB</td><td>1 small EC2</td><td>~$80/mo</td></tr>
+          <tr><td>V1</td><td>10,000</td><td>50GB on EBS</td><td>2 EC2 + small Postgres</td><td>~$1,800/mo</td></tr>
+          <tr><td>V2</td><td>100,000</td><td>500GB on S3</td><td>4 EC2 + medium Postgres</td><td>~$18,000/mo</td></tr>
+          <tr><td>V3</td><td>1,000,000+</td><td>5TB+ on S3</td><td>sharded fleet</td><td>~$200,000/mo</td></tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:1.5rem;font-size:0.7rem;color:var(--text-secondary);">LLM costs scale linearly with active usage — typically dwarf infrastructure cost at small tiers, become commodity overhead at large tiers. our marginal cost per active user is roughly 30–50% lower than vector-DB competitors because we don't pay for embeddings or vector hosting.</p>
+    </div>
+  </section>
+
+  <div class="container"><div class="section-rule"></div></div>
+
+  <!-- ========== CTA ========== -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="end-cta">
+        <h2>ready to integrate · pilot scoped in 2–4 weeks.</h2>
+        <p>each product is the same architecture wrapped for a different team problem. reppo's user profile memory is the first pilot we're scoping. the pattern generalizes — if you're building a platform, an agent, an app, or an org that needs persistent memory, talk to us. we don't build memory for you, we sell you the memory layer.</p>
+        <div class="end-cta-buttons">
+          <a href="https://x.com/sibylcap" target="_blank" rel="noopener" class="btn-primary">talk on x</a>
+          <a href="mailto:sibylcap@gmail.com" class="btn-secondary">email sibyl labs</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <div class="footer-brand">SIBYL · <span class="sub">MEMORY</span></div>
+          <div class="footer-meta">a sibyl labs, llc product family · 2026</div>
+        </div>
+        <div class="footer-links">
+          <a href="/">sibyl</a>
+          <a href="/framework">framework</a>
+          <a href="/benchmark">benchmark</a>
+          <a href="https://x.com/sibylcap" target="_blank" rel="noopener">@sibylcap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
