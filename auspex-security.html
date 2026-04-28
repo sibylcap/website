@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auspex Vault — Security Framework v0.1 (DRAFT)</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Security framework for the Auspex Vault — a multi-profile veREPPO-weighted voting vault for Reppo. Draft v0.1, co-design with Reppo team in progress.">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #06070a;
+      --surface: #0b0e14;
+      --elevated: #10131a;
+      --highest: #161a23;
+      --border: #181c26;
+      --border-strong: #222836;
+      --text-primary: #e0e2e8;
+      --text-dim: #9aa0ac;
+      --text-secondary: #6a7080;
+      --text-muted: #404858;
+      --gold: #c4a862;
+      --gold-bright: #e3c878;
+      --gold-dim: rgba(196,168,98,0.12);
+      --teal: #2ea9a1;
+      --green: #5a8a6a;
+      --amber: #b5944a;
+      --red: #b56262;
+      --violet: #8878a8;
+      --slate: #5a7a9a;
+      --font-display: 'Fraunces', 'Times New Roman', serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.7; }
+    a { color: var(--gold); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--gold-bright); }
+    code { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-primary); background: rgba(196,168,98,0.08); padding: 0.05rem 0.3rem; border-radius: 2px; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 clamp(1.5rem, 4vw, 4rem); }
+    .section { padding: clamp(2.5rem, 5vh, 4rem) 0; border-bottom: 1px solid var(--border); }
+    .section:last-of-type { border-bottom: none; }
+
+    .doc-header {
+      padding: clamp(4rem, 10vh, 7rem) 0 clamp(2rem, 4vh, 3rem);
+      border-bottom: 1px solid var(--border);
+    }
+    .doc-status {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--amber);
+      background: rgba(181,148,74,0.06);
+      border-radius: 999px; color: var(--amber);
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-variation-settings: "opsz" 96, "SOFT" 40, "WONK" 1;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+    h1 .sub { color: var(--gold); font-style: italic; font-weight: 400; }
+    .doc-subtitle { color: var(--text-dim); font-size: 1rem; max-width: 60ch; margin-bottom: 2rem; }
+    .doc-meta {
+      display: flex; flex-wrap: wrap; gap: 1.5rem; padding-top: 1.5rem;
+      border-top: 1px dashed var(--border); font-size: 0.7rem;
+    }
+    .doc-meta-item .label { color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; font-size: 0.625rem; display: block; margin-bottom: 0.25rem; }
+    .doc-meta-item .val { color: var(--text-primary); }
+
+    h2 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-variation-settings: "opsz" 60, "SOFT" 30;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+    h3 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 1.15rem;
+      font-variation-settings: "opsz" 24, "SOFT" 20;
+      letter-spacing: -0.005em;
+      color: var(--text-primary);
+      margin-top: 1.5rem; margin-bottom: 0.6rem;
+    }
+    h4 {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    p { color: var(--text-dim); margin-bottom: 1rem; max-width: 75ch; }
+    p strong { color: var(--text-primary); font-weight: 500; }
+
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .section-eyebrow::before { content: ''; width: 2rem; height: 1px; background: var(--gold); }
+    .section-eyebrow .num { color: var(--text-muted); }
+
+    /* Diagram containers */
+    .diagram {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: clamp(1rem, 2vw, 1.5rem);
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .diagram-caption {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+
+    /* Tables */
+    table {
+      width: 100%; border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.7rem;
+    }
+    th, td {
+      padding: 0.7rem 0.85rem; text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      border-bottom-color: var(--border-strong);
+    }
+    td:first-child { color: var(--text-primary); font-weight: 500; }
+    td { color: var(--text-dim); }
+
+    /* Lists */
+    ul, ol { padding-left: 0; margin-bottom: 1rem; }
+    ul li, ol li {
+      list-style: none; padding: 0.3rem 0 0.3rem 1.5rem;
+      color: var(--text-dim);
+      position: relative;
+      font-size: 0.8125rem;
+      max-width: 75ch;
+    }
+    ul li::before { content: '·'; position: absolute; left: 0.5rem; color: var(--gold); font-weight: 600; }
+    ol { counter-reset: ol-counter; }
+    ol li { padding-left: 2rem; }
+    ol li::before { counter-increment: ol-counter; content: counter(ol-counter) '.'; position: absolute; left: 0.5rem; color: var(--gold); font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500; }
+
+    /* Callouts */
+    .callout {
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      border-radius: 4px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+      font-size: 0.75rem;
+    }
+    .callout.warn { border-left-color: var(--amber); }
+    .callout.danger { border-left-color: var(--red); }
+    .callout.ok { border-left-color: var(--green); }
+    .callout .head {
+      font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.4rem;
+    }
+    .callout.warn .head { color: var(--amber); }
+    .callout.danger .head { color: var(--red); }
+    .callout.ok .head { color: var(--green); }
+    .callout p { margin: 0; color: var(--text-dim); font-size: 0.75rem; max-width: none; }
+
+    /* Open questions box */
+    .open-q {
+      background: linear-gradient(135deg, rgba(196,168,98,0.06) 0%, rgba(196,168,98,0.02) 100%);
+      border: 1px solid rgba(196,168,98,0.25);
+      border-radius: 6px;
+      padding: 1.5rem 1.75rem;
+      margin: 1.5rem 0;
+    }
+    .open-q .head { color: var(--gold); font-size: 0.625rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .open-q p { font-size: 0.75rem; color: var(--text-dim); margin: 0; max-width: none; }
+    .open-q ul { margin-top: 0.6rem; margin-bottom: 0; }
+    .open-q ul li { padding: 0.25rem 0 0.25rem 1.25rem; font-size: 0.75rem; }
+
+    /* Code blocks */
+    pre {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      line-height: 1.6;
+      color: var(--text-dim);
+      overflow-x: auto;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 2rem 0 4rem;
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer .sub { color: var(--gold); }
+
+    /* Print friendly */
+    @media print {
+      body { background: white; color: black; }
+      .diagram, .callout, .open-q, table { break-inside: avoid; }
+      a { color: black; text-decoration: underline; }
+    }
+
+    /* TOC */
+    .toc { padding: 1rem 0 2rem; font-size: 0.7rem; }
+    .toc h4 { margin-top: 0; }
+    .toc ol { padding-left: 0; }
+    .toc ol li { padding: 0.2rem 0 0.2rem 2rem; }
+    .toc a { color: var(--text-dim); }
+    .toc a:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+  <header class="doc-header">
+    <div class="container">
+      <div class="doc-status">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--amber);"></span>
+        DRAFT v0.1 · co-design in progress · not for public distribution
+      </div>
+      <h1>Auspex Vault<br><span class="sub">Security Framework</span></h1>
+      <p class="doc-subtitle">Multi-profile veREPPO-weighted voting vault for Reppo. This document describes the security model, threat surface, mitigations, and audit plan, and invites Reppo collaboration on each section.</p>
+      <div class="doc-meta">
+        <div class="doc-meta-item"><span class="label">Document</span><span class="val">v0.1 · 2026-04-28</span></div>
+        <div class="doc-meta-item"><span class="label">Authors</span><span class="val">Sibyl Labs, LLC</span></div>
+        <div class="doc-meta-item"><span class="label">Reviewers</span><span class="val">Reppo (TBD), independent audit firm (TBD)</span></div>
+        <div class="doc-meta-item"><span class="label">Status</span><span class="val" style="color: var(--amber);">co-design in progress</span></div>
+        <div class="doc-meta-item"><span class="label">Distribution</span><span class="val">URL-only · indexed: no</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- TOC -->
+    <nav class="toc section">
+      <h4>Contents</h4>
+      <ol>
+        <li><a href="#summary">Executive summary</a></li>
+        <li><a href="#principles">Core security principles</a></li>
+        <li><a href="#threat">Threat model</a></li>
+        <li><a href="#authority">Two authority paths</a></li>
+        <li><a href="#components">Component architecture</a></li>
+        <li><a href="#surface">Attack surface analysis</a></li>
+        <li><a href="#multisig">Multi-sig procedures</a></li>
+        <li><a href="#audit">Audit plan</a></li>
+        <li><a href="#opsec">Operational security</a></li>
+        <li><a href="#incident">Incident response</a></li>
+        <li><a href="#open">Open questions for Reppo</a></li>
+        <li><a href="#changelog">Change log</a></li>
+      </ol>
+    </nav>
+
+    <!-- 1. SUMMARY -->
+    <section class="section" id="summary">
+      <div class="section-eyebrow"><span class="num">01</span><span>executive summary</span></div>
+      <h2>What this document is for.</h2>
+      <p>The Auspex Vault is a smart contract that lets Reppo voters stake $REPPO with a chosen lock duration, receive a transferable yield-bearing wrapper (auREPPO), and have an autonomous agent cast votes on their behalf according to a registered policy. This document captures the security model that makes that safe.</p>
+      <p><strong>The core security architecture is two independent authority paths.</strong> The agent has authority to cast votes (operational, frequent, low-impact) but has zero authority over funds. All fund movements — deposits, withdrawals, contract upgrades, treasury transfers, parameter changes — require multi-signature approval from Reppo, Virtuals, and Sibyl Labs.</p>
+      <p>This document is a draft and is not yet implemented. Reppo's collaboration on each section is requested — open questions are flagged in section 11 and inline in each component review.</p>
+    </section>
+
+    <!-- 2. PRINCIPLES -->
+    <section class="section" id="principles">
+      <div class="section-eyebrow"><span class="num">02</span><span>core principles</span></div>
+      <h2>Security architecture rests on five principles.</h2>
+      <ol>
+        <li><strong>The agent never touches funds.</strong> Voting and fund control are completely separate authority paths. Compromise of the agent's signing key cannot result in stolen tokens.</li>
+        <li><strong>Multi-sig is the single source of truth for fund movements.</strong> Three independent signers — Reppo + Virtuals + Sibyl Labs — must agree before any movement of user-deposited tokens or contract-controlled state changes.</li>
+        <li><strong>Vote casting goes through a permission-scoped proxy.</strong> The proxy contract can call only one function on Reppo's voting contract, and only with calldata produced by the agent. It cannot call any other function on any other contract.</li>
+        <li><strong>Every voting policy is committed on-chain before the agent casts a single vote in that epoch.</strong> Anyone can audit whether the agent voted in line with its registered policy by reading the policy hash and the vote events.</li>
+        <li><strong>The vault is pausable and depositors can always exit.</strong> Multi-sig can pause new deposits and new votes for incident response. Withdrawals at lock maturity are never blocked.</li>
+      </ol>
+    </section>
+
+    <!-- 3. THREAT MODEL -->
+    <section class="section" id="threat">
+      <div class="section-eyebrow"><span class="num">03</span><span>threat model</span></div>
+      <h2>What we are protecting against.</h2>
+      <p>The threat model is enumerated explicitly so Reppo can challenge or expand it. Each row identifies a class of attack, the assets it would put at risk, and the layer of mitigation that defends against it.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Threat</th>
+            <th>Asset at risk</th>
+            <th>Primary mitigation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Theft of user-deposited $REPPO via contract bug</td><td>All vault TVL</td><td>Audit + multi-sig pause + bounded function surface</td></tr>
+          <tr><td>Compromise of agent signing key</td><td>One epoch of voting (no funds)</td><td>Permission-scoped proxy + policy hash verification</td></tr>
+          <tr><td>Compromise of one multi-sig signer</td><td>None alone (requires N-of-N)</td><td>Multi-sig threshold + signer hardware wallets</td></tr>
+          <tr><td>Coordinated multi-sig collusion</td><td>All vault TVL + parameter integrity</td><td>3 independent organizations, on-chain transparency, public commitments</td></tr>
+          <tr><td>Reppo voting contract changes / upgrade breaks integration</td><td>Vote effectiveness</td><td>Multi-sig pause + proxy upgrade path</td></tr>
+          <tr><td>Smart contract reentrancy / math errors</td><td>Vault TVL</td><td>Audit, OpenZeppelin libraries, coverage testing</td></tr>
+          <tr><td>Malicious profile registration</td><td>Vote signal quality</td><td>Multi-sig gates new profile registration</td></tr>
+          <tr><td>Agent prompt injection via pod data</td><td>One epoch of voting (no funds)</td><td>Sandboxed agent, structured-output schema, no tool access during scoring</td></tr>
+          <tr><td>Off-chain agent runtime compromise</td><td>One epoch of voting (no funds)</td><td>Isolated runtime, key rotation, observable decision log</td></tr>
+          <tr><td>MEV / front-running on vote casts</td><td>Vote effectiveness, not principal</td><td>Private mempool submission for vote txs</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 4. AUTHORITY PATHS -->
+    <section class="section" id="authority">
+      <div class="section-eyebrow"><span class="num">04</span><span>two authority paths</span></div>
+      <h2>The single most important property: the agent never touches money.</h2>
+      <p>Two completely separate authority paths exist in the system. Voting is operational and high-frequency; funds are governance and rare. Mixing them is the classic mistake that leads to "agent gets compromised, drains vault." We don't make that mistake.</p>
+
+      <div class="diagram">
+        <svg viewBox="0 0 1000 540" style="width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto;" aria-label="Two authority paths diagram">
+          <defs>
+            <marker id="arr-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0 0, 10 5, 0 10" fill="#c4a862"/>
+            </marker>
+            <marker id="arr-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0 0, 10 5, 0 10" fill="#2ea9a1"/>
+            </marker>
+          </defs>
+
+          <!-- VOTING PATH (top) -->
+          <text x="500" y="30" text-anchor="middle" fill="#2ea9a1" font-family="IBM Plex Mono" font-size="11" letter-spacing="4" font-weight="500">VOTING PATH · OPERATIONAL · HIGH-FREQUENCY</text>
+          <line x1="40" y1="50" x2="960" y2="50" stroke="#2ea9a1" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.4"/>
+
+          <!-- Voting boxes -->
+          <g font-family="IBM Plex Mono" font-size="11" fill="#e0e2e8">
+            <!-- Policy registry -->
+            <rect x="60" y="80" width="160" height="68" fill="#10131a" stroke="#2ea9a1" stroke-width="1" rx="3"/>
+            <text x="140" y="105" text-anchor="middle" fill="#2ea9a1" font-size="9" letter-spacing="2">POLICY REGISTRY</text>
+            <text x="140" y="124" text-anchor="middle" font-size="10">on-chain</text>
+            <text x="140" y="138" text-anchor="middle" font-family="Fraunces" font-size="9" fill="#9aa0ac" font-style="italic">policyHash[epoch]</text>
+
+            <!-- Agent -->
+            <rect x="280" y="80" width="160" height="68" fill="#10131a" stroke="#2ea9a1" stroke-width="1" rx="3"/>
+            <text x="360" y="105" text-anchor="middle" fill="#2ea9a1" font-size="9" letter-spacing="2">AGENT</text>
+            <text x="360" y="124" text-anchor="middle" font-size="10">off-chain</text>
+            <text x="360" y="138" text-anchor="middle" font-family="Fraunces" font-size="9" fill="#9aa0ac" font-style="italic">computes intentions</text>
+
+            <!-- Proxy -->
+            <rect x="500" y="80" width="160" height="68" fill="#10131a" stroke="#2ea9a1" stroke-width="1" rx="3"/>
+            <text x="580" y="105" text-anchor="middle" fill="#2ea9a1" font-size="9" letter-spacing="2">PROXY CONTRACT</text>
+            <text x="580" y="124" text-anchor="middle" font-size="10">on-chain</text>
+            <text x="580" y="138" text-anchor="middle" font-family="Fraunces" font-size="9" fill="#9aa0ac" font-style="italic">vote() only</text>
+
+            <!-- Reppo voting -->
+            <rect x="720" y="80" width="180" height="68" fill="#10131a" stroke="#c4a862" stroke-width="1" rx="3"/>
+            <text x="810" y="105" text-anchor="middle" fill="#c4a862" font-size="9" letter-spacing="2">REPPO VOTING CONTRACT</text>
+            <text x="810" y="124" text-anchor="middle" font-size="10">on-chain</text>
+            <text x="810" y="138" text-anchor="middle" font-family="Fraunces" font-size="9" fill="#9aa0ac" font-style="italic">cast vote per pod</text>
+
+            <!-- Voting flow arrows -->
+            <line x1="220" y1="114" x2="275" y2="114" stroke="#2ea9a1" stroke-width="1.5" marker-end="url(#arr-teal)"/>
+            <text x="247" y="106" text-anchor="middle" font-size="8" fill="#9aa0ac">reads</text>
+
+            <line x1="440" y1="114" x2="495" y2="114" stroke="#2ea9a1" stroke-width="1.5" marker-end="url(#arr-teal)"/>
+            <text x="467" y="106" text-anchor="middle" font-size="8" fill="#9aa0ac">via API</text>
+
+            <line x1="660" y1="114" x2="715" y2="114" stroke="#2ea9a1" stroke-width="1.5" marker-end="url(#arr-teal)"/>
+            <text x="687" y="106" text-anchor="middle" font-size="8" fill="#9aa0ac">scoped call</text>
+          </g>
+
+          <!-- Separator / boundary -->
+          <line x1="40" y1="220" x2="960" y2="220" stroke="#222836" stroke-width="2"/>
+          <text x="500" y="245" text-anchor="middle" fill="#404858" font-family="IBM Plex Mono" font-size="9" letter-spacing="3" font-style="italic">— authority boundary · no path crosses —</text>
+          <line x1="40" y1="262" x2="960" y2="262" stroke="#222836" stroke-width="2"/>
+
+          <!-- FUNDS PATH (bottom) -->
+          <text x="500" y="300" text-anchor="middle" fill="#c4a862" font-family="IBM Plex Mono" font-size="11" letter-spacing="4" font-weight="500">FUNDS PATH · GOVERNANCE · MULTI-SIG ONLY</text>
+          <line x1="40" y1="320" x2="960" y2="320" stroke="#c4a862" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.4"/>
+
+          <g font-family="IBM Plex Mono" font-size="11" fill="#e0e2e8">
+            <!-- Depositor -->
+            <rect x="60" y="350" width="140" height="68" fill="#10131a" stroke="#c4a862" stroke-width="1" rx="3"/>
+            <text x="130" y="375" text-anchor="middle" fill="#c4a862" font-size="9" letter-spacing="2">DEPOSITOR</text>
+            <text x="130" y="394" text-anchor="middle" font-size="10">user wallet</text>
+            <text x="130" y="408" text-anchor="middle" font-family="Fraunces" font-size="9" fill="#9aa0ac" font-style="italic">deposits $REPPO</text>
+
+            <!-- Vault -->
+            <rect x="380" y="350" width="200" height="120" fill="#10131a" stroke="#c4a862" stroke-width="1.5" rx="3"/>
+            <text x="480" y="375" text-anchor="middle" fill="#c4a862" font-size="9" letter-spacing="2">AUSPEX VAULT</text>
+            <text x="480" y="394" text-anchor="middle" font-size="10">on-chain · holds funds</text>
+            <text x="480" y="412" text-anchor="middle" font-family="Fraunces" font-size="9" fill="#9aa0ac" font-style="italic">deposit() · withdraw()</text>
+            <text x="480" y="428" text-anchor="middle" font-family="Fraunces" font-size="9" fill="#9aa0ac" font-style="italic">setProfile() · pause()</text>
+            <text x="480" y="446" text-anchor="middle" font-family="Fraunces" font-size="9" fill="#9aa0ac" font-style="italic">distributeRewards()</text>
+
+            <!-- Multi-sig -->
+            <rect x="720" y="350" width="200" height="120" fill="#10131a" stroke="#b5944a" stroke-width="1.5" rx="3"/>
+            <text x="820" y="375" text-anchor="middle" fill="#b5944a" font-size="9" letter-spacing="2">MULTI-SIG</text>
+            <text x="820" y="394" text-anchor="middle" font-size="10">3-of-3 (or 2-of-3)</text>
+            <text x="820" y="416" text-anchor="middle" font-size="9" fill="#e0e2e8">Reppo</text>
+            <text x="820" y="432" text-anchor="middle" font-size="9" fill="#e0e2e8">Virtuals</text>
+            <text x="820" y="448" text-anchor="middle" font-size="9" fill="#e0e2e8">Sibyl Labs</text>
+
+            <!-- Funds flow arrows -->
+            <line x1="200" y1="384" x2="375" y2="384" stroke="#c4a862" stroke-width="1.5" marker-end="url(#arr-gold)"/>
+            <text x="287" y="376" text-anchor="middle" font-size="8" fill="#9aa0ac">deposit / withdraw</text>
+
+            <line x1="720" y1="410" x2="585" y2="410" stroke="#b5944a" stroke-width="1.5" marker-end="url(#arr-gold)"/>
+            <text x="652" y="402" text-anchor="middle" font-size="8" fill="#b5944a">authorizes governance ops</text>
+          </g>
+
+          <!-- Bottom annotation -->
+          <text x="500" y="510" text-anchor="middle" fill="#404858" font-family="IBM Plex Mono" font-size="9" letter-spacing="2" font-style="italic">the agent appears nowhere on this path</text>
+        </svg>
+        <div class="diagram-caption">Figure 1 · Two authority paths. The agent is on the upper rail (operational voting) and has no edge to the lower rail (funds).</div>
+      </div>
+
+      <h3>Why this design</h3>
+      <p>Most agentic-DeFi failures collapse the two rails into one. An agent with a single key that can both vote AND move funds is a single point of failure — compromise the key, lose the vault. Auspex separates these explicitly. Compromising the agent's signing key gives an attacker the ability to cast bad votes for one epoch, after which the multi-sig can rotate the key. Compromising the agent does not give an attacker any path to user funds.</p>
+    </section>
+
+    <!-- 5. COMPONENTS -->
+    <section class="section" id="components">
+      <div class="section-eyebrow"><span class="num">05</span><span>component architecture</span></div>
+      <h2>Five components, scoped purposes.</h2>
+
+      <div class="diagram">
+        <svg viewBox="0 0 1000 460" style="width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto;" aria-label="Component architecture diagram">
+          <defs>
+            <marker id="arr-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <polygon points="0 0, 10 5, 0 10" fill="#6a7080"/>
+            </marker>
+          </defs>
+
+          <!-- User -->
+          <g font-family="IBM Plex Mono" fill="#e0e2e8">
+            <rect x="40" y="200" width="120" height="60" fill="#10131a" stroke="#5a8a6a" stroke-width="1" rx="3"/>
+            <text x="100" y="225" text-anchor="middle" fill="#5a8a6a" font-size="9" letter-spacing="2">DEPOSITOR</text>
+            <text x="100" y="245" text-anchor="middle" font-family="Fraunces" font-size="10" font-style="italic">end user</text>
+          </g>
+
+          <!-- Vault (center) -->
+          <g font-family="IBM Plex Mono" fill="#e0e2e8">
+            <rect x="240" y="160" width="220" height="140" fill="#10131a" stroke="#c4a862" stroke-width="1.5" rx="3"/>
+            <text x="350" y="185" text-anchor="middle" fill="#c4a862" font-size="10" letter-spacing="2" font-weight="500">AUSPEX VAULT</text>
+            <line x1="260" y1="195" x2="440" y2="195" stroke="#c4a862" stroke-width="0.5" opacity="0.4"/>
+            <text x="350" y="215" text-anchor="middle" font-size="9">holds locked $REPPO</text>
+            <text x="350" y="231" text-anchor="middle" font-size="9">mints auREPPO</text>
+            <text x="350" y="247" text-anchor="middle" font-size="9">tracks profile assignments</text>
+            <text x="350" y="263" text-anchor="middle" font-size="9">distributes rewards</text>
+            <text x="350" y="285" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="9" fill="#9aa0ac">controlled by multi-sig</text>
+          </g>
+
+          <!-- Policy registry (top left) -->
+          <g font-family="IBM Plex Mono" fill="#e0e2e8">
+            <rect x="240" y="40" width="220" height="80" fill="#10131a" stroke="#2ea9a1" stroke-width="1" rx="3"/>
+            <text x="350" y="65" text-anchor="middle" fill="#2ea9a1" font-size="10" letter-spacing="2">POLICY REGISTRY</text>
+            <line x1="260" y1="75" x2="440" y2="75" stroke="#2ea9a1" stroke-width="0.5" opacity="0.4"/>
+            <text x="350" y="93" text-anchor="middle" font-size="9">policy hash per epoch</text>
+            <text x="350" y="108" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="9" fill="#9aa0ac">committed before voting begins</text>
+          </g>
+
+          <!-- Agent (top right) -->
+          <g font-family="IBM Plex Mono" fill="#e0e2e8">
+            <rect x="540" y="40" width="220" height="80" fill="#10131a" stroke="#2ea9a1" stroke-width="1" rx="3"/>
+            <text x="650" y="65" text-anchor="middle" fill="#2ea9a1" font-size="10" letter-spacing="2">AGENT (off-chain)</text>
+            <line x1="560" y1="75" x2="740" y2="75" stroke="#2ea9a1" stroke-width="0.5" opacity="0.4"/>
+            <text x="650" y="93" text-anchor="middle" font-size="9">scores pods · emits intentions</text>
+            <text x="650" y="108" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="9" fill="#9aa0ac">key authorized for proxy only</text>
+          </g>
+
+          <!-- Proxy (right) -->
+          <g font-family="IBM Plex Mono" fill="#e0e2e8">
+            <rect x="540" y="160" width="220" height="80" fill="#10131a" stroke="#2ea9a1" stroke-width="1" rx="3"/>
+            <text x="650" y="185" text-anchor="middle" fill="#2ea9a1" font-size="10" letter-spacing="2">PROXY CONTRACT</text>
+            <line x1="560" y1="195" x2="740" y2="195" stroke="#2ea9a1" stroke-width="0.5" opacity="0.4"/>
+            <text x="650" y="213" text-anchor="middle" font-size="9">single function: vote()</text>
+            <text x="650" y="228" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="9" fill="#9aa0ac">cannot move funds</text>
+          </g>
+
+          <!-- Reppo voting (far right) -->
+          <g font-family="IBM Plex Mono" fill="#e0e2e8">
+            <rect x="540" y="280" width="220" height="80" fill="#10131a" stroke="#c4a862" stroke-width="1" rx="3"/>
+            <text x="650" y="305" text-anchor="middle" fill="#c4a862" font-size="10" letter-spacing="2">REPPO VOTING</text>
+            <line x1="560" y1="315" x2="740" y2="315" stroke="#c4a862" stroke-width="0.5" opacity="0.4"/>
+            <text x="650" y="333" text-anchor="middle" font-size="9">native vote() entry point</text>
+            <text x="650" y="348" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="9" fill="#9aa0ac">unchanged by us</text>
+          </g>
+
+          <!-- Multi-sig (bottom) -->
+          <g font-family="IBM Plex Mono" fill="#e0e2e8">
+            <rect x="240" y="340" width="220" height="80" fill="#10131a" stroke="#b5944a" stroke-width="1.5" rx="3"/>
+            <text x="350" y="365" text-anchor="middle" fill="#b5944a" font-size="10" letter-spacing="2">MULTI-SIG</text>
+            <line x1="260" y1="375" x2="440" y2="375" stroke="#b5944a" stroke-width="0.5" opacity="0.4"/>
+            <text x="350" y="393" text-anchor="middle" font-size="9">Reppo · Virtuals · Sibyl Labs</text>
+            <text x="350" y="408" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="9" fill="#9aa0ac">authorizes vault governance</text>
+          </g>
+
+          <!-- Connections -->
+          <g stroke="#6a7080" stroke-width="1" fill="none" font-family="IBM Plex Mono" font-size="8">
+            <!-- Depositor → Vault -->
+            <line x1="160" y1="230" x2="235" y2="230" marker-end="url(#arr-dim)"/>
+            <text x="195" y="222" text-anchor="middle" fill="#9aa0ac">deposit</text>
+
+            <!-- Vault → Policy -->
+            <line x1="350" y1="160" x2="350" y2="125" marker-end="url(#arr-dim)"/>
+            <text x="370" y="145" fill="#9aa0ac">commits</text>
+
+            <!-- Policy ← Agent -->
+            <line x1="540" y1="80" x2="465" y2="80" marker-end="url(#arr-dim)"/>
+            <text x="500" y="72" text-anchor="middle" fill="#9aa0ac">reads</text>
+
+            <!-- Agent → Proxy -->
+            <line x1="650" y1="125" x2="650" y2="155" marker-end="url(#arr-dim)"/>
+            <text x="690" y="143" fill="#9aa0ac">vote intention</text>
+
+            <!-- Proxy → Reppo voting -->
+            <line x1="650" y1="245" x2="650" y2="275" marker-end="url(#arr-dim)"/>
+            <text x="690" y="263" fill="#9aa0ac">scoped call</text>
+
+            <!-- Multi-sig → Vault -->
+            <line x1="350" y1="340" x2="350" y2="305" marker-end="url(#arr-dim)"/>
+            <text x="370" y="325" fill="#b5944a">authorizes</text>
+          </g>
+        </svg>
+        <div class="diagram-caption">Figure 2 · Component architecture. Five components. Three trust zones (multi-sig in amber, off-chain agent + voting path in teal, end user in green).</div>
+      </div>
+
+      <h3>5.1 · Auspex Vault Contract</h3>
+      <p><strong>Purpose:</strong> Holds locked $REPPO, mints auREPPO to depositors, tracks per-user profile assignments, distributes Performance Pool rewards.</p>
+      <p><strong>Authority:</strong> Multi-sig only. The vault has no automated authority to move tokens out — every fund operation requires a multi-sig transaction.</p>
+      <p><strong>Surface:</strong> <code>deposit()</code>, <code>withdraw()</code> (when lock matures), <code>switchProfile()</code>, <code>distributeRewards()</code>, plus multi-sig-gated functions <code>setProfile()</code>, <code>pause()</code>, <code>unpause()</code>, <code>updateProxy()</code>, <code>upgradeContract()</code>.</p>
+      <p><strong>Audit scope:</strong> highest priority. All fund flows.</p>
+
+      <h3>5.2 · Proxy Contract</h3>
+      <p><strong>Purpose:</strong> Bridges the agent's off-chain vote intentions to Reppo's voting contract, with permission scoped exclusively to a single function call.</p>
+      <p><strong>Authority:</strong> The proxy can call <code>vote()</code> on the Reppo voting contract. It cannot call any other function on any other contract. The agent's signing key is whitelisted to call the proxy's <code>relay()</code> function. That is the proxy's entire surface.</p>
+      <p><strong>Why this matters:</strong> If the agent key is compromised, the attacker can cast votes during one epoch. They cannot drain funds, change parameters, or affect any other contract. After detection, the multi-sig rotates the agent key in a single transaction.</p>
+      <p><strong>Audit scope:</strong> medium priority. The function surface is small but the integration with Reppo's voting contract must be exact.</p>
+
+      <h3>5.3 · Agent Runtime</h3>
+      <p><strong>Purpose:</strong> Reads incoming pods, applies the registered voting policy, computes intentions, calls the proxy.</p>
+      <p><strong>Authority:</strong> One signing key, authorized to call the proxy only.</p>
+      <p><strong>Compromise impact:</strong> Bad votes for one epoch. No fund impact.</p>
+      <p><strong>Decision auditability:</strong> Every vote is preceded by an on-chain commitment to the policy hash for that epoch. Anyone can verify the agent's vote was consistent with the policy by reading public state.</p>
+
+      <h3>5.4 · Policy Registry</h3>
+      <p><strong>Purpose:</strong> On-chain commitment of voting policies. Each profile's voting rules are hashed and committed to this registry before votes are cast in that epoch.</p>
+      <p><strong>Authority:</strong> Multi-sig registers / deactivates profiles. The agent reads the registry but does not write to it.</p>
+      <p><strong>Why on-chain:</strong> Depositors can verify the policy backing their stake has not silently changed. Reppo can audit policy lineage across epochs.</p>
+
+      <h3>5.5 · Multi-sig Wallet</h3>
+      <p><strong>Purpose:</strong> Three-organization governance wallet that controls the vault.</p>
+      <p><strong>Signers:</strong> Reppo, Virtuals, Sibyl Labs. One signer per organization.</p>
+      <p><strong>Threshold:</strong> Open question — see section 7. Recommendation: 2-of-3 for routine operations (rewards, profile registration), 3-of-3 for emergency operations (pause, upgrade).</p>
+      <p><strong>Implementation:</strong> Gnosis Safe on Base, audited and battle-tested.</p>
+    </section>
+
+    <!-- 6. ATTACK SURFACE -->
+    <section class="section" id="surface">
+      <div class="section-eyebrow"><span class="num">06</span><span>attack surface analysis</span></div>
+      <h2>What an attacker could try, and what stops them.</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Attack vector</th>
+            <th>Worst case</th>
+            <th>Mitigation layer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Reentrancy on <code>withdraw()</code></td><td>Drained vault</td><td>Checks-effects-interactions, OZ ReentrancyGuard, audit</td></tr>
+          <tr><td>Integer overflow in reward math</td><td>Inflated balances</td><td>Solidity 0.8+ checked arithmetic, formal review</td></tr>
+          <tr><td>Access control bypass on multi-sig functions</td><td>Unauthorized governance</td><td>OZ AccessControl, multi-sig-only modifiers, audit</td></tr>
+          <tr><td>Agent key compromise</td><td>Bad votes for one epoch</td><td>Permission-scoped proxy, multi-sig key rotation</td></tr>
+          <tr><td>Proxy contract upgrade misuse</td><td>Malicious vote function swap</td><td>Multi-sig + timelock on proxy upgrades</td></tr>
+          <tr><td>Front-running of vote casts</td><td>MEV extraction on votes</td><td>Private mempool / Flashbots Protect</td></tr>
+          <tr><td>Profile-hash collision attack</td><td>Wrong policy applied</td><td>Keccak-256, full epoch+profileId in preimage</td></tr>
+          <tr><td>Pod-content prompt injection</td><td>One epoch of bad votes</td><td>Structured-output schema, no tool access in scoring</td></tr>
+          <tr><td>Reppo voting contract upgrade breaks integration</td><td>Votes fail or misroute</td><td>Multi-sig pause, proxy redeployment process</td></tr>
+          <tr><td>Multi-sig signer key theft (1 signer)</td><td>None alone (requires N-of-N)</td><td>Hardware wallets per signer</td></tr>
+          <tr><td>Multi-sig signer collusion (≥ threshold)</td><td>Vault drained</td><td>3 independent organizations, public on-chain transparency, signaling</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 7. MULTI-SIG -->
+    <section class="section" id="multisig">
+      <div class="section-eyebrow"><span class="num">07</span><span>multi-sig procedures</span></div>
+      <h2>Three signers. Three signing classes.</h2>
+      <p>Not all multi-sig operations are equal. Routine fee distributions and profile management happen often. Emergency pauses and contract upgrades happen rarely. The multi-sig threshold can vary by operation class.</p>
+
+      <h3>Class 1 — Routine</h3>
+      <p>Profile registration / deactivation, reward distribution, parameter tuning within bounded ranges.</p>
+      <p><strong>Threshold:</strong> 2-of-3</p>
+      <p><strong>Timelock:</strong> 24 hours</p>
+
+      <h3>Class 2 — Material</h3>
+      <p>Agent key rotation, proxy upgrades, vault parameter changes outside bounded ranges.</p>
+      <p><strong>Threshold:</strong> 3-of-3</p>
+      <p><strong>Timelock:</strong> 72 hours</p>
+
+      <h3>Class 3 — Emergency</h3>
+      <p>Pause vault, emergency proxy reset.</p>
+      <p><strong>Threshold:</strong> 2-of-3</p>
+      <p><strong>Timelock:</strong> none (emergency)</p>
+      <p><strong>Tradeoff:</strong> Emergency pause is fast (no timelock) so the multi-sig can react to incidents. Emergency cannot move funds — it can only stop new movement. Fund moves still require Class 1 or 2 with timelock.</p>
+
+      <h3>Hardware wallet requirement</h3>
+      <p>Each signer holds their key on a hardware wallet (Ledger or equivalent). No software-only key management on the multi-sig path.</p>
+    </section>
+
+    <!-- 8. AUDIT -->
+    <section class="section" id="audit">
+      <div class="section-eyebrow"><span class="num">08</span><span>audit plan</span></div>
+      <h2>Independent firm. Reppo's standard.</h2>
+      <p>Reppo's existing contracts have been audited three times. The Auspex Vault should meet the same standard. Open questions on which firms are appropriate are flagged below.</p>
+
+      <h3>Scope</h3>
+      <ul>
+        <li>Auspex Vault contract — full surface, including all multi-sig-gated functions</li>
+        <li>Proxy contract — function-scoping enforcement, no privilege escalation</li>
+        <li>Policy registry — hash collision resistance, epoch-tied integrity</li>
+        <li>Multi-sig integration — Gnosis Safe configuration, signer management</li>
+        <li>Reward distribution math — pro-rata correctness, no inflation</li>
+        <li>Reentrancy and integer-overflow review across all fund-touching functions</li>
+        <li>External integration — Reppo voting contract interaction surface</li>
+      </ul>
+
+      <h3>Out of scope</h3>
+      <ul>
+        <li>Reppo voting contract internals (already audited by Reppo)</li>
+        <li>Off-chain agent runtime (separate operational review, see §9)</li>
+        <li>Frontend / UI (separate review)</li>
+      </ul>
+
+      <h3>Cost estimate (rough)</h3>
+      <ul>
+        <li>Tier-1 firm (OpenZeppelin, Trail of Bits, Spearbit): $30k – $80k</li>
+        <li>Tier-2 firm (Pashov, Cantina, Cyfrin): $15k – $40k</li>
+        <li>Plus optional formal verification: $20k – $40k</li>
+        <li>Plus bug bounty post-deployment: $20k – $50k initial pool</li>
+      </ul>
+
+      <div class="open-q">
+        <div class="head">open question for reppo</div>
+        <p><strong>Audit firm + cost-share.</strong> Reppo holds existing relationships with the firms that audited the Reppo voting contracts. We propose a cost-share where Reppo selects the firm and contributes meaningfully to the audit cost. If Reppo's preferred firm is significantly more expensive than what we'd choose, the cost-share reflects that.</p>
+      </div>
+    </section>
+
+    <!-- 9. OPSEC -->
+    <section class="section" id="opsec">
+      <div class="section-eyebrow"><span class="num">09</span><span>operational security</span></div>
+      <h2>The off-chain agent is a real attack surface. Here's how we contain it.</h2>
+
+      <h3>Agent runtime isolation</h3>
+      <p>The agent runs in a dedicated runtime with no access to multi-sig keys, treasury wallets, or any system that holds value. The runtime has exactly one signing key (the agent key), and that key can call exactly one function (the proxy's <code>relay()</code>).</p>
+
+      <h3>Key management</h3>
+      <ul>
+        <li>Agent signing key: stored in a secrets manager (Doppler), accessed via runtime injection, never persisted to disk in plaintext.</li>
+        <li>Multi-sig signer keys: hardware wallets only, one per organization.</li>
+        <li>Agent key rotation: scheduled every 90 days OR on-demand via multi-sig within 24 hours of suspected compromise.</li>
+      </ul>
+
+      <h3>Decision logging</h3>
+      <p>Every agent vote intention is logged with: pod ID, score, rationale text, policy hash applied, timestamp. Logs are append-only and exported to a publicly readable mirror so depositors can audit decisions.</p>
+
+      <h3>Prompt injection protection</h3>
+      <p>Pods contain user-submitted text that the agent reads to score. Adversarial pods could attempt prompt injection. Mitigations:</p>
+      <ul>
+        <li>Structured-output enforcement on all scoring calls (no free-form responses)</li>
+        <li>Pod content presented to the model in a clearly delimited untrusted-content context</li>
+        <li>Agent has no tool access during scoring — it can only output a score and rationale</li>
+        <li>Anomalous score patterns trigger automatic abstention for that pod and human review</li>
+      </ul>
+    </section>
+
+    <!-- 10. INCIDENT RESPONSE -->
+    <section class="section" id="incident">
+      <div class="section-eyebrow"><span class="num">10</span><span>incident response</span></div>
+      <h2>What happens when something goes wrong.</h2>
+
+      <h3>Severity classification</h3>
+      <ul>
+        <li><strong>SEV-1:</strong> Active or imminent loss of user funds</li>
+        <li><strong>SEV-2:</strong> Active or imminent corruption of vote signal at material scale</li>
+        <li><strong>SEV-3:</strong> Operational degradation (agent offline, multi-sig coordination delays)</li>
+        <li><strong>SEV-4:</strong> Anomalous activity, no immediate impact</li>
+      </ul>
+
+      <h3>SEV-1 response</h3>
+      <ol>
+        <li>Any multi-sig signer notices and notifies the others within minutes via secure channel</li>
+        <li>Multi-sig executes Class-3 emergency pause within 30 minutes</li>
+        <li>Public communication via @sibylcap and Reppo channels within 2 hours</li>
+        <li>Forensics + RCA within 72 hours</li>
+        <li>Remediation + audit before unpause</li>
+      </ol>
+
+      <h3>SEV-2 response</h3>
+      <ol>
+        <li>Multi-sig pauses voting (not deposits) within 1 hour</li>
+        <li>Agent key rotation within 24 hours via Class-2 multi-sig action</li>
+        <li>Public RCA within 7 days</li>
+      </ol>
+
+      <h3>Communication channels</h3>
+      <ul>
+        <li>Internal: a private channel between Reppo + Virtuals + Sibyl Labs reps, established at launch</li>
+        <li>Public: @sibylcap on X, Reppo's announcements channel, both repositories</li>
+        <li>Depositor direct: email list captured at deposit time, GDPR-friendly</li>
+      </ul>
+
+      <div class="callout warn">
+        <div class="head">draft</div>
+        <p>This section is a placeholder for the runbook that will accompany the contract deployment. The actual runbook will include named individuals at each org, on-call rotations, escalation paths, and evidence-collection procedures. Open question for Reppo on §11.</p>
+      </div>
+    </section>
+
+    <!-- 11. OPEN QUESTIONS -->
+    <section class="section" id="open">
+      <div class="section-eyebrow"><span class="num">11</span><span>open questions for reppo collaboration</span></div>
+      <h2>Where Reppo's input shapes the design.</h2>
+      <p>This document is a draft. Each of the following is an open question where Reppo's expertise should inform the answer. We propose a defaults position for each, but the partnership decision is co-design.</p>
+
+      <div class="open-q">
+        <div class="head">Q1 · audit firm + cost-share</div>
+        <p>Which firm. Sibyl Labs's preference is OpenZeppelin or Trail of Bits. Reppo holds existing relationships with the firms that audited the Reppo voting contracts. We propose Reppo selects the firm and contributes meaningfully to the audit cost.</p>
+      </div>
+
+      <div class="open-q">
+        <div class="head">Q2 · multi-sig threshold per operation class</div>
+        <p>The split above (Class 1: 2-of-3, Class 2: 3-of-3, Class 3: 2-of-3 emergency) is our default. Reppo may have stronger views on what should require unanimity.</p>
+      </div>
+
+      <div class="open-q">
+        <div class="head">Q3 · timelock durations</div>
+        <p>24 hours / 72 hours / none is our default. Reppo's experience with their existing contracts may suggest different durations.</p>
+      </div>
+
+      <div class="open-q">
+        <div class="head">Q4 · pause authority</div>
+        <p>Currently scoped to multi-sig. Open question: should Reppo's existing security operations team have unilateral pause authority for SEV-1 events on a separate, narrowly-scoped role?</p>
+      </div>
+
+      <div class="open-q">
+        <div class="head">Q5 · profile registration governance</div>
+        <p>Default: only multi-sig can register new profiles. Open question: should this be permissionless with a bond + multi-sig veto, or strictly gated?</p>
+      </div>
+
+      <div class="open-q">
+        <div class="head">Q6 · agent key rotation cadence</div>
+        <p>Default: 90 days scheduled + on-demand. Reppo's view on whether this should be tighter.</p>
+      </div>
+
+      <div class="open-q">
+        <div class="head">Q7 · incident response named contacts</div>
+        <p>Reppo to nominate the on-call contact at their organization, with a backup. Sibyl Labs and Virtuals do the same.</p>
+      </div>
+
+      <div class="open-q">
+        <div class="head">Q8 · upgrade path for the vault contract itself</div>
+        <p>Default: not upgradeable. Migration via deploy-new-then-multi-sig-redirect. Reppo may prefer upgradeable with timelock + multi-sig.</p>
+      </div>
+
+      <div class="open-q">
+        <div class="head">Q9 · bug bounty</div>
+        <p>Default: $20k – $50k initial pool, scaling with TVL, run via Immunefi. Reppo's experience with bug bounty programs welcome.</p>
+      </div>
+
+      <div class="open-q">
+        <div class="head">Q10 · Reppo dev contact for security framework co-design</div>
+        <p>Sibyl Labs is asking Reppo to nominate a security-side dev contact who can iterate on this framework with us before contracts deploy. Without this, the partnership is one-sided and we don't proceed.</p>
+      </div>
+    </section>
+
+    <!-- 12. CHANGELOG -->
+    <section class="section" id="changelog">
+      <div class="section-eyebrow"><span class="num">12</span><span>change log</span></div>
+      <h2>Document version history.</h2>
+      <table>
+        <thead>
+          <tr><th>Version</th><th>Date</th><th>Author</th><th>Changes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>v0.1</td>
+            <td>2026-04-28</td>
+            <td>Sibyl Labs</td>
+            <td>Initial draft. Two-rail authority model documented. Component architecture, attack surface, multi-sig procedures, audit plan, opsec, incident response framework. Open questions queued for Reppo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <div style="font-family: var(--font-display); font-weight: 600; font-variation-settings: 'opsz' 14, 'SOFT' 20; color: var(--text-primary); letter-spacing: 0.16em; font-size: 0.9rem; text-transform: uppercase;">
+            SIBYL · <span class="sub">AUSPEX</span> · Security
+          </div>
+          <div style="font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.04em; margin-top: 0.4rem;">a sibyl labs, llc draft document · 2026 · co-design with Reppo in progress</div>
+        </div>
+        <div style="font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.06em;">
+          v0.1 · noindex · share by URL only
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
