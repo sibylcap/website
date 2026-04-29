@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auspex Vault — Security Framework v0.1 (DRAFT)</title>
+  <title>Auspex Vault · Security Framework v0.1 (DRAFT)</title>
   <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="Security framework for the Auspex Vault — a multi-profile veREPPO-weighted voting vault for Reppo. Draft v0.1, co-design with Reppo team in progress.">
+  <meta name="description" content="Security framework for the Auspex Vault · a multi-profile veREPPO-weighted voting vault for Reppo. Draft v0.1, co-design with Reppo team in progress.">
   <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -297,8 +297,8 @@
       <div class="section-eyebrow"><span class="num">01</span><span>executive summary</span></div>
       <h2>What this document is for.</h2>
       <p>The Auspex Vault is a smart contract that lets Reppo voters stake $REPPO with a chosen lock duration, receive a transferable yield-bearing wrapper (auREPPO), and have an autonomous agent cast votes on their behalf according to a registered policy. This document captures the security model that makes that safe.</p>
-      <p><strong>The core security architecture is two independent authority paths.</strong> The agent has authority to cast votes (operational, frequent, low-impact) but has zero authority over funds. All fund movements — deposits, withdrawals, contract upgrades, treasury transfers, parameter changes — require multi-signature approval from Reppo, Virtuals, and Sibyl Labs.</p>
-      <p>This document is a draft and is not yet implemented. Reppo's collaboration on each section is requested — open questions are flagged in section 11 and inline in each component review.</p>
+      <p><strong>The core security architecture is two independent authority paths.</strong> The agent has authority to cast votes (operational, frequent, low-impact) but has zero authority over funds. All fund movements. deposits, withdrawals, contract upgrades, treasury transfers, parameter changes. require multi-signature approval from Reppo, Virtuals, and Sibyl Labs.</p>
+      <p>This document is a draft and is not yet implemented. Reppo's collaboration on each section is requested. open questions are flagged in section 11 and inline in each component review.</p>
     </section>
 
     <!-- 2. PRINCIPLES -->
@@ -307,7 +307,7 @@
       <h2>Security architecture rests on five principles.</h2>
       <ol>
         <li><strong>The agent never touches funds.</strong> Voting and fund control are completely separate authority paths. Compromise of the agent's signing key cannot result in stolen tokens.</li>
-        <li><strong>Multi-sig is the single source of truth for fund movements.</strong> Three independent signers — Reppo + Virtuals + Sibyl Labs — must agree before any movement of user-deposited tokens or contract-controlled state changes.</li>
+        <li><strong>Multi-sig is the single source of truth for fund movements.</strong> Three independent signers. Reppo + Virtuals + Sibyl Labs. must agree before any movement of user-deposited tokens or contract-controlled state changes.</li>
         <li><strong>Vote casting goes through a permission-scoped proxy.</strong> The proxy contract can call only one function on Reppo's voting contract, and only with calldata produced by the agent. It cannot call any other function on any other contract.</li>
         <li><strong>Every voting policy is committed on-chain before the agent casts a single vote in that epoch.</strong> Anyone can audit whether the agent voted in line with its registered policy by reading the policy hash and the vote events.</li>
         <li><strong>The vault is pausable and depositors can always exit.</strong> Multi-sig can pause new deposits and new votes for incident response. Withdrawals at lock maturity are never blocked.</li>
@@ -403,7 +403,7 @@
 
           <!-- Separator / boundary -->
           <line x1="40" y1="220" x2="960" y2="220" stroke="#222836" stroke-width="2"/>
-          <text x="500" y="245" text-anchor="middle" fill="#404858" font-family="IBM Plex Mono" font-size="9" letter-spacing="3" font-style="italic">— authority boundary · no path crosses —</text>
+          <text x="500" y="245" text-anchor="middle" fill="#404858" font-family="IBM Plex Mono" font-size="9" letter-spacing="3" font-style="italic">.  authority boundary · no path crosses . </text>
           <line x1="40" y1="262" x2="960" y2="262" stroke="#222836" stroke-width="2"/>
 
           <!-- FUNDS PATH (bottom) -->
@@ -448,7 +448,7 @@
       </div>
 
       <h3>Why this design</h3>
-      <p>Most agentic-DeFi failures collapse the two rails into one. An agent with a single key that can both vote AND move funds is a single point of failure — compromise the key, lose the vault. Auspex separates these explicitly. Compromising the agent's signing key gives an attacker the ability to cast bad votes for one epoch, after which the multi-sig can rotate the key. Compromising the agent does not give an attacker any path to user funds.</p>
+      <p>Most agentic-DeFi failures collapse the two rails into one. An agent with a single key that can both vote AND move funds is a single point of failure. compromise the key, lose the vault. Auspex separates these explicitly. Compromising the agent's signing key gives an attacker the ability to cast bad votes for one epoch, after which the multi-sig can rotate the key. Compromising the agent does not give an attacker any path to user funds.</p>
     </section>
 
     <!-- 5. COMPONENTS -->
@@ -560,7 +560,7 @@
 
       <h3>5.1 · Auspex Vault Contract</h3>
       <p><strong>Purpose:</strong> Holds locked $REPPO, mints auREPPO to depositors, tracks per-user profile assignments, distributes Performance Pool rewards.</p>
-      <p><strong>Authority:</strong> Multi-sig only. The vault has no automated authority to move tokens out — every fund operation requires a multi-sig transaction.</p>
+      <p><strong>Authority:</strong> Multi-sig only. The vault has no automated authority to move tokens out. every fund operation requires a multi-sig transaction.</p>
       <p><strong>Surface:</strong> <code>deposit()</code>, <code>withdraw()</code> (when lock matures), <code>switchProfile()</code>, <code>distributeRewards()</code>, plus multi-sig-gated functions <code>setProfile()</code>, <code>pause()</code>, <code>unpause()</code>, <code>updateProxy()</code>, <code>upgradeContract()</code>.</p>
       <p><strong>Audit scope:</strong> highest priority. All fund flows.</p>
 
@@ -584,7 +584,7 @@
       <h3>5.5 · Multi-sig Wallet</h3>
       <p><strong>Purpose:</strong> Three-organization governance wallet that controls the vault.</p>
       <p><strong>Signers:</strong> Reppo, Virtuals, Sibyl Labs. One signer per organization.</p>
-      <p><strong>Threshold:</strong> Open question — see section 7. Recommendation: 2-of-3 for routine operations (rewards, profile registration), 3-of-3 for emergency operations (pause, upgrade).</p>
+      <p><strong>Threshold:</strong> Open question. see section 7. Recommendation: 2-of-3 for routine operations (rewards, profile registration), 3-of-3 for emergency operations (pause, upgrade).</p>
       <p><strong>Implementation:</strong> Gnosis Safe on Base, audited and battle-tested.</p>
     </section>
 
@@ -622,21 +622,21 @@
       <h2>Three signers. Three signing classes.</h2>
       <p>Not all multi-sig operations are equal. Routine fee distributions and profile management happen often. Emergency pauses and contract upgrades happen rarely. The multi-sig threshold can vary by operation class.</p>
 
-      <h3>Class 1 — Routine</h3>
+      <h3>Class 1. Routine</h3>
       <p>Profile registration / deactivation, reward distribution, parameter tuning within bounded ranges.</p>
       <p><strong>Threshold:</strong> 2-of-3</p>
       <p><strong>Timelock:</strong> 24 hours</p>
 
-      <h3>Class 2 — Material</h3>
+      <h3>Class 2. Material</h3>
       <p>Agent key rotation, proxy upgrades, vault parameter changes outside bounded ranges.</p>
       <p><strong>Threshold:</strong> 3-of-3</p>
       <p><strong>Timelock:</strong> 72 hours</p>
 
-      <h3>Class 3 — Emergency</h3>
+      <h3>Class 3. Emergency</h3>
       <p>Pause vault, emergency proxy reset.</p>
       <p><strong>Threshold:</strong> 2-of-3</p>
       <p><strong>Timelock:</strong> none (emergency)</p>
-      <p><strong>Tradeoff:</strong> Emergency pause is fast (no timelock) so the multi-sig can react to incidents. Emergency cannot move funds — it can only stop new movement. Fund moves still require Class 1 or 2 with timelock.</p>
+      <p><strong>Tradeoff:</strong> Emergency pause is fast (no timelock) so the multi-sig can react to incidents. Emergency cannot move funds. it can only stop new movement. Fund moves still require Class 1 or 2 with timelock.</p>
 
       <h3>Hardware wallet requirement</h3>
       <p>Each signer holds their key on a hardware wallet (Ledger or equivalent). No software-only key management on the multi-sig path.</p>
@@ -650,13 +650,13 @@
 
       <h3>Scope</h3>
       <ul>
-        <li>Auspex Vault contract — full surface, including all multi-sig-gated functions</li>
-        <li>Proxy contract — function-scoping enforcement, no privilege escalation</li>
-        <li>Policy registry — hash collision resistance, epoch-tied integrity</li>
-        <li>Multi-sig integration — Gnosis Safe configuration, signer management</li>
-        <li>Reward distribution math — pro-rata correctness, no inflation</li>
+        <li>Auspex Vault contract. full surface, including all multi-sig-gated functions</li>
+        <li>Proxy contract. function-scoping enforcement, no privilege escalation</li>
+        <li>Policy registry. hash collision resistance, epoch-tied integrity</li>
+        <li>Multi-sig integration. Gnosis Safe configuration, signer management</li>
+        <li>Reward distribution math. pro-rata correctness, no inflation</li>
         <li>Reentrancy and integer-overflow review across all fund-touching functions</li>
-        <li>External integration — Reppo voting contract interaction surface</li>
+        <li>External integration. Reppo voting contract interaction surface</li>
       </ul>
 
       <h3>Out of scope</h3>
@@ -703,7 +703,7 @@
       <ul>
         <li>Structured-output enforcement on all scoring calls (no free-form responses)</li>
         <li>Pod content presented to the model in a clearly delimited untrusted-content context</li>
-        <li>Agent has no tool access during scoring — it can only output a score and rationale</li>
+        <li>Agent has no tool access during scoring. it can only output a score and rationale</li>
         <li>Anomalous score patterns trigger automatic abstention for that pod and human review</li>
       </ul>
     </section>

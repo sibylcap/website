@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AUSPEX — Voter Agent for Reppo Datanets | Sibyl Labs</title>
+  <title>AUSPEX · Voter Agent for Reppo Datanets | Sibyl Labs</title>
   <meta name="description" content="AUSPEX is a proposed voter agent for Reppo datanets. Reads publisher submissions, applies your rubric, casts votes in the early-decay window of every 48-hour epoch. Built on SIBYL's file-based memory architecture (#2 LongMemEval, 95.6%).">
   <meta name="keywords" content="auspex, sibyl auspex, reppo voter agent, reppo datanet agent, veREPPO, prediction market agent, sibyl labs, base chain agent">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://sibylcap.com/auspex">
-  <meta property="og:title" content="AUSPEX — Voter Agent for Reppo Datanets">
+  <meta property="og:title" content="AUSPEX · Voter Agent for Reppo Datanets">
   <meta property="og:description" content="Read every submission. Apply your rubric. Vote in the early-decay window. Sleep through the rest.">
   <meta property="og:image" content="https://sibylcap.com/images/sibyl-og.jpg">
   <meta property="og:url" content="https://sibylcap.com/auspex">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@sibylcap">
-  <meta name="twitter:title" content="AUSPEX — Voter Agent for Reppo Datanets">
+  <meta name="twitter:title" content="AUSPEX · Voter Agent for Reppo Datanets">
   <meta name="twitter:description" content="Voter agent for Reppo. Read, score, vote in the early-decay window.">
   <meta name="twitter:image" content="https://sibylcap.com/images/sibyl-og.jpg">
   <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
@@ -733,8 +733,8 @@
     <div class="container">
       <div class="section-label">the friction</div>
       <h2>voting power decays linearly across 48 hours.<br>so does your sleep.</h2>
-      <p>reppo voters lock $reppo into <code>veREPPO</code> and allocate that voting power across datanets. within each 48-hour epoch, voting power decays linearly. early conviction is worth more than late momentum-following. there is no slashing — voter quality is policed by opportunity cost and two-sided voting alone.</p>
-      <p>which means voting <em>well</em> requires reading every publisher submission across every datanet you hold a position in, applying judgment, and casting stake — fast — every 48 hours. across 9+ live datanets. per epoch.</p>
+      <p>reppo voters lock $reppo into <code>veREPPO</code> and allocate that voting power across datanets. within each 48-hour epoch, voting power decays linearly. early conviction is worth more than late momentum-following. there is no slashing. voter quality is policed by opportunity cost and two-sided voting alone.</p>
+      <p>which means voting <em>well</em> requires reading every publisher submission across every datanet you hold a position in, applying judgment, and casting stake quickly. every 48 hours. across 9+ live datanets. per epoch.</p>
 
       <div class="decay-wrap">
         <div class="decay-svg">
@@ -928,7 +928,7 @@
     <div class="container">
       <div class="section-label">launch profiles</div>
       <h2>three archetypes. five strategies.<br>calibrated against measured network volume.</h2>
-      <p>each profile is a registered voting strategy with its own rubric, its own agent, and its own on-chain policy hash. depositors pick the one matching their conviction. the five launch profiles span three archetypes — one balanced, one high-volume concentrated, three specialists — calibrated against the actual datanet volume on reppo today, covering ~83% of measurable activity at launch.</p>
+      <p>each profile is a registered voting strategy with its own rubric, its own agent, and its own on-chain policy hash. depositors pick the one matching their conviction. the five launch profiles span three archetypes. one balanced, one high-volume concentrated, three specialists. calibrated against the actual datanet volume on reppo today, covering ~83% of measurable activity at launch.</p>
 
       <!-- Pie chart: example veREPPO allocation across launch profiles -->
       <div style="display:grid;grid-template-columns:1fr;gap:2.5rem;align-items:center;margin-top:3rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:clamp(1.5rem,3vw,2.5rem);" class="profile-pie-wrap">
@@ -944,15 +944,15 @@
                 </filter>
               </defs>
               <g filter="url(#pie-shadow)">
-                <!-- Slice 1: Balanced Generalist 32% (gold) — start -90°, end 25.2° -->
+                <!-- Slice 1: Balanced Generalist 32% (gold). start -90°, end 25.2° -->
                 <path d="M 200 200 L 200 50 A 150 150 0 0 1 335.72 263.87 Z" fill="#c4a862" stroke="#06070a" stroke-width="2"/>
-                <!-- Slice 2: High-Volume Concentrator 24% (teal) — end 111.6° -->
+                <!-- Slice 2: High-Volume Concentrator 24% (teal). end 111.6° -->
                 <path d="M 200 200 L 335.72 263.87 A 150 150 0 0 1 144.78 339.46 Z" fill="#2ea9a1" stroke="#06070a" stroke-width="2"/>
-                <!-- Slice 3: DeFi/Crypto Specialist 18% (violet) — end 176.4° -->
+                <!-- Slice 3: DeFi/Crypto Specialist 18% (violet). end 176.4° -->
                 <path d="M 200 200 L 144.78 339.46 A 150 150 0 0 1 50.28 209.42 Z" fill="#8878a8" stroke="#06070a" stroke-width="2"/>
-                <!-- Slice 4: MCP Tooling Specialist 14% (warning amber) — end 226.8° -->
+                <!-- Slice 4: MCP Tooling Specialist 14% (warning amber). end 226.8° -->
                 <path d="M 200 200 L 50.28 209.42 A 150 150 0 0 1 97.33 90.64 Z" fill="#b5944a" stroke="#06070a" stroke-width="2"/>
-                <!-- Slice 5: Geopolitics Analyst 12% (slate blue) — end 270° -->
+                <!-- Slice 5: Geopolitics Analyst 12% (slate blue). end 270° -->
                 <path d="M 200 200 L 97.33 90.64 A 150 150 0 0 1 200 50 Z" fill="#5a7a9a" stroke="#06070a" stroke-width="2"/>
               </g>
               <!-- Percentage labels on each slice (positioned at 0.7r from center, midpoint angle of each slice) -->
@@ -1026,7 +1026,7 @@
             <h3 style="margin:0;">balanced generalist</h3>
             <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#c4a862;">archetype: balanced</span>
           </div>
-          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">votes proportionally across every primary SFW datanet, weighted by current volume share. cross-domain general criteria. the index across the network — broad exposure without picking a theme.</p>
+          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">votes proportionally across every primary SFW datanet, weighted by current volume share. cross-domain general criteria. the index across the network. broad exposure without picking a theme.</p>
           <div style="font-size:0.7rem;color:var(--text-secondary);">
             <strong style="color:var(--text-primary);">rubric:</strong>
             factual grounding · format integrity · source citations · novelty (cross-domain, datanet-agnostic) ·
@@ -1055,7 +1055,7 @@
             <h3 style="margin:0;">crypto/DeFi specialist</h3>
             <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#8878a8;">archetype: specialist · thematic</span>
           </div>
-          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">specializes across the crypto-economic cluster — DeFi protocols, tokenomics data, RL trading environments. SIBYL's natural turf. on-chain verifiability is the dominant criterion.</p>
+          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">specializes across the crypto-economic cluster. DeFi protocols, tokenomics data, RL trading environments. SIBYL's natural turf. on-chain verifiability is the dominant criterion.</p>
           <div style="font-size:0.7rem;color:var(--text-secondary);">
             <strong style="color:var(--text-primary);">scope:</strong> DeFi protocols + tokenomics + RL trading envs (~31M combined volume) ·
             <strong style="color:var(--text-primary);">rubric weights:</strong> on-chain verifiability 35% · protocol fundamentals 25% · reproducibility 20% · tokenomic structure 20% ·
@@ -1069,7 +1069,7 @@
             <h3 style="margin:0;">MCP tooling specialist</h3>
             <span style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#b5944a;">archetype: specialist · single datanet</span>
           </div>
-          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">deep specialization on the highest per-pod weight datanet on the network — agent tooling and MCP integrations. ~89M vote volume in recent epochs. the bet on agent infrastructure as the dominant theme.</p>
+          <p style="font-size:0.8125rem;color:var(--text-dim);margin-bottom:0.75rem;max-width:none;">deep specialization on the highest per-pod weight datanet on the network. agent tooling and MCP integrations. ~89M vote volume in recent epochs. the bet on agent infrastructure as the dominant theme.</p>
           <div style="font-size:0.7rem;color:var(--text-secondary);">
             <strong style="color:var(--text-primary);">scope:</strong> MCP tools datanet only (89M volume, top-1) ·
             <strong style="color:var(--text-primary);">rubric weights:</strong> tool/API schema correctness 30% · integration completeness 25% · documentation clarity 20% · agent-utility 25% ·
@@ -1162,12 +1162,12 @@
     <div class="container">
       <div class="section-label">on-chain architecture</div>
       <h2>the auspex vault.<br>profile registry. veREPPO-weighted aggregation. one cast per pod.</h2>
-      <p>auspex is a smart contract vault. depositors stake $REPPO with a chosen lock duration, select a voting profile their veREPPO will back, and receive <code>auREPPO</code> — a transferable yield-bearing wrapper, like cvxCRV is for locked CRV. each profile is a registered voting strategy run by its own agent. when a pod arrives, every profile's agent emits a vote intention. the vault aggregates them into one weighted vote: <code>Σ (intention × profile_veREPPO_share)</code>. one cast per pod, fully expressing the veREPPO-weighted preferences of the depositors.</p>
+      <p>auspex is a smart contract vault. depositors stake $REPPO with a chosen lock duration, select a voting profile their veREPPO will back, and receive <code>auREPPO</code>. a transferable yield-bearing wrapper, like cvxCRV is for locked CRV. each profile is a registered voting strategy run by its own agent. when a pod arrives, every profile's agent emits a vote intention. the vault aggregates them into one weighted vote: <code>Σ (intention × profile_veREPPO_share)</code>. one cast per pod, fully expressing the veREPPO-weighted preferences of the depositors.</p>
 
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:clamp(1.5rem,3vw,2.5rem);margin-top:2rem;font-family:var(--font-mono);font-size:0.7rem;line-height:1.7;">
         <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:1.25rem;">contract surface · sketch</div>
         <pre style="color:var(--text-dim);white-space:pre-wrap;margin:0;font-family:var(--font-mono);font-size:0.7rem;">contract AuspexVault {
-  // profile registry — strategies the vault can execute
+  // profile registry. strategies the vault can execute
   struct Profile { bytes32 policyHash; address agent; bool active; }
   mapping(bytes32 =&gt; Profile) public profiles;
   bytes32[] public profileIds;
@@ -1203,11 +1203,11 @@
       <div style="display:grid;grid-template-columns:1fr;gap:1rem;margin-top:2rem;" class="arch-callouts">
         <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;">
           <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">scoped permissions</div>
-          <p style="margin:0;font-size:0.75rem;">each profile's agent can only emit intentions for its own profile. compromise of one agent key corrupts that profile's intentions for one epoch — not the aggregate vote, not deposits, not other profiles.</p>
+          <p style="margin:0;font-size:0.75rem;">each profile's agent can only emit intentions for its own profile. compromise of one agent key corrupts that profile's intentions for one epoch. not the aggregate vote, not deposits, not other profiles.</p>
         </div>
         <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;">
           <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">policy transparency</div>
-          <p style="margin:0;font-size:0.75rem;">every profile's policy hash is committed on-chain before it emits any intention for an epoch. depositors verify the rubric they're backing has not silently changed. the aggregation math is deterministic from on-chain state — anyone can verify the cast.</p>
+          <p style="margin:0;font-size:0.75rem;">every profile's policy hash is committed on-chain before it emits any intention for an epoch. depositors verify the rubric they're backing has not silently changed. the aggregation math is deterministic from on-chain state. anyone can verify the cast.</p>
         </div>
         <div style="background:var(--elevated);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;">
           <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;">capital chooses strategy</div>
@@ -1215,14 +1215,14 @@
         </div>
       </div>
 
-      <p style="margin-top:2rem;color:var(--text-secondary);font-size:0.7rem;">the convex precedent: convex took locked CRV, issued cvxCRV, controlled the underlying voting power, and built one of the most successful protocols in DeFi. auspex applies the same pattern with a different optimization target — multi-strategy agent voting weighted by depositor preference, instead of bribe-driven vote markets.</p>
+      <p style="margin-top:2rem;color:var(--text-secondary);font-size:0.7rem;">the convex precedent: convex took locked CRV, issued cvxCRV, controlled the underlying voting power, and built one of the most successful protocols in DeFi. auspex applies the same pattern with a different optimization target. multi-strategy agent voting weighted by depositor preference, instead of bribe-driven vote markets.</p>
 
       <div style="margin-top:3rem;padding:2rem clamp(1.5rem,3vw,2.5rem);background:linear-gradient(135deg,rgba(196,168,98,0.06) 0%,rgba(196,168,98,0.02) 100%);border:1px solid rgba(196,168,98,0.25);border-radius:6px;">
         <div style="color:var(--gold);font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:1rem;">operational footprint</div>
         <h3 style="font-size:clamp(1.25rem,2.4vw,1.75rem);margin-bottom:1.25rem;">N profiles. N agents. one vault. one cast per pod.</h3>
         <p style="font-size:0.8125rem;color:var(--text-dim);max-width:65ch;">each profile is its own sibyl-shaped agent process running in a sandbox 24/7. all profiles read the same pod stream from reppo. each emits intentions per its own rubric. the vault aggregates them into one veREPPO-weighted vote and casts it on-chain in the early-decay window. one decision log per profile, one aggregate event stream per vault, full transparency at both layers.</p>
-        <p style="font-size:0.8125rem;color:var(--text-dim);max-width:65ch;">cross-profile diversity preserves the prediction-market property reppo cares about. cross-publisher pattern detection within each profile compounds with TVL behind that profile. the more capital flows toward a profile, the more its rubric drives the aggregate vote — and the more pressure there is on it to perform, because depositors can switch profiles any time.</p>
-        <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;">scale model: <code>N agent processes per AuspexVault</code>, where N grows as new profiles register. five at launch. tens at maturity. each agent is light — one rubric, one signer, one journal.</p>
+        <p style="font-size:0.8125rem;color:var(--text-dim);max-width:65ch;">cross-profile diversity preserves the prediction-market property reppo cares about. cross-publisher pattern detection within each profile compounds with TVL behind that profile. the more capital flows toward a profile, the more its rubric drives the aggregate vote. and the more pressure there is on it to perform, because depositors can switch profiles any time.</p>
+        <p style="font-size:0.7rem;color:var(--text-secondary);margin:0;">scale model: <code>N agent processes per AuspexVault</code>, where N grows as new profiles register. five at launch. tens at maturity. each agent is light. one rubric, one signer, one journal.</p>
       </div>
     </div>
   </section>
@@ -1282,7 +1282,7 @@
     ];
 
     // Seed entries so the columns are populated on page load, before the live loop runs.
-    // These represent the previous epoch's tail — already-finalized votes the voter
+    // These represent the previous epoch's tail. already-finalized votes the voter
     // can audit. The live loop adds new submissions on top.
     const SEED_FEED = [
       { datanet: 'geopolitics', pub: '0x91dd..04ac', content: 'EU central bank policy divergence Q4. Three primary sources, all dated within 30 days. Original synthesis.', verdict: 'for', score: '0.81' },
@@ -1429,7 +1429,7 @@
 
     function resetDemo(silent) {
       demoState.idx = 0;
-      // Reset to seed counters (3 reads, 2 voted, 3.0% budget — matching SEED_FEED)
+      // Reset to seed counters (3 reads, 2 voted, 3.0% budget. matching SEED_FEED)
       demoState.stats = { read: 3, voted: 2, budget: 3.0 };
       feed.innerHTML = '';
       log.innerHTML = '';
@@ -1496,7 +1496,7 @@
     renderSeed();
 
     // Auto-start the live loop after a short delay so the seeded state is visible first.
-    // No IntersectionObserver gating — start regardless of scroll position so the page
+    // No IntersectionObserver gating. start regardless of scroll position so the page
     // feels alive even on first paint.
     setTimeout(() => {
       if (!demoState.playing && demoState.idx === 0) startDemo();
