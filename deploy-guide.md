@@ -179,8 +179,6 @@ git add ping-app/style.css ping-app/app.js ping-app/index.html
 # Commit with a descriptive message
 git commit -m "$(cat <<'EOF'
 Description of what changed and why
-
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 EOF
 )"
 
