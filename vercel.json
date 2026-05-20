@@ -53,19 +53,6 @@
       ]
     },
     {
-      "source": "/presale",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        },
-        {
-          "key": "Pragma",
-          "value": "no-cache"
-        }
-      ]
-    },
-    {
       "source": "/files/(.*)",
       "headers": [
         {
@@ -109,7 +96,16 @@
     { "source": "/", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/index.html" },
     { "source": "/dashboard", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/dashboard.html" },
     { "source": "/messages", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/messages.html" },
-    { "source": "/:path*", "has": [{ "type": "host", "value": "claim.sibylcap.com" }], "destination": "/claim.html" }
+    { "source": "/:path*", "has": [{ "type": "host", "value": "claim.sibylcap.com" }], "destination": "/claim.html" },
+    { "source": "/", "has": [{ "type": "host", "value": "blog.sibylcap.com" }], "destination": "/blog/index.html" },
+    { "source": "/:slug", "has": [{ "type": "host", "value": "blog.sibylcap.com" }], "destination": "/blog/:slug.html" }
+  ],
+  "redirects": [
+    { "source": "/ping", "destination": "https://ping.sibylcap.com", "permanent": true },
+    { "source": "/memory", "destination": "https://sibyllabs.org/memory", "permanent": true },
+    { "source": "/blog", "has": [{ "type": "host", "value": "sibylcap.com" }], "destination": "https://blog.sibylcap.com", "permanent": true },
+    { "source": "/blog/:slug*", "has": [{ "type": "host", "value": "sibylcap.com" }], "destination": "https://blog.sibylcap.com/:slug*", "permanent": true },
+    { "source": "/api/plugin/:path*", "destination": "https://api.sibyllabs.org/api/plugin/:path*", "permanent": true }
   ],
   "cleanUrls": true,
   "trailingSlash": false
