@@ -27,7 +27,7 @@ Triggered by the Vercel April 2026 security incident notice. We were NOT in the 
   - `the relay signing key` (wallet signing key) — new relay address `0x30FAfe372734cfD29b46bAf9bd0361ffFf779fDF`. Old balance (0.02 ETH / $46) swept to new address via tx `0x7b56afb43a6e82e5d84667746e2e909889e3d65719c32ce7530a848baf42b347`.
 - **`RELAY_ADDRESS` constant updated** in `api/fund.js` (x402 payTo), `api/ping-stats.js` (relay wallet stats), `dashboard.html`, `mind.html`, `ping.html`.
 - **`package.json` fix**: added `viem` as an explicit dependency. Was previously relying on build cache, which caused `FUNCTION_INVOCATION_FAILED` on fresh deploys for `api/fund.js` and `api/pingcast.js` (both use `privateKeyToAccount` from viem). All serverless functions using viem are now stable.
-- **Remaining Vercel env vars pending operator-side rotation**: `the Google OAuth refresh token`, `the Google OAuth client secret` (Google Cloud Console), `the X API token` (X developer portal), 18× Neon `the partners DB credentials` credentials (Vercel dashboard Neon integration), `the RPC endpoint` (if Alchemy-keyed).
+- **Remaining Vercel env vars pending operator-side rotation**: Google OAuth credentials (Google Cloud Console), X API token (X developer portal), Neon advisory-DB credentials (Vercel Neon integration), and the RPC endpoint key. Specific variable names are managed in their respective dashboards, not documented here.
 
 ---
 
