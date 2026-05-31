@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SIBYL Brain — The Connectome</title>
+  <meta name="description" content="An interactive map of SIBYL's file architecture: the files the agent thinks with and how they connect. Identities masked, structure real. A snapshot of the current brain.">
+  <!-- review gate: noindex until operator flips to index -->
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://sibylcap.com/brain">
+  <meta property="og:title" content="SIBYL Brain — The Connectome">
+  <meta property="og:description" content="The files SIBYL thinks with, and the links between them. Drag the nodes. Identities masked, structure real.">
+  <meta property="og:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+  <meta property="og:url" content="https://sibylcap.com/brain">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@sibylcap">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" defer></script>
+  <script src="/brain-data.js" defer></script>
+  <style>
+    /* tokens mirror the canonical style.css :root (agent-face dark). Kept inline so the
+       page is a self-contained full-screen app; values must stay in sync with style.css. */
+    :root{
+      --bg:#06070a; --surface:#0b0e14; --surface-2:#0d1118; --elevated:#131620; --highest:#1a1e28;
+      --border:#181c26; --border-strong:#222836;
+      --text-primary:#e0e2e8; --text-secondary:#a8aebd; --text-dim:#9aa0ac; --text-muted:#8c93a8; --text-faint:#5d6478;
+      --accent:#6b8ba5; --accent-hover:#7d9ab2; --gold:#c4a862; --gold-bright:#d4b872;
+      --font-display:'Fraunces','Times New Roman',serif; --font-mono:'IBM Plex Mono','Courier New',monospace;
+      /* type ladder (4 steps): micro / body / nav / title */
+      --t-micro:.625rem; --t-body:.75rem; --t-nav:1rem; --t-title:1.5rem;
+      /* motion tiers */ --m-state:150ms; --m-elem:250ms; --m-cam:600ms;
+      /* one rectangular radius + one pill */ --r:8px; --r-pill:999px;
+      /* symmetric overlay frame */ --gutter:1.25rem; --top:4rem;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;overscroll-behavior:none}
+    body{
+      background:var(--bg); color:var(--text-primary); font-family:var(--font-mono);
+      -webkit-font-smoothing:antialiased; overflow:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    .vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+    /* nav — aligned to canonical .nav (logo 1rem / .25em, active = accent) */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:40;background:rgba(6,7,10,.72);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:.7rem var(--gutter);max-width:1600px;margin:0 auto}
+    .nav-logo{font-family:var(--font-display);font-weight:600;letter-spacing:.25em;font-size:var(--t-nav)}
+    .nav-links{display:flex;gap:1.25rem;font-size:var(--t-body);letter-spacing:.12em;text-transform:lowercase;color:var(--text-muted)}
+    .nav-links a{transition:color var(--m-state)}
+    .nav-links a:hover{color:var(--text-primary)}
+    .nav-links a.active{color:var(--accent)}
+
+    /* stage / graph */
+    .stage{position:fixed;inset:0}
+    #graph{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+    #graph:active{cursor:grabbing}
+
+    /* header overlay */
+    .header{position:fixed;top:var(--top);left:var(--gutter);z-index:20;max-width:min(42ch,72vw);pointer-events:none}
+    .eyebrow{font-size:var(--t-micro);letter-spacing:.4em;text-transform:uppercase;color:var(--gold);text-shadow:0 1px 10px var(--bg),0 0 4px var(--bg)}
+    .title{font-family:var(--font-display);font-weight:300;font-size:clamp(2.2rem,5vw,3.4rem);line-height:.98;margin:.5rem 0;letter-spacing:-.01em;text-shadow:0 2px 18px var(--bg),0 0 6px var(--bg)}
+    .subtitle{font-size:var(--t-body);line-height:1.6;color:var(--text-secondary);text-shadow:0 1px 10px var(--bg),0 0 4px var(--bg)}
+    .subtitle b{color:var(--text-primary);font-weight:500}
+
+    /* legend */
+    .legend{position:fixed;left:var(--gutter);bottom:calc(var(--gutter) + env(safe-area-inset-bottom));z-index:20;display:flex;flex-wrap:wrap;gap:.5rem;max-width:min(40ch,70vw)}
+    .chip{display:inline-flex;align-items:center;gap:.4rem;min-height:28px;padding:.3rem .6rem;border:1px solid var(--border-strong);border-radius:var(--r-pill);background:var(--surface);font-size:var(--t-micro);letter-spacing:.04em;color:var(--text-secondary);cursor:pointer;user-select:none;transition:opacity var(--m-state),border-color var(--m-state)}
+    .chip:hover{border-color:var(--accent)}
+    .chip.off{opacity:.35}
+    .chip .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+
+    /* controls (top-right). reserve a lane so the panel never buries them */
+    .controls{position:fixed;top:var(--top);right:var(--gutter);z-index:25;display:flex;flex-direction:column;gap:.5rem;align-items:flex-end;transition:right var(--m-elem)}
+    body.panel-open .controls{right:calc(20rem + var(--gutter) + .6rem)}
+    .search{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r);padding:.4rem .6rem}
+    .search input{background:none;border:none;outline:none;color:var(--text-primary);font-family:var(--font-mono);font-size:var(--t-body);width:13rem}
+    .search input::placeholder{color:var(--text-muted)}
+    .btnrow{display:flex;gap:.5rem}
+    .btn{background:var(--surface);border:1px solid var(--border-strong);color:var(--text-secondary);font-family:var(--font-mono);font-size:var(--t-micro);letter-spacing:.06em;min-height:32px;padding:.45rem .7rem;border-radius:var(--r);cursor:pointer;transition:border-color var(--m-state),color var(--m-state)}
+    .btn:hover{border-color:var(--accent);color:var(--text-primary)}
+    .btn.active{border-color:var(--gold);color:var(--gold-bright)}
+
+    /* info panel */
+    .panel{position:fixed;top:var(--top);right:var(--gutter);z-index:30;width:20rem;max-width:78vw;background:rgba(11,14,20,.94);backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:var(--r);padding:1rem 1.1rem;transform:translateX(120%);opacity:0;transition:transform var(--m-elem) cubic-bezier(.2,.8,.2,1),opacity var(--m-elem);max-height:78vh;overflow:auto}
+    .panel.open{transform:translateX(0);opacity:1}
+    .panel .ptype{font-size:var(--t-micro);letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted)}
+    .panel .plabel{font-family:var(--font-display);font-weight:400;font-size:var(--t-title);line-height:1.1;margin:.25rem 0 .15rem;word-break:break-word}
+    .panel .pmeta{font-size:var(--t-body);color:var(--text-muted);margin-bottom:.75rem}
+    .panel .pnote{font-size:var(--t-body);color:var(--text-secondary);line-height:1.55;border-left:2px solid var(--accent);padding-left:.65rem;margin-bottom:.85rem}
+    .panel .pconn-h{font-size:var(--t-micro);letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.45rem}
+    .conn{display:flex;align-items:center;gap:.5rem;font-size:var(--t-body);padding:.3rem 0;color:var(--text-secondary);cursor:pointer;border-bottom:1px solid rgba(34,40,54,.5);transition:color var(--m-state)}
+    .conn:hover{color:var(--text-primary)}
+    .conn .cdot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+    .conn .ckind{margin-left:auto;font-size:var(--t-micro);letter-spacing:.08em;color:var(--text-muted);text-transform:uppercase}
+    .panel .pclose{position:absolute;top:.3rem;right:.3rem;color:var(--text-faint);font-size:1.25rem;line-height:1;cursor:pointer;padding:.6rem;margin:-.2rem}
+    .panel .pclose:hover{color:var(--text-primary)}
+
+    /* footer note */
+    .foot{position:fixed;right:var(--gutter);bottom:calc(var(--gutter) + env(safe-area-inset-bottom));z-index:15;font-size:var(--t-micro);color:var(--text-muted);text-align:right;letter-spacing:.04em;line-height:1.7;pointer-events:none}
+
+    /* loading */
+    .loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:var(--t-body);letter-spacing:.1em;z-index:5}
+
+    /* graph elements */
+    .link{stroke-linecap:round;fill:none}
+    .node circle.dot{stroke:var(--bg);stroke-width:1.5px;transition:opacity var(--m-state)}
+    .node.sel circle.dot{stroke:#e0e2e8;stroke-width:2.5px}
+    .node text{font-family:var(--font-mono);font-size:10px;fill:var(--text-secondary);pointer-events:none;paint-order:stroke;stroke:var(--bg);stroke-width:2.5px;stroke-linejoin:round;transition:opacity var(--m-state)}
+    .node.masked text{fill:var(--text-muted)}
+    .dim{opacity:.15 !important}
+
+    /* dataflow flow animation */
+    @keyframes dash{to{stroke-dashoffset:-16}}
+
+    /* ---------- mobile ---------- */
+    @media (max-width:680px){
+      .header{top:7.25rem;left:1rem;max-width:88vw}
+      .title{margin:.4rem 0}
+      .controls{top:3.4rem;left:.7rem;right:.7rem;align-items:stretch;flex-direction:column}
+      body.panel-open .controls{right:.7rem}
+      .search input{width:100%;font-size:16px}        /* 16px suppresses iOS focus-zoom */
+      .btnrow{justify-content:flex-start;flex-wrap:wrap}
+      .panel{top:auto;bottom:0;right:0;left:0;width:100%;max-width:100%;border-radius:var(--r) var(--r) 0 0;transform:translateY(120%);max-height:55vh;padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
+      .panel.open{transform:translateY(0)}
+      body.panel-open .legend{display:none}            /* sheet would cover it */
+      .legend{max-width:92vw}
+      .chip{font-size:var(--t-body);padding:.45rem .75rem;min-height:34px}
+      .conn{font-size:var(--t-body);padding:.4rem 0}
+      .foot{display:none}
+    }
+
+    /* heavy mobile compositing: drop backdrop blur for near-opaque fills */
+    @media (hover:none){
+      .nav{backdrop-filter:none;background:rgba(6,7,10,.94)}
+      .panel{backdrop-filter:none;background:rgba(11,14,20,.985)}
+      .link{animation:none !important}               /* kill perpetual repaint on touch */
+    }
+    @media (prefers-reduced-motion:reduce){
+      .link{animation:none !important}
+      *{transition-duration:.01ms !important}
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">SIBYL</a>
+      <div class="nav-links">
+        <a href="/mind">mind</a>
+        <a href="/brain" class="active" aria-current="page">brain</a>
+        <a href="https://docs.sibylcap.com" target="_blank" rel="noopener">docs</a>
+        <a href="https://x.com/sibylcap" target="_blank" rel="noopener">X</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="stage"><svg id="graph" aria-label="SIBYL brain connectome — interactive force-directed map of memory files"></svg></div>
+  <div class="loading" id="loading">assembling the brain</div>
+  <p class="vh" id="a11y-summary"></p>
+
+  <div class="header">
+    <div class="eyebrow">proof of work</div>
+    <h1 class="title">the brain</h1>
+    <p class="subtitle">the files SIBYL thinks with, and the links between them. drag a node. tap one to trace its connections. <b>identities are masked. the structure is real.</b></p>
+  </div>
+
+  <div class="controls">
+    <div class="search"><input id="search" type="text" placeholder="find a node" autocomplete="off" spellcheck="false" aria-label="find a node"></div>
+    <div class="btnrow">
+      <button class="btn" id="labels">labels</button>
+      <button class="btn" id="freeze">freeze</button>
+      <button class="btn" id="reset">reset</button>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" role="dialog" aria-label="node details">
+    <span class="pclose" id="pclose" role="button" aria-label="close" tabindex="0">×</span>
+    <div class="ptype" id="ptype"></div>
+    <div class="plabel" id="plabel"></div>
+    <div class="pmeta" id="pmeta"></div>
+    <div class="pnote" id="pnote" style="display:none"></div>
+    <div class="pconn-h" id="pconnh"></div>
+    <div id="pconn"></div>
+  </aside>
+
+  <div class="legend" id="legend"></div>
+  <div class="foot" id="foot"></div>
+
+  <script>
+  window.addEventListener('load', function(){
+    if (typeof d3 === 'undefined' || !window.__BRAIN__){
+      document.getElementById('loading').textContent = 'failed to load graph';
+      return;
+    }
+    document.getElementById('loading').style.display='none';
+    const isTouch = window.matchMedia('(hover:none)').matches;
+
+    const DATA = window.__BRAIN__;
+    const families = DATA.families;
+    const nodes = DATA.nodes.map(d => Object.assign({}, d));
+    const links = DATA.links.map(d => Object.assign({}, d));
+    const byId = new Map(nodes.map(n => [n.id, n]));
+    const colorOf = n => n.color || (families[n.family] && families[n.family].color) || '#8c93a8';
+    const radiusOf = n => {
+      let base = 4 + Math.sqrt(n.degree || 1) * 2.0;
+      if (n.hub) base += 4;
+      if (n.family === 'core') base += 5;
+      if (n.family === 'systems') base = Math.max(base, 8);
+      return Math.min(base, 18);
+    };
+
+    // adjacency
+    const adj = new Map(nodes.map(n => [n.id, []]));
+    links.forEach(l => {
+      adj.get(l.source).push({ other: l.target, kind: l.kind });
+      adj.get(l.target).push({ other: l.source, kind: l.kind });
+    });
+
+    // a11y text summary (graph content is otherwise visual-only)
+    const famCounts = {};
+    nodes.forEach(n => { famCounts[n.family] = (famCounts[n.family]||0)+1; });
+    document.getElementById('a11y-summary').textContent =
+      `SIBYL brain: ${DATA.meta.counts.totalMemoryFiles} memory files mapped as ${nodes.length} nodes and ${links.length} connections. Families: ` +
+      Object.entries(famCounts).map(([f,c]) => `${families[f]?families[f].label:f} ${c}`).join(', ') + '. Identities masked.';
+
+    const svg = d3.select('#graph');
+    const root = svg.append('g');
+    let W = window.innerWidth, H = window.innerHeight;
+
+    // link styling: monotonic dark ramp for structure, accent for flow
+    const linkColor = { contains:'#333b4d', indexes:'#3a4456', references:'#4a5468', reads:'#55617a', writes:'#6b8ba5', dataflow:'#c4a862' };
+    const dataflowKinds = new Set(['dataflow']);
+    const dashedKinds = new Set(['references','reads']);
+    const baseLinkOpacity = d => d.kind==='contains'?0.3:0.55;
+
+    const linkSel = root.append('g').selectAll('line')
+      .data(links).join('line')
+      .attr('class','link')
+      .attr('stroke', d => linkColor[d.kind] || '#333b4d')
+      .attr('stroke-width', d => d.kind==='dataflow'?1.3:(d.kind==='contains'?0.7:1))
+      .attr('stroke-opacity', baseLinkOpacity)
+      .attr('stroke-dasharray', d => dataflowKinds.has(d.kind)?'3 4':(dashedKinds.has(d.kind)?'2 3':null))
+      .style('animation', d => dataflowKinds.has(d.kind)?'dash 1.1s linear infinite':null);
+
+    const nodeSel = root.append('g').selectAll('g')
+      .data(nodes).join('g')
+      .attr('class', d => 'node' + (d.masked?' masked':''))
+      .attr('role','button')
+      .attr('aria-label', d => d.label);
+
+    // enlarged transparent hit target for touch (≥44px); on desktop matches the dot
+    nodeSel.append('circle')
+      .attr('r', d => isTouch ? Math.max(radiusOf(d), 22) : radiusOf(d))
+      .attr('fill','transparent').attr('pointer-events','all');
+    nodeSel.append('circle')
+      .attr('class','dot')
+      .attr('r', radiusOf)
+      .attr('fill', colorOf).attr('fill-opacity', 0.92)
+      .attr('pointer-events','none');
+
+    const alwaysLabel = d => d.hub || d.family==='core' || d.family==='systems' || (d.family==='memory' && !d.masked) || d.family==='senses' || d.family==='personality';
+    nodeSel.append('text')
+      .attr('x', d => radiusOf(d) + 4).attr('y', 3)
+      .attr('opacity', d => alwaysLabel(d) ? 1 : 0)
+      .text(d => d.label);
+
+    // simulation (lighter + auto-settle on touch)
+    const sim = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(links).id(d=>d.id)
+        .distance(d => d.kind==='contains'?38:(d.kind==='dataflow'?120:70))
+        .strength(d => d.kind==='contains'?0.7:0.25))
+      .force('charge', d3.forceManyBody().strength(-240))
+      .force('collide', d3.forceCollide().radius(d => radiusOf(d)+7).iterations(isTouch?1:2))
+      .force('x', d3.forceX(W/2).strength(0.03))
+      .force('y', d3.forceY(H/2).strength(0.05))
+      .on('tick', ticked);
+    if (isTouch) sim.alphaDecay(0.035);
+    // lock layout once stable on touch so idle CPU drops to zero
+    sim.on('end', () => { if (isTouch && !frozen) nodes.forEach(n => { n.fx=n.x; n.fy=n.y; }); });
+
+    function ticked(){
+      linkSel.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+      nodeSel.attr('transform', d=>`translate(${d.x},${d.y})`);
+    }
+
+    // zoom / pan
+    const zoom = d3.zoom().scaleExtent([0.25,4]).on('zoom', e => root.attr('transform', e.transform));
+    svg.call(zoom);
+    function fitView(){ W = window.innerWidth; H = window.innerHeight; svg.attr('viewBox', `0 0 ${W} ${H}`); }
+    fitView();
+    setTimeout(() => {
+      const k = Math.min(1, Math.min(W, H) / 760);
+      svg.transition().duration(var_cam()).call(zoom.transform, d3.zoomIdentity.translate(W/2*(1-k), H/2*(1-k)).scale(k));
+    }, 900);
+    function var_cam(){ return window.matchMedia('(prefers-reduced-motion:reduce)').matches ? 0 : 600; }
+
+    // drag (clickDistance keeps small jitters as taps, not drags)
+    nodeSel.call(d3.drag()
+      .clickDistance(8)
+      .on('start', (e,d) => { if(!e.active) sim.alphaTarget(0.25).restart(); d.fx=d.x; d.fy=d.y; })
+      .on('drag', (e,d) => { d.fx=e.x; d.fy=e.y; })
+      .on('end', (e,d) => { if(!e.active) sim.alphaTarget(0); if(!frozen && !isTouch){ d.fx=null; d.fy=null; } }));
+
+    // ---- labels toggle (the only way to read masked labels on touch) ----
+    let labelsOn = false;
+    const baseLabelOp = d => labelsOn ? 1 : (alwaysLabel(d) ? 1 : 0);
+
+    // ---- selection / highlight ----
+    let selected = null;
+    const muted = new Set();
+    function neighborsOf(id){ const s=new Set([id]); adj.get(id).forEach(a=>s.add(a.other)); return s; }
+    function highlight(id){
+      const keep = neighborsOf(id);
+      nodeSel.classed('dim', d => !keep.has(d.id)).classed('sel', d => d.id===id);
+      nodeSel.select('text').attr('opacity', d => keep.has(d.id) ? 1 : (labelsOn || alwaysLabel(d) ? 0.12 : 0));
+      linkSel.classed('dim', l => l.source.id!==id && l.target.id!==id)
+             .attr('stroke-opacity', l => (l.source.id===id||l.target.id===id)?0.95:0.09);
+    }
+    function clearHighlight(){
+      selected=null; document.body.classList.remove('panel-open');
+      nodeSel.classed('dim',false).classed('sel',false);
+      nodeSel.select('text').attr('opacity', baseLabelOp);
+      linkSel.classed('dim',false).attr('stroke-opacity', baseLinkOpacity);
+      applyFamilyFilter();
+      document.getElementById('panel').classList.remove('open');
+    }
+
+    const panel = document.getElementById('panel');
+    function openPanel(d){
+      selected=d.id; document.body.classList.add('panel-open');
+      document.getElementById('ptype').textContent = (families[d.family]?families[d.family].label:d.family) + (d.tier?' · '+d.tier+' tier':'') + (d.aggregated?' · aggregated':'');
+      document.getElementById('plabel').textContent = d.label;
+      const conns = adj.get(d.id);
+      document.getElementById('pmeta').textContent = `${conns.length} connection${conns.length===1?'':'s'}`;
+      const note=document.getElementById('pnote');
+      let noteText = d.note || '';
+      if (d.masked) noteText = (noteText? noteText+' ' : '') + 'identity masked. a real entity stands here; the name is never shown.';
+      if (d.aggregated) noteText = (noteText? noteText+' ' : '') + 'aggregated category. sensitive files are counted, never named.';
+      if (noteText){ note.style.display='block'; note.textContent=noteText; } else note.style.display='none';
+      document.getElementById('pconnh').textContent = conns.length?'connections':'';
+      const box=document.getElementById('pconn'); box.innerHTML='';
+      conns.slice().sort((a,b)=>a.kind.localeCompare(b.kind)).forEach(c=>{
+        const o=byId.get(c.other); if(!o) return;
+        const row=document.createElement('div'); row.className='conn';
+        row.innerHTML = `<span class="cdot" style="background:${colorOf(o)}"></span><span>${o.label}</span><span class="ckind">${c.kind}</span>`;
+        row.onclick=()=>{ const t=byId.get(c.other); if(t) select(t); };
+        box.appendChild(row);
+      });
+      panel.classList.add('open');
+    }
+    function select(d){
+      highlight(d.id); openPanel(d);
+      if (isTouch){ // pan the selected node into the visible upper third (above the sheet)
+        const t = d3.zoomTransform(svg.node()); const k = t.k;
+        svg.transition().duration(var_cam()).call(zoom.transform,
+          d3.zoomIdentity.translate(W/2 - d.x*k, H*0.30 - d.y*k).scale(k));
+      }
+    }
+
+    nodeSel.on('click', (e,d) => { e.stopPropagation(); select(d); });
+    if (!isTouch){
+      nodeSel.on('mouseenter', (e,d) => { if(!selected) d3.select(e.currentTarget).select('text').attr('opacity',1); });
+      nodeSel.on('mouseleave', (e,d) => { if(!selected && !labelsOn && !alwaysLabel(d)) d3.select(e.currentTarget).select('text').attr('opacity',0); });
+    }
+    svg.on('click', clearHighlight);
+    const closeBtn = document.getElementById('pclose');
+    closeBtn.onclick = clearHighlight;
+    closeBtn.onkeydown = e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); clearHighlight(); } };
+
+    // ---- legend + family filter ----
+    const legend=document.getElementById('legend');
+    Object.entries(families).forEach(([key,f])=>{
+      const chip=document.createElement('div'); chip.className='chip'; chip.dataset.fam=key;
+      chip.setAttribute('role','switch'); chip.setAttribute('aria-checked','true');
+      chip.innerHTML=`<span class="dot" style="background:${f.color}"></span>${f.label}`;
+      chip.onclick=()=>{
+        if(muted.has(key)){muted.delete(key);chip.classList.remove('off');chip.setAttribute('aria-checked','true');}
+        else {muted.add(key);chip.classList.add('off');chip.setAttribute('aria-checked','false');}
+        applyFamilyFilter();
+      };
+      legend.appendChild(chip);
+    });
+    function applyFamilyFilter(){
+      if(selected) return;
+      nodeSel.style('opacity', d => muted.has(d.family)?0.06:1).style('pointer-events', d => muted.has(d.family)?'none':'all');
+      linkSel.style('opacity', l => (muted.has(l.source.family)||muted.has(l.target.family))?0.04:1);
+    }
+
+    // ---- search ----
+    const search=document.getElementById('search');
+    search.addEventListener('input', ()=>{
+      const q=search.value.trim().toLowerCase();
+      if(!q){ if(!selected) clearHighlight(); return; }
+      const hit=nodes.find(n=>n.label.toLowerCase().includes(q));
+      if(hit){
+        select(hit);
+        const k=1.6;
+        svg.transition().duration(var_cam()).call(zoom.transform, d3.zoomIdentity.translate(W/2 - hit.x*k, (isTouch?H*0.3:H/2) - hit.y*k).scale(k));
+      }
+    });
+
+    // ---- buttons ----
+    const labelsBtn=document.getElementById('labels');
+    labelsBtn.onclick=function(){
+      labelsOn=!labelsOn; this.classList.toggle('active',labelsOn);
+      if(selected){ highlight(selected); } else { nodeSel.select('text').attr('opacity', baseLabelOp); }
+    };
+    let frozen=false;
+    document.getElementById('freeze').onclick=function(){
+      frozen=!frozen; this.classList.toggle('active',frozen); this.textContent=frozen?'frozen':'freeze';
+      if(frozen){ nodes.forEach(n=>{n.fx=n.x;n.fy=n.y;}); sim.alphaTarget(0); }
+      else { nodes.forEach(n=>{n.fx=null;n.fy=null;}); sim.alphaTarget(0.1).restart(); setTimeout(()=>sim.alphaTarget(0),600); }
+    };
+    document.getElementById('reset').onclick=function(){
+      search.value=''; muted.clear(); document.querySelectorAll('.chip').forEach(c=>{c.classList.remove('off');c.setAttribute('aria-checked','true');});
+      labelsOn=false; labelsBtn.classList.remove('active');
+      clearHighlight();
+      svg.transition().duration(var_cam()).call(zoom.transform, d3.zoomIdentity);
+    };
+
+    // footer
+    const c=DATA.meta.counts;
+    document.getElementById('foot').innerHTML = `snapshot · ${c.totalMemoryFiles} memory files · ${c.nodes} nodes · ${c.links} links<br>identities masked · structure real · contents never shown`;
+
+    window.addEventListener('resize', fitView);
+  });
+  </script>
+</body>
+</html>
