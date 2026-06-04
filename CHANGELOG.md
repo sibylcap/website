@@ -1,5 +1,19 @@
 # website changelog
 
+## 2026-06-04 — SIBYL Score endpoint rebuilt X-free (api/sibyl-score.js → v2)
+
+Rebuilt `api/sibyl-score.js` to score **entirely from free signals** — zero X/Twitter API calls. The two X-derived categories (`social_traction` 18 + `community_health` 17, which fired four per-request X reads at ~$0.10/call against a $0.05 price) are replaced by a single free **`market_traction`** category (0-20) built from DexScreener data we already fetch:
+
+- **4a 24h volume (0-7)** — `volume.h24` bands: ≥$500K (7) / ≥$100K (5) / ≥$20K (3) / ≥$2K (1) / else 0.
+- **4b buy/sell pressure (0-7)** — `txns.h24` buy% over ≥20 txns: ≥60% (7) / ≥52% (5) / ≥45% (4) / ≥38% (2) / else 0; <20 txns → "too few to read" (0).
+- **4c trade participation (0-6)** — total 24h trades: ≥500 (6) / ≥100 (4) / ≥20 (2) / ≥1 (1) / else 0.
+
+New rubric: `contract_safety` 25 + `builder_conviction` 13 (GitHub 8 + maturity 5; the X shipping-velocity sub-score was removed) + `liquidity_exit` 17 + `market_traction` 20 = raw 75, **normalized to 0-100** (`round(raw/75*100)`). Tier thresholds unchanged (apply to the normalized 0-100). `version` bumped to `sibyl-score-v2`; output carries a `scoring` note that the full social score returns as a paid tier once the x402→X-credits rail exists. The `?twitter=` hint is dropped; `?github=` is retained.
+
+Why: x402 revenue can't yet be moved off-chain into X API credits, so X reads cannot live in the base $0.05 price. The four `fetchX*` functions and the (now dead, X-data-null) social/community blocks are left in place for Acer to revive behind a paid tier later. Verified in isolation (`computeScore` over high-traction / dead / sell-pressure / no-DEX mock tokens, all assertions green) and live on prod: VIRTUAL → 73/100, `data_sources` carries no `x-api`, gated path still returns HTTP 402 (`exact`/`base`/`50000`).
+
+Also synced the x402 discovery surface to v2: the `DESCRIPTION` and `DISCOVERY_OPTS` (the text + schema an agent reads from the 402 response before paying) dropped the stale "social traction / community health" copy and the `twitter` input param, and now advertise the four free categories (contract safety, builder conviction, liquidity depth, market traction) with a v2 output example. The 402 payment contract is unchanged: x402 v1, `exact`, `base`, $0.05 USDC to the pay-to wallet, direct-tx (`X-PAYMENT-TX`) settlement path.
+
 ## 2026-06-04 — x402 payment gate rebuild (api/_x402.js) — fixes Roy/Blocktronics integration block
 
 Replaced the hand-rolled facilitator client in `api/_x402.js` (the shared gate behind sibyl-score, advisory, evaluate, pingcast, fund) with a corrected, standards-aligned gate. Fixes 4 drift bugs that broke the standard x402 path (Roy of Blocktronics hit the "Unsupported network" wall integrating payment):
