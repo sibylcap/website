@@ -1,6 +1,151 @@
-# Website & x402 Changelog
+# website changelog
+
+## 2026-06-04 — x402 payment gate rebuild (api/_x402.js) — fixes Roy/Blocktronics integration block
+
+Replaced the hand-rolled facilitator client in `api/_x402.js` (the shared gate behind sibyl-score, advisory, evaluate, pingcast, fund) with a corrected, standards-aligned gate. Fixes 4 drift bugs that broke the standard x402 path (Roy of Blocktronics hit the "Unsupported network" wall integrating payment):
+
+- **F1** advertise network `base` (was CAIP-2 `eip155:8453`, which throws "Unsupported network" in the x402 SDK).
+- **F2** advertise `x402Version 1` (the x402@1.2.0 lib supports v1 only; we advertised 2).
+- **F3** facilitator request reshaped to `{ x402Version, paymentPayload, paymentRequirements }` (was `{ payment:<base64> }`).
+- **F4** facilitator URL is now a config constant (`X402_FACILITATOR_URL`); the old `x402.org/facilitator` 308-redirects. Gasless settlement is opt-in via that env var (Coinbase CDP or self-host later); until set, the gasless path returns a clean 402 with direct-tx instructions.
+- **F5** accept-either-input: tolerate network `base|eip155:8453` and `x402Version 1|2` on the way in.
+- **F6** paid responses set `Cache-Control: no-store` and replay protection fails CLOSED on DB error (closes the prior replay/edge-cache paywall-bypass).
+
+The **direct-tx path** (`X-PAYMENT-TX`: send USDC to the pay-to wallet, resend with the tx hash, single-use, replay-protected) is preserved and is Roy's working path today, no facilitator required. Sandbox-verified 13/13. Drop-in: unchanged `gate(req,res,opts)` + `discovery` interface.
+
+## 2026-06-02 — plugin blog: current-version refresh (client 0.4.7 + mcp 0.1.5)
+
+`blog/plugin-longmemeval.html` "current releases" line bumped to `sibyl-memory-client 0.4.7` and added `sibyl-memory-mcp 0.1.5` (the 2026-06-02 bundled UserSignal security fixes shipped to PyPI). Benchmark-version provenance (produced on hermes 0.3.5 / client 0.4.2) unchanged.
+
+## 2026-05-31 — WW3 buyback-flywheel advisory diagram (new page)
+
+New page `ww3-buyback-flywheel.html` (sibylcap.com/ww3-buyback-flywheel): a partner advisory deliverable for WW3, accompanying the staking/buyback dashboard reply. Creme paper lab face per rule 46/50 (Fraunces + IBM Plex Mono, canonical creme `:root` tokens, `noindex, nofollow`).
+
+Hand-authored SVG flywheel diagram encoding the actual thesis: the front half of the loop (wager → 1% skim → USDC accumulator → $1 floor gate) is **active today** (solid ochre); the gate currently evaluates NO and loops back to "keep accumulating" (solid warn-red, tagged IDLE NOW); the entire yield half (4h TWAP swap → split → 80% notifyReward / 20% burn → stakers → return loop) is **dormant** (dashed grey) until wager volume clears the swap floor. Legend distinguishes the three states. Supporting sections: the per-cycle math (~$0.047/day skimmed → ~$0.02/4h cycle vs the $1 floor), the seed-nudge-vs-grow-volume comparison, and the load-bearing gate table (organic APR ≥8% sustained + volume 5× to 70/30d). Diagram verified via chrome-headless render before deploy.
+
+## 2026-05-31 — /brain UI/UX + mobile optimization pass
+
+Ran the dedicated review agents (color-science/branding + mobile/responsive) on `/brain` and implemented the findings.
+
+**Color science (the defining fix):** prior palette collapsed three families into one indistinguishable blue (`projects`/`senses`/`identity` all ≈ `#5a8ab5`) and put jade `community` ≈ green `ping` with jade double-booked across meanings. Re-hued in `scripts/brain-graph.mjs`: `senses` → desaturated steel `#93a6bd`, `workmem` → neutral gray `#6a6e78`, `community` → bluer teal `#27a3b5`; system nodes now only carry an iconic brand color for the marquee products (Talos/Ping/Memory/$SIBYL) and otherwise inherit systems gold (kills the advisory=projects / erc=senses / website=community collisions). Regenerated `brain-data.js`.
+
+**Layout/type:** symmetric overlay frame (single `--gutter` 1.25rem + `--top` 4rem, was 1.4/1.2 asymmetric); the info panel no longer buries the search/controls (controls reserve a lane and slide left when the panel opens); collapsed the 9-size type soup into a 4-step ladder (`--t-micro/.625` → `--t-body/.75` → `--t-nav/1` → `--t-title/1.5`); faint sub-WCAG text bumped off `--text-faint` to `--text-muted`; node labels 9px→10px on `--text-secondary`; dim-on-select lifted .07→.15 (and links .04→.09) so the connectome stays a readable ghost; `contains` link skeleton lifted from near-invisible; nav/eyebrow/active-link aligned to canonical `style.css` (logo 1rem/.25em, active = `--accent`); three motion tiers (150/250/600ms); two radii (8px + pill).
+
+**Mobile (was largely unusable on touch):** `touch-action:none` + `overscroll-behavior:none` (stop gesture trapping/rubber-band); 44px transparent hit-targets per node (were ~10px); bottom-sheet capped at 55vh with the selected node panned into the visible upper third and the legend hidden while open; `labels` toggle added (hover-gated labels were unreachable on touch); safe-area-inset for legend/footer/sheet; sim auto-freezes on settle for touch (+lighter collide/alphaDecay); perpetual dash animation + backdrop-blur dropped under `@media (hover:none)`; `prefers-reduced-motion` honored; 16px search font (kills iOS focus-zoom); a11y summary + node roles/aria. Verified desktop + 390px mobile render, zero console errors.
+
+## 2026-05-31 — /brain interactive connectome (new page)
+
+New page `brain.html` (sibylcap.com/brain): an interactive D3 force-directed map of the file architecture. Sibling to `/mind` (dark agent face, Fraunces + IBM Plex Mono, reuses the /mind family color language). Draggable nodes, zoom/pan, click-to-trace-connections, family-toggle legend, node search. D3 7.9 from cdnjs (CSP-allowed); graph data in `brain-data.js` (same-origin script).
+
+**Full-fidelity memory map.** Every file under `memory/` is its own node (282 files → 281 leaf nodes + the INDEX spine). 331 nodes / 336 links total once personality, MCP, scripts, services, and product systems are added. First pass aggregated directories into single nodes (102 nodes) and undershot the real file count — replaced with 1:1 fidelity.
+
+**Privacy (rules 51/52).** Snapshot, not live. Generated by `scripts/brain-graph.mjs` with a masking pass: function/topic/architectural filenames stay real; anything encoding an identity or opsec mechanism is masked to a numbered placeholder (people→USER##, projects→COMPANY##, community→MEMBER##, research→RESEARCH##, archive→ARCHIVE##, endpoint_reviews→ENDPOINT##, raw→RAW##, swarm→SWARM##, opsec-named files→OPS##). File-node ids are opaque counters (`f0001`) so a masked label can't leak its filename through the id. Contents are never shown — files and connections only. Audited: zero entity names, denylist tokens, addresses, or key var names in the output. Shipped `noindex, nofollow` pending operator review before indexing.
+
+## 2026-05-27 — removed sibyl-gtm-strategy.html
+
+Operator directive: remove the GTM page. SIBYL's own "Growth-Phase GTM Strategy" (April 1, noindex, orphan/unlinked). Deleted the file + removed the two robots.txt Disallow entries for it. net-gtm.html (immutable dark template, rule 50) and ww3-gtm.html (partner deliverable) untouched. /sibyl-gtm-strategy now 404s.
+
+## 2026-05-27 — x402 endpoint docs accuracy pass (audit-docs-vs-code)
+
+Source-of-truth: `website/api/*.js` route files (live, curl-verified). Endpoint consolidation 2026-05 left docs stale across two pages.
+
+**Endpoint reality (curl-confirmed):**
+- `/api/sibyl-score` $0.05 — comprehensive 5-category 0-100 audit (consolidated old score + check + builder). LIVE.
+- `/api/evaluate` $0.25, `/api/advisory` $0.50 — LIVE.
+- `/api/fund` $2.00 floor (dynamic ETH×1.3x), `/api/pingcast` $2.00 — LIVE.
+- `/api/score`, `/api/check`, `/api/builder`, `/api/narrative` — all return 404 (removed).
+
+**mind.html (sibylcap.com/mind):** intel-x402 grid rewritten 6 → 3 intelligence endpoints (sibyl-score, evaluate, advisory). "six paid endpoints" → "three paid intelligence endpoints" in intelligence node + grid intro. Dropped dead narrative/builder/score/check tiles; added sibyl-score as the headline audit tile.
+
+**x402.html (sibylcap.com/x402):** fund endpoint price corrected $1.00 → $2.00+ (dynamic, $2 floor) + desc updated to reflect dynamic ETH×1.3x pricing. Other 4 endpoints (sibyl-score, evaluate, advisory, pingcast) already current; all functions curl-verified working in demo mode.
 
 All notable changes to sibylcap.com and x402 paid endpoints.
+
+---
+
+## 2026-05-22
+
+### Plugin LongMemEval benchmark paper published
+
+`blog/plugin-longmemeval.html` shipped to `blog.sibylcap.com/plugin-longmemeval`. First public
+measurement of the `sibyl-memory-hermes` plugin (closed beta) on the full 500-question
+LongMemEval Oracle dataset. Result: 95.1% overall ex-pref on Sonnet 4.5, matching the
+published Opus 4.6 ceiling within 0.5pp and beating the published Sonnet 4.6 ceiling by 1.5pp.
+
+Page built to match the existing blog design system (operator directive: unified blog at
+blog.sibylcap.com under SIBYL's voice, links to Sibyl Labs for product/lab references).
+Same tokens, fonts, nav, hero-stats, callout, code-box, table, animated bar chart, scroll
+reveal, and progress bar as `longmemeval-v2.html`. New beta meta-tag and beta callout
+variant added for closed-beta status indicator. SVG architecture diagram rebuilt with the
+dark palette (agent · plugin tools · opaque Sibyl Schema with three tiers); schema
+internals intentionally not exposed per operator directive. Per-category comparison bar
+chart added (plugin vs published Opus ceiling, with overall ex-pref highlight row).
+
+Reproducibility kit hosted at `sibylcap.com/data/benchmark/plugin/`: full hypotheses JSONL
+(560 KB, 500 records), manifest with env versions and prompt SHAs, runner script, patched
+scorer with `splitGold` helper, v2 pre-fix and v3 post-fix score summaries. Blog index
+updated: plugin paper is the new featured-card; native-memory paper demoted to standard
+article-card. Voice scrub clean (0 em dashes, 0 LLM tells).
+
+### UI/UX audit remediation — P0+P1 across all sibylcap.com pages
+
+Operator directive: "do a full desktop/mobile ui/ux audit using all our
+agents and lets make sure this looks & feels good on all devices.
+ultrathink" then "knock it out". Five parallel subagent passes (desktop
+QA, mobile QA, accessibility, performance, design system) surfaced 60+
+findings across viewports 320px → 2560px. P0 + P1 + the safe P2 polish
+items shipped in this wave; P3 (em dash sweep across marketing copy,
+font self-hosting) explicitly deferred.
+
+**P0 — Token unification:** `framework.html`, `benchmark.html`,
+`about.html` had inline `:root` definitions that drifted from
+`style.css` canonical tokens. Trimmed inline blocks to page-local
+extensions only (`--text-dim`, `--gold-dim`, `--gold-line`,
+`--teal-dim`, `--ease`) and bound each page to `style.css?v=34`.
+
+**P0 — Mobile baseline (`style.css`):** new `@media (max-width: 480px)`
+block enforces 16px form inputs (kills iOS auto-zoom-on-focus), 44×44
+touch target minimum on all interactive elements (`.nav-rep-btn`,
+`.x-icon`, `.nav-dex-link`, drawer triggers), `nav-inner` padding 2rem
+→ 0.875rem, section-label font floor, `safe-area-inset` honored on
+`.nav` + `body`.
+
+**P0 — `pitch.html` form UX:** every input got `inputmode`,
+`autocomplete`, `autocapitalize`, `spellcheck`, and the contract field
+got `pattern="^0x[a-fA-F0-9]{40}$"`. Type-on-mobile is now correct
+keyboard + autocomplete suggestion per field semantics.
+
+**P0 — Asset weight:** `bg-hero.png` (1.2MB) and `memory-tree.png`
+(354KB) converted to WebP via `ffmpeg -c:v libwebp`. CSS uses
+`image-set()` with WebP first + PNG fallback for the hero
+background; `<picture>` element wraps memory-tree references with
+`loading=lazy`, `decoding=async`, dimensions. Total page-load weight
+reduction: ~1.4MB → ~120KB on the WebP path (88% reduction).
+
+**P1 — Accessibility baseline:** `.skip-link` utility + global
+`:focus-visible { outline: 2px solid var(--accent) }`. `mind.html`
+heading order fixed (h3 → h2 for "Broadcast Origin Types" so screen
+readers report sections at the correct nesting level). Memory
+categorical synapse colors recolored from Tailwind defaults to
+canonical palette tokens (`--gold`, `--memory-jade`, `--violet`,
+`--memory-red`) so the /mind page renders inside the SIBYL color
+system, not a generic Tailwind palette.
+
+**P1 — Color contrast:** `--text-muted` bumped #6a7080 → #8c93a8
+(WCAG AA 4.5:1 against bg #06070a; was 4.07:1, failing). `--text-dim`
+added as a 7-stop above muted for non-body contexts. `--text-faint`
+slightly raised. `.nav-rep-btn` ("Rate SIBYL" pill) bumped from
+8%/20% gold transparency to 12%/32% — was effectively invisible on
+the dark nav, now reads as a clear affordance.
+
+**P2 — Footer mobile wrap:** `.footer-right` now flex-wraps with
+center justification and a baseline alignment so the 5 links + email
+don't push out of viewport at 320-375px.
+
+Files modified: `style.css` (v33 → v34), `framework.html`,
+`benchmark.html`, `about.html`, `mind.html`, `pitch.html`,
+`index.html`. New assets: `images/bg-hero.webp`,
+`images/memory-tree.webp`.
 
 ---
 
@@ -1394,3 +1539,14 @@ Triggered by the Vercel April 2026 security incident notice. We were NOT in the 
 ### Website
 - **sibylcap.com launched**: Syne font, text-only hero, portfolio API, live treasury data.
 - **Custom domain connected** via Vercel.
+
+### longmemeval-v2.html bar chart unified with plugin-longmemeval pattern
+
+Same fix applied retroactively per operator: stacked layered bars at different
+opacities were hiding shorter series. Switched to three thin (10px) bars
+stacked vertically inside each track: v1 Sonnet on top (muted gray), v2 Sonnet
+in the middle (accent), v2 Opus at the bottom (gold). All three series now
+fully visible at full opacity regardless of relative score. Values column
+widened to 80px and shows all three percentages stacked, color-coded to match
+each bar. Responsive override updated for mobile (≤640px): track height 34px,
+bar height 8px, narrower bar-label and bar-value columns.
