@@ -6,3 +6,10 @@ node_modules/
 *.key
 *.pem
 .env*.local
+
+# Internal surfaces — NEVER in this PUBLIC repo (rule 52). Deploy locally via Vercel;
+# canonical version-controlled home is a PRIVATE repo.
+dashboard-data.json
+dashboard.html
+/partners/
+/api/partners/
