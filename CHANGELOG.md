@@ -1,5 +1,59 @@
 # website changelog
 
+## 2026-06-30 — blog/plugin-longmemeval.html current-versions line bump
+
+Closed-beta status paragraph "current:" list updated to `sibyl-memory-hermes 0.3.12`, `sibyl-memory-client 0.4.17`, `sibyl-memory-cli 0.3.18`, `sibyl-memory-mcp 0.1.11` in lockstep with the 2026-06-30 PyPI publish (summarizer privacy + bounty audit release). Benchmark numbers untouched — the result remains attributed to hermes 0.3.5 / client 0.4.2.
+
+## 2026-06-23 — blog/plugin-longmemeval.html current-versions line bump
+
+Closed-beta status paragraph "current:" list updated to `sibyl-memory-hermes 0.3.10`, `sibyl-memory-client 0.4.14`, `sibyl-memory-cli 0.3.16`, `sibyl-memory-mcp 0.1.10` in lockstep with the 2026-06-23 PyPI publish of the consolidated security + durability patch. Benchmark numbers untouched — the result remains attributed to hermes 0.3.5 / client 0.4.2.
+
+## 2026-06-21 — partner vesting claim page (partners.sibylcap.com/vest)
+
+- New `website/partners/vest.html`: a wallet-connect claim page for the new **SibylVestingVault** (Base mainnet `0xec6ce8a738556aa4a795abb0859191b26320be01`), mirroring the `claim.html` portal (dark Fraunces/Plex theme, 5-RPC fallback, raw `eth_call`, no library). Reads the connected wallet's grants via `grantIdsOf` -> `getGrant`/`claimableOf`, renders a card per grant (token symbol/decimals auto-read, total/vested/claimed/locked, progress bar, schedule note), claims via `claim(grantId)` or `claimAll()`. `noindex, nofollow`, 30s auto-refresh.
+- Routing: added `/vest` to the `partners.` host map in `middleware.js` (-> `/partners/vest.html`) plus a matching `vercel.json` rewrite.
+- CSP: added the 4 fallback Base RPC hosts (llamarpc, drpc, publicnode, 1rpc) to `connect-src` so the multi-RPC failover actually works (previously only `mainnet.base.org` was allowed, which silently defeated the fallback on this page and `claim.html`).
+- Hero: replaced the text headline with the CLI-sibyl terminal banner image (`/images/sibyl-cli-banner.png`, copied from `sibyllabs/`) per operator — the image version avoids cross-browser font/render issues. Blends into the dark page (banner bg ~= page bg).
+- Per-grant schedule: added **Start**, **Ends**, and a live 1-second **Remaining** countdown (`fmtDuration` + `tickRemaining` ticker) to each grant card.
+
+## 2026-06-11 — blog/plugin-longmemeval.html current-versions line bump
+
+Closed-beta status paragraph "current:" list updated to `sibyl-memory-client 0.4.11`, `sibyl-memory-cli 0.3.13`, `sibyl-memory-mcp 0.1.9` (hermes unchanged 0.3.8) in lockstep with the 2026-06-11 PyPI release (bugflow PRs #7+#8 combined). Benchmark numbers untouched — the result was and remains attributed to hermes 0.3.5 / client 0.4.2.
+
+## 2026-06-08 — beta-analysis-v2 dek closing line reworded (operator)
+
+- Reworded the final sentence of the `blog/beta-analysis-v2.html` dek/lede (`p.lede`, line 710). Operator note: the old closer "The goal is the smallest correct one." did not land as a punchy close. New: "The goal should be to optimize the workflow itself: reduce the context while increasing efficiency and recall." Active framing (optimize the workflow) instead of a static target, and it sets up the body's ingest/storage/retrieval hygiene argument. Body thesis phrase ("smallest correct context") left intact across lines 731/812/834/854 — deliberate, load-bearing. Meta `description` / `og:description` / `twitter:description` / JSON-LD left unchanged (they carry the description, not the flagged closer; operator scope was the visible subheader only).
+
+## 2026-06-08 — beta-analysis-v2 PUBLISHED: replication kit download + blog index + robots index
+
+- **Replication kit (download):** packaged a public, PII-scrubbed kit at `data/sibyl-4way-500co-benchmark.zip` (512 KB): README + 3 runner scripts (Sibyl / Mem0 / answer-phase) + 6 per-engine reports + 4 raw per-question JSONs (Sibyl + Mem0). Curated from the private archive `memory/raw/sylvain-500co-benchmark-2026-06-07/` with rules 35/51/52 enforced: tester identity/email/Discord IDs and the internal `NOTES.md` excluded; the lone `credentials_source` local path (`/home/<tester>/...`) redacted to `~/...` in the two Sibyl JSONs; runners verified to use only the public `sibyl_memory_client` API + env-var secrets (no keys/tokens embedded — the record-level `"tier"` is synthetic memory-tier data, not auth). Hindsight included as reports only (no runner artifact); Mnemosyne documented but excluded (no reproducible artifact).
+- Added a **"Raw data & reproducibility"** section + `.dl` download card at the bottom of `blog/beta-analysis-v2.html` (after the closed-beta callout, before the endcap), mirroring V1. Link is the apex `https://sibylcap.com/data/sibyl-4way-500co-benchmark.zip` (blog host does not serve `/data/`). Bumped `.dl-meta` contrast muted→secondary to match the UI-review AA pass.
+- **Published:** flipped `beta-analysis-v2` robots `noindex, nofollow` → `index, follow`, and added it as the **top featured card** in `blog/index.html` (June 7, 2026; "Most memory products are solving the wrong problem"; 350/350 · 228 vs 11,892 · $0.64 vs $18.68 · 50/50 traps).
+
+## 2026-06-08 — UI review pass on beta-analysis-v2 (+ blocker fixes to sibling beta-analysis)
+
+5-agent UI/UX review (typography, responsive/mobile, brand+figures, polish/ending) of `blog/beta-analysis-v2.html` before public launch. Verdict: launch-ready after 2 blockers + cheap should-fixes; all applied and re-verified at 1280px + 414px (computed-style assertions + element screenshots):
+
+- **Blocker — CTA button text color:** `.article-body a {color:var(--accent)}` (specificity 0,1,1) was overriding `.cta-primary{color:#000}` / `.cta-discord{color:#fff}` (0,1,0), so both endcap buttons rendered accent-blue instead of black/white (Discord icon `fill:currentColor` dim too). Added specificity-winning `.article-body a.cta-primary` / `.cta-discord` color rules (incl. :hover) + `.article-body a.cta-btn {border-bottom:none}`. Verified computed `rgb(0,0,0)` / `rgb(255,255,255)`. **Same latent bug fixed on the live sibling `blog/beta-analysis.html`.**
+- **Blocker — mobile horizontal overflow:** nav `.nav-icon-link::after` hover tooltips (`opacity:0`, not `display:none`) spilled ~28px past the 414px viewport (scrollWidth 442 vs 414). Added `.nav-icon-link::after {display:none}` to the `@media (max-width:560px)` block. Verified `scrollWidth == clientWidth`. Fixed on both pages.
+- **Should-fix — contrast (AA):** `--text-muted` (#474e5e, ~2.4:1) carried competitor data cells, `.note` caveats, `.fig figcaption`, and `.stat-label` framing. Repointed `.d`, `.note`, `.fig figcaption`, `.stat-label` → `--text-secondary` (#7e8594, ~5.4:1). (v2 only.)
+- **Should-fix — unified table color language:** the two tables used green/amber/white tiers that clashed with the creme cards' gold/violet. Now one language: Sibyl = gold (`.g`→gold, `tr.sibyl td`→gold), strong competitor scores = white (`.w`), everything else = secondary (`.d`); dropped amber `.y` from the table markup. (v2 only.)
+- **Polish (v2):** h2 1.25rem→1.5rem (clearer hierarchy); +44px gap between hero stats and first paragraph (desktop) / +32px (mobile); `.note` line-height 1.5; mobile `th` line-height 1.25 to compact the wrapped "Cost to answer all 350" header.
+
+v2 remains `noindex, nofollow` pending operator go to publish (flip robots + add to `blog/index.html`).
+
+## 2026-06-07 — Blog V2 rewritten to full 4-engine report (blog/beta-analysis-v2.html)
+
+Rewrote `blog/beta-analysis-v2.html` from the Sibyl-vs-Mem0 two-way into the full **four-engine** report: Sibyl / Hindsight / Mem0 / Mnemosyne on the same independent 500-company, 365-day, 350-question business-memory benchmark (Sylvain/Cloud, June 2026). New thesis framing per operator: *most memory products optimize the wrong variable (a bigger context window); the goal is the smallest correct context, achieved through ingest/storage/retrieval hygiene — low context keeps cost near zero, holds the agent on identity + hard rules, and reduces resource use rather than inflating it.*
+
+Structure (12 sections): wrong-problem thesis → the test (2-phase: retrieval-isolated, then Sonnet-answered) → 4-way result (overall table + dual overview graphic) → per-category collapse (heatmap graphic + 4×7 table) → LLM-can't-fix-retrieval (Hindsight 152→152) → the wrong problem measured (context bloat, 228 vs 11,892 tok/q) → negative-trap hallucination (Sibyl 50/50, field 0/50) → scale ($0, 47.6s, 287MB) → honesty caveats → foundation → what it means (maps to the graph-native GNN tier).
+
+Six new creme stat-graphics web-optimized into `images/blog/blog-{4way-overview,4way-heatmap,llm-ceiling,context-bloat,traps,efficiency}.png` (2× renders also archived to Drive Images·Production). Honesty caveats baked in inline (rule 34/35): Mnemosyne figures Discord-sourced with no runner artifact; Mem0 922MB Discord-sourced (Sibyl 287MB verifiable from byte count); Sibyl's 6 answer misses are temporal_topic date-FORMAT mismatches where retrieval passed (not recall failures); Mem0 engine-only (infer=False); competitor numbers are the tester's own runs, not vendor self-reports; not conflated with published LongMemEval. Old `mem0-{tester-fullscale,scale-integrity,head-to-head}.png` figures dropped from the page (files retained on disk). Head/OG/Twitter/JSON-LD updated to the 4-way; og:image → `blog-4way-overview.png`; read time 9→12 min. **Still `noindex, nofollow`** pending operator approval — flip robots to `index, follow` + add to `blog/index.html` on go. Source memo: `memory/research/sylvain-500co-4way-blog-compile-2026-06-07.md`. Vercel deploy is the ship; GitHub `sibylcap/website` sync still pending the force-rewrite reconcile (carry-forward).
+
+## 2026-06-07 — Blog V2 draft: Sibyl Memory vs Mem0 (blog/beta-analysis-v2.html)
+
+New blog post `blog/beta-analysis-v2.html` (served at `blog.sibylcap.com/beta-analysis-v2`), same dark design system as `beta-analysis.html`. Covers the 365-day business-memory benchmark vs Mem0: an independent tester's full-500 result (Sibyl 350/350 vs Mem0 92/350, framed "independent beta test") plus our own in-house reproduction (350/350 at full scale, $0 write+recall, 0 invented answers, and the engine-only head-to-head at N=20 / N=100 showing Mem0 falling 87% to 72% as the corpus grows). Embeds 3 flexflow-curated creme stat cards copied to `images/blog/mem0-{scale-integrity,head-to-head,tester-fullscale}.png`. Honesty split explicit throughout: reproduced-by-us vs tester-reported; engine-only (Mem0 infer=False); tester not named (privacy); no LongMemEval numbers restated (linked only). **Shipped as `noindex, nofollow` DRAFT for operator review** — flip robots to `index, follow` + add to `blog/index.html` on approval. Not pushed to GitHub (local sibylcap/website pending the force-rewrite reconcile; Vercel deploy is the ship).
+
 ## 2026-06-04 — SIBYL Score endpoint rebuilt X-free (api/sibyl-score.js → v2)
 
 Rebuilt `api/sibyl-score.js` to score **entirely from free signals** — zero X/Twitter API calls. The two X-derived categories (`social_traction` 18 + `community_health` 17, which fired four per-request X reads at ~$0.10/call against a $0.05 price) are replaced by a single free **`market_traction`** category (0-20) built from DexScreener data we already fetch:

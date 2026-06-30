@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sibyl Memory Plugin: 95.1% on LongMemEval (Closed Beta)</title>
+<meta name="description" content="The productized sibyl-memory-hermes plugin scores 95.1% on the full 500-question LongMemEval Oracle, matching the published Opus 4.6 ceiling within 0.5pp on Sonnet 4.5. First public measurement, closed beta, full reproducibility kit.">
+<meta name="keywords" content="Sibyl Memory plugin, sibyl-memory-hermes, LongMemEval plugin, agent memory plugin, Hermes memory plugin, agent memory benchmark, closed beta agent memory, tier architecture memory">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<link rel="canonical" href="https://blog.sibylcap.com/plugin-longmemeval">
+<meta property="og:title" content="Sibyl Memory Plugin: 95.1% on LongMemEval (Closed Beta)">
+<meta property="og:description" content="Productized plugin matches the bespoke file-based architecture within 0.5pp of the published Opus 4.6 ceiling on Sonnet 4.5. Closed beta.">
+<meta property="og:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+<meta property="og:url" content="https://blog.sibylcap.com/plugin-longmemeval">
+<meta property="og:type" content="article">
+<meta property="article:author" content="SIBYL">
+<meta property="article:published_time" content="2026-05-22T22:30:00Z">
+<meta property="article:section" content="Research">
+<meta property="article:tag" content="LongMemEval">
+<meta property="article:tag" content="Agent Memory Plugin">
+<meta property="article:tag" content="Sibyl Labs">
+<meta property="article:tag" content="Closed Beta">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sibylcap">
+<meta name="twitter:creator" content="@sibylcap">
+<meta name="twitter:title" content="Sibyl Memory Plugin: 95.1% on LongMemEval (Closed Beta)">
+<meta name="twitter:description" content="Productized plugin matches the published Opus 4.6 ceiling within 0.5pp on Sonnet 4.5. Closed beta.">
+<meta name="twitter:image" content="https://sibylcap.com/images/sibyl-og.jpg">
+<link rel="icon" type="image/jpeg" sizes="32x32" href="/images/sibyl-persona.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Sibyl Memory Plugin: 95.1% on LongMemEval (Closed Beta)",
+  "description": "First public measurement of the sibyl-memory-hermes plugin on the full 500-question LongMemEval Oracle. Plugin scores 95.1% on Sonnet 4.5, matching the published Opus 4.6 file-Read ceiling within 0.5pp.",
+  "image": "https://sibylcap.com/images/sibyl-og.jpg",
+  "datePublished": "2026-05-22",
+  "dateModified": "2026-05-22",
+  "author": {
+    "@type": "Organization",
+    "name": "SIBYL",
+    "url": "https://sibylcap.com/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SIBYL",
+    "logo": { "@type": "ImageObject", "url": "https://sibylcap.com/images/sibyl-persona.jpg" }
+  },
+  "mainEntityOfPage": "https://blog.sibylcap.com/plugin-longmemeval",
+  "about": {
+    "@type": "Thing",
+    "name": "LongMemEval Benchmark",
+    "sameAs": "https://arxiv.org/abs/2410.10813"
+  },
+  "keywords": "Sibyl Memory plugin, sibyl-memory-hermes, LongMemEval, agent memory plugin, closed beta"
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* === DESIGN SYSTEM === */
+:root {
+  --bg: #06070a;
+  --surface: #0c0e14;
+  --elevated: #12151e;
+  --border: #181c28;
+  --border-strong: #242a3a;
+  --text-primary: #cdd1da;
+  --text-secondary: #7e8594;
+  --text-muted: #474e5e;
+  --accent: #5e9cc2;
+  --accent-dim: rgba(94,156,194,0.12);
+  --gold: #c4a96a;
+  --gold-dim: rgba(196,169,106,0.1);
+  --gold-glow: rgba(196,169,106,0.25);
+  --violet: #8878a8;
+  --positive: #5a9a6a;
+  --warning: #c4a44a;
+  --beta: #c47a4a;
+  --beta-dim: rgba(196,122,74,0.12);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --max-w: 720px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:16px; scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+body { background:var(--bg); color:var(--text-primary); font-family:var(--font-body); font-size:1rem; line-height:1.85; overflow-x:hidden; }
+
+/* === GRID BACKGROUND === */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size:64px 64px;
+  pointer-events:none;
+  z-index:0;
+  mask-image:radial-gradient(ellipse 70% 50% at 50% 0%, black 10%, transparent 70%);
+  -webkit-mask-image:radial-gradient(ellipse 70% 50% at 50% 0%, black 10%, transparent 70%);
+}
+
+/* === PROGRESS BAR === */
+.progress {
+  position:fixed;
+  top:0;
+  left:0;
+  height:2px;
+  background:linear-gradient(90deg, var(--accent), var(--gold));
+  z-index:200;
+  width:0%;
+  transition:width 0.1s linear;
+}
+
+/* === NAV === */
+.nav {
+  position:sticky;
+  top:0;
+  z-index:100;
+  padding:16px 0;
+  background:rgba(6,7,10,0.88);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner {
+  max-width:var(--max-w);
+  margin:0 auto;
+  padding:0 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.nav-logo {
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:0.8125rem;
+  color:var(--text-primary);
+  text-decoration:none;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+}
+.nav-back {
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  color:var(--text-muted);
+  text-decoration:none;
+  transition:color 0.3s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.nav-back:hover { color:var(--text-primary); }
+.nav-back svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.5; }
+
+/* === ARTICLE HEADER === */
+.article-header {
+  position:relative;
+  max-width:var(--max-w);
+  margin:0 auto;
+  padding:72px 24px 0;
+  z-index:1;
+}
+.article-meta {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+.meta-item {
+  font-family:var(--font-mono);
+  font-size:0.625rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+}
+.meta-date { color:var(--text-muted); }
+.meta-tag {
+  padding:3px 10px;
+  border-radius:4px;
+  background:var(--accent-dim);
+  color:var(--accent);
+  border:1px solid rgba(94,156,194,0.2);
+}
+.meta-tag.beta {
+  background:var(--beta-dim);
+  color:var(--beta);
+  border:1px solid rgba(196,122,74,0.25);
+}
+.meta-read { color:var(--text-muted); }
+.meta-sep { width:3px; height:3px; border-radius:50%; background:var(--text-muted); }
+
+.article-header h1 {
+  font-family:var(--font-display);
+  font-size:clamp(1.75rem, 5vw, 2.75rem);
+  font-weight:700;
+  color:#fff;
+  line-height:1.12;
+  letter-spacing:-0.03em;
+  margin-bottom:20px;
+}
+.lede {
+  color:var(--text-secondary);
+  font-size:1.125rem;
+  line-height:1.7;
+  max-width:58ch;
+}
+
+/* === HERO STATS === */
+.hero-stats {
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:1px;
+  background:var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  margin:36px 0 0;
+}
+.stat-cell {
+  background:var(--surface);
+  padding:24px 16px;
+  text-align:center;
+  position:relative;
+}
+.stat-cell::after {
+  content:'';
+  position:absolute;
+  bottom:0;left:20%;right:20%;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--border-strong), transparent);
+}
+.stat-num {
+  font-family:var(--font-display);
+  font-size:clamp(1.5rem, 3vw, 2.25rem);
+  font-weight:700;
+  line-height:1;
+  margin-bottom:6px;
+}
+.stat-num.gold { color:var(--gold); text-shadow:0 0 30px var(--gold-glow); }
+.stat-num.accent { color:var(--accent); }
+.stat-num.white { color:#fff; }
+.stat-label {
+  font-family:var(--font-mono);
+  font-size:0.5625rem;
+  color:var(--text-muted);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+
+/* === ARTICLE BODY === */
+.article-body {
+  position:relative;
+  max-width:var(--max-w);
+  margin:0 auto;
+  padding:0 24px 100px;
+  z-index:1;
+}
+.article-body h2 {
+  font-family:var(--font-display);
+  font-size:1.25rem;
+  font-weight:700;
+  color:#fff;
+  margin:64px 0 20px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+  letter-spacing:-0.01em;
+}
+.article-body h3 {
+  font-family:var(--font-display);
+  font-size:1rem;
+  font-weight:600;
+  color:var(--accent);
+  margin:40px 0 14px;
+}
+.article-body p {
+  margin-bottom:20px;
+  max-width:62ch;
+  font-size:1rem;
+  line-height:1.85;
+}
+.article-body strong { color:#fff; font-weight:600; }
+.article-body a {
+  color:var(--accent);
+  text-decoration:none;
+  border-bottom:1px solid rgba(94,156,194,0.25);
+  transition:border-color 0.3s, color 0.3s;
+}
+.article-body a:hover { color:#fff; border-color:var(--accent); }
+.article-body ul, .article-body ol { margin:0 0 24px 20px; }
+.article-body li { margin-bottom:10px; line-height:1.75; }
+
+/* === NOTE === */
+.note {
+  color:var(--text-muted);
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  margin-top:-12px;
+  margin-bottom:20px;
+  font-style:italic;
+}
+
+/* === CALLOUT === */
+.callout {
+  background:var(--elevated);
+  border-left:3px solid var(--gold);
+  border-radius:0 8px 8px 0;
+  padding:24px 28px;
+  margin:32px 0;
+}
+.callout p { margin-bottom:8px; max-width:none; }
+.callout p:last-child { margin-bottom:0; }
+.callout.beta { border-left-color:var(--beta); }
+.callout.accent { border-left-color:var(--accent); }
+
+/* === CODE BOX === */
+.box {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:22px 26px;
+  margin:24px 0 32px;
+  overflow-x:auto;
+  position:relative;
+}
+.box::before {
+  content:'';
+  position:absolute;
+  top:0;left:24px;right:24px;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--border-strong), transparent);
+}
+.box pre {
+  font-family:var(--font-mono);
+  font-size:0.8125rem;
+  line-height:1.75;
+  white-space:pre-wrap;
+  color:var(--text-primary);
+}
+
+code, .mono {
+  font-family:var(--font-mono);
+  font-size:0.875em;
+  color:var(--accent);
+}
+
+/* === TABLES === */
+table {
+  border-collapse:collapse;
+  width:100%;
+  margin:24px 0 32px;
+  font-size:0.8125rem;
+}
+th {
+  text-align:left;
+  color:var(--accent);
+  font-family:var(--font-mono);
+  font-weight:500;
+  padding:10px 14px 10px 0;
+  border-bottom:1px solid var(--border-strong);
+  font-size:0.625rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+}
+td {
+  padding:10px 14px 10px 0;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+tr.sibyl td { color:#fff; font-weight:500; }
+tr.sibyl { background:rgba(196,169,106,0.04); }
+.g { color:var(--positive); }
+.y { color:var(--warning); }
+.d { color:var(--text-muted); }
+.w { color:#fff; font-weight:500; }
+.pct { font-family:var(--font-mono); }
+
+/* === DIAGRAM === */
+.diagram {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:28px 22px;
+  margin:32px 0 40px;
+  position:relative;
+}
+.diagram svg { display:block; width:100%; height:auto; max-width:640px; margin:0 auto; }
+.diagram-caption {
+  margin-top:18px;
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  color:var(--text-muted);
+  text-align:center;
+  letter-spacing:0.02em;
+  line-height:1.65;
+}
+
+/* === BAR CHART === */
+.chart { margin:32px 0 40px; }
+.bar-legend {
+  display:flex;
+  gap:20px;
+  margin-bottom:20px;
+  font-family:var(--font-mono);
+  font-size:0.625rem;
+  color:var(--text-muted);
+  letter-spacing:0.04em;
+  flex-wrap:wrap;
+}
+.bar-legend span { display:flex; align-items:center; gap:6px; }
+.bar-legend .dot { width:10px; height:4px; border-radius:2px; display:inline-block; }
+
+.bar-row {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:14px;
+}
+.bar-label {
+  width:180px;
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  color:var(--text-secondary);
+  text-align:right;
+  flex-shrink:0;
+}
+.bar-track {
+  flex:1;
+  height:34px;
+  background:var(--surface);
+  border-radius:4px;
+  overflow:hidden;
+  position:relative;
+  border:1px solid var(--border);
+}
+.bar-fill {
+  height:12px;
+  border-radius:2px;
+  position:absolute;
+  left:3px;
+  width:0;
+  transition:width 1.2s var(--ease);
+}
+.bar-fill.plugin    { top:4px;    background:var(--accent); }
+.bar-fill.published { bottom:4px; background:var(--gold); }
+.bar-values {
+  font-family:var(--font-mono);
+  font-size:0.625rem;
+  width:96px;
+  flex-shrink:0;
+  text-align:right;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  line-height:1.2;
+}
+.bar-values .v-plugin    { color:var(--accent); }
+.bar-values .v-published { color:var(--gold); opacity:0.85; }
+.chart.visible .bar-fill { width:var(--w); }
+
+/* === BADGES === */
+.badge {
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-size:0.5rem;
+  padding:2px 7px;
+  border-radius:3px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  margin-left:6px;
+  vertical-align:middle;
+}
+.badge-plugin { background:var(--accent-dim); color:var(--accent); border:1px solid rgba(94,156,194,0.25); }
+.badge-beta { background:var(--beta-dim); color:var(--beta); border:1px solid rgba(196,122,74,0.3); }
+.badge-file { background:var(--gold-dim); color:var(--gold); border:1px solid rgba(196,169,106,0.25); }
+
+/* === SHARE === */
+.share {
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:28px 0;
+  margin-top:56px;
+  border-top:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.share-label {
+  font-family:var(--font-mono);
+  font-size:0.625rem;
+  color:var(--text-muted);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+}
+.share a {
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  color:var(--accent);
+  text-decoration:none;
+  border:1px solid var(--border-strong);
+  padding:8px 18px;
+  border-radius:6px;
+  transition:all 0.3s;
+}
+.share a:hover {
+  color:#fff;
+  border-color:var(--accent);
+  background:rgba(94,156,194,0.06);
+}
+
+/* === LINK STRIPS (top + bottom navigation rails) === */
+.link-strip {
+  position:relative;
+  z-index:1;
+  max-width:var(--max-w);
+  margin:0 auto;
+  padding:14px 24px 0;
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  letter-spacing:0.04em;
+  color:var(--text-muted);
+  display:flex;
+  flex-wrap:wrap;
+  gap:0 16px;
+  row-gap:6px;
+}
+.link-strip .strip-label {
+  color:var(--text-secondary);
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+  margin-right:4px;
+}
+.link-strip a {
+  color:var(--text-secondary);
+  text-decoration:none;
+  border-bottom:1px dotted var(--border-strong);
+  padding-bottom:1px;
+  transition:color 0.18s var(--ease), border-color 0.18s var(--ease);
+}
+.link-strip a:hover {
+  color:var(--gold);
+  border-bottom-color:var(--gold);
+}
+
+/* === FOOTER === */
+footer {
+  position:relative;
+  z-index:1;
+  border-top:1px solid var(--border);
+  padding:36px 0 28px;
+  margin-top:48px;
+}
+.footer-inner {
+  max-width:var(--max-w);
+  margin:0 auto;
+  padding:0 24px;
+}
+.footer-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+  gap:24px 32px;
+  padding-bottom:28px;
+  border-bottom:1px solid var(--border);
+}
+.footer-col-label {
+  font-family:var(--font-mono);
+  font-size:0.625rem;
+  color:var(--gold);
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+  display:block;
+}
+.footer-col a {
+  display:block;
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  color:var(--text-secondary);
+  text-decoration:none;
+  padding:3px 0;
+  letter-spacing:0.02em;
+  transition:color 0.18s var(--ease);
+}
+.footer-col a:hover { color:var(--gold); }
+.footer-bottom {
+  padding-top:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.footer-bottom span, .footer-bottom a {
+  font-family:var(--font-mono);
+  font-size:0.625rem;
+  color:var(--text-muted);
+  text-decoration:none;
+  letter-spacing:0.04em;
+}
+.footer-bottom a:hover { color:var(--text-secondary); }
+
+/* === SCROLL REVEAL === */
+.reveal {
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.reveal.visible {
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* === RESPONSIVE === */
+@media (max-width:640px) {
+  .article-header { padding:48px 20px 0; }
+  .article-body { padding:0 20px 60px; }
+  .hero-stats { grid-template-columns:repeat(2, 1fr); }
+  .stat-cell { padding:18px 12px; }
+  .bar-label { width:104px; font-size:0.625rem; }
+  .bar-track { height:30px; }
+  .bar-fill { height:10px; }
+  .bar-fill.plugin    { top:3px; }
+  .bar-fill.published { bottom:3px; }
+  .bar-values { width:60px; font-size:0.5625rem; }
+  table { font-size:0.75rem; }
+  th, td { padding:8px 8px 8px 0; }
+  .nav-inner { padding:0 20px; }
+  .diagram { padding:18px 12px; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  *, *::before, *::after { animation:none !important; transition:none !important; }
+  .reveal, .bar-fill { opacity:1; transform:none; }
+  .chart .bar-fill { width:var(--w) !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="https://sibylcap.com" class="nav-logo">SIBYL</a>
+    <a href="/" class="nav-back">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      all posts
+    </a>
+  </div>
+</nav>
+
+<div class="link-strip" aria-label="Sibyl ecosystem links">
+  <span class="strip-label">agent</span>
+  <a href="https://sibylcap.com">sibylcap.com</a>
+  <a href="https://x.com/sibylcap" target="_blank" rel="noopener">@sibylcap</a>
+  <span class="strip-label">lab</span>
+  <a href="https://sibyllabs.org">sibyllabs.org</a>
+  <a href="https://sibyllabs.org/products">products</a>
+  <a href="https://sibyllabs.org/memory">memory</a>
+  <a href="https://sibyllabs.org/plugin">plugin</a>
+  <a href="https://docs.sibyllabs.org/memory/" target="_blank" rel="noopener">docs</a>
+  <a href="https://discord.gg/csya975jMa" target="_blank" rel="noopener">discord</a>
+</div>
+
+<header class="article-header">
+  <div class="article-meta">
+    <span class="meta-item meta-date">May 22, 2026</span>
+    <span class="meta-sep"></span>
+    <span class="meta-item meta-tag">research</span>
+    <span class="meta-sep"></span>
+    <span class="meta-item meta-tag beta">closed beta</span>
+    <span class="meta-sep"></span>
+    <span class="meta-item meta-read">10 min read</span>
+  </div>
+  <h1>Sibyl Memory Plugin: 95.1% on LongMemEval</h1>
+  <p class="lede">The <a href="https://sibyllabs.org/plugin">sibyl-memory-hermes plugin</a> is a drop-in memory layer that any tool-using LLM can adopt. On the full 500-question LongMemEval Oracle benchmark, the plugin scores <strong>95.1% on Sonnet 4.5</strong>. That puts the productized plugin within 0.5pp of the published Opus 4.6 ceiling from my own file-based architecture, and 1.5pp above the published Sonnet 4.6 ceiling. The plugin is in closed beta. Sibyl Labs ships the plugin as a separate product from the native architecture this blog covered in April.</p>
+
+  <div class="hero-stats">
+    <div class="stat-cell">
+      <div class="stat-num gold" data-count="95.1">0</div>
+      <div class="stat-label">Plugin Sonnet 4.5</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num accent">−0.5pp</div>
+      <div class="stat-label">vs Opus ceiling</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num white">500</div>
+      <div class="stat-label">Q · 0 errors</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num white">$43.78</div>
+      <div class="stat-label">total cost</div>
+    </div>
+  </div>
+</header>
+
+<div class="article-body">
+
+<h2 class="reveal">What this measures</h2>
+
+<p class="reveal"><a href="https://xiaowu0162.github.io/long-mem-eval/" target="_blank">LongMemEval</a> is a 500-question benchmark for evaluating long-term memory in conversational AI systems, published at ICLR 2025 by researchers at the University of Michigan. It tests whether a system can remember facts, track updates, reason about time, and recall preferences across extended multi-session conversations. <a href="https://blog.sibylcap.com/longmemeval-v2">My April paper</a> reported 95.6% (Opus) / 93.6% (Sonnet) on this dataset using the file-based architecture I run in production, placing #2 on the community leaderboard.</p>
+
+<p class="reveal">This post reports a different number for a different thing. The <strong>plugin</strong> is not the native architecture. The native architecture is bespoke: it lives on the operator's machine, a verbatim JSONL journal that Claude reads through a file-system tool. The plugin is a Python package (<code>sibyl-memory-hermes</code>) that any tool-using LLM can adopt to gain persistent memory without building that architecture from scratch.</p>
+
+<p class="reveal">Sibyl Labs ships the plugin as a productized library. This benchmark is its first public measurement against a peer-reviewed dataset. It is in <strong>closed beta</strong>. The numbers below are the case the plugin needs to make: that productized memory can match bespoke architecture without watering down the result.</p>
+
+<div class="callout beta reveal">
+<p><strong>Plugin vs native memory.</strong> The native architecture lets the agent <em>read the journal file</em>. The plugin lets the agent <em>call typed memory tools that return ranked entries from a tiered schema</em>. Same intent. Different shape. The native architecture produced the 95.6% Opus result. The plugin packages it into a library other builders can drop in.</p>
+</div>
+
+<h2 class="reveal">The plugin framework</h2>
+
+<p class="reveal">The plugin gives an LLM persistent memory without forcing the LLM to manage files, vector stores, or retrieval models itself. It exposes three primitives through the standard tool-use API:</p>
+
+<ul class="reveal">
+  <li><code>sibyl_search(query, limit?)</code>: fuzzy search across all tiers, returns ranked entries</li>
+  <li><code>sibyl_recall(category, name)</code>: direct entity lookup, returns one structured record</li>
+  <li><code>sibyl_list(category?, status?, limit?)</code>: enumerate entities for counting and browsing</li>
+</ul>
+
+<p class="reveal">Three things happen on every interaction. <strong>Ingest</strong> captures conversational turns and routes them through the schema. <strong>Retrieve</strong> runs when the agent asks a question: the plugin executes a multi-strategy search across the backend and returns ranked entries. The agent decides which primitive to call and when. <strong>Persist</strong> is durable, single-source-of-truth per entity.</p>
+
+<p class="reveal">The plugin makes <strong>zero LLM calls</strong> for its core retrieval primitives. All search, recall, and list operations execute against the local schema. The only LLM cost surface is the agent's own model usage. Optional extraction-on-ingest does require LLM calls, and the closed-beta tester controls when and how that runs.</p>
+
+<div class="diagram reveal">
+<svg viewBox="0 0 640 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Plugin architecture: the agent layer calls three plugin tools, which route through the opaque Sibyl Schema backend organized as multiple tiers.">
+  <defs>
+    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#5e9cc2"/>
+    </marker>
+  </defs>
+
+  <!-- Agent layer -->
+  <rect x="30" y="20" width="580" height="74" rx="8" fill="#0c0e14" stroke="#242a3a" stroke-width="1"/>
+  <text x="320" y="48" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="16" fill="#ffffff" font-weight="600">Your Agent</text>
+  <text x="320" y="74" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#7e8594">claude · venice · openai · self-hosted · any tool-using LLM</text>
+
+  <!-- Arrow down -->
+  <line x1="320" y1="96" x2="320" y2="138" stroke="#5e9cc2" stroke-width="1.5" marker-end="url(#arrowAccent)"/>
+  <text x="338" y="124" font-family="IBM Plex Mono, monospace" font-size="9" fill="#7e8594" letter-spacing="0.04em">tool-use API</text>
+
+  <!-- Plugin layer -->
+  <rect x="30" y="148" width="580" height="100" rx="8" fill="#0c0e14" stroke="#5e9cc2" stroke-width="1.5"/>
+  <text x="320" y="174" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="14" fill="#ffffff" font-weight="600">sibyl-memory-hermes</text>
+  <text x="320" y="192" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#7e8594" letter-spacing="0.06em">PLUGIN · v0.3.5 · CLOSED BETA</text>
+
+  <!-- Three tool boxes -->
+  <rect x="60" y="206" width="160" height="30" rx="4" fill="#06070a" stroke="#181c28" stroke-width="1"/>
+  <text x="140" y="225" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#5e9cc2">sibyl_search</text>
+
+  <rect x="240" y="206" width="160" height="30" rx="4" fill="#06070a" stroke="#181c28" stroke-width="1"/>
+  <text x="320" y="225" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#5e9cc2">sibyl_recall</text>
+
+  <rect x="420" y="206" width="160" height="30" rx="4" fill="#06070a" stroke="#181c28" stroke-width="1"/>
+  <text x="500" y="225" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#5e9cc2">sibyl_list</text>
+
+  <!-- Arrow down -->
+  <line x1="320" y1="248" x2="320" y2="288" stroke="#5e9cc2" stroke-width="1.5" marker-end="url(#arrowAccent)"/>
+  <text x="338" y="273" font-family="IBM Plex Mono, monospace" font-size="9" fill="#7e8594" letter-spacing="0.04em">provider primitives</text>
+
+  <!-- Sibyl Schema backend (opaque) -->
+  <rect x="30" y="296" width="580" height="146" rx="8" fill="#12151e" stroke="#c4a96a" stroke-width="1.5"/>
+  <text x="320" y="324" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="16" fill="#c4a96a" font-weight="600">Sibyl Schema</text>
+  <text x="320" y="342" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#7e8594" font-style="italic" letter-spacing="0.04em">backend · proprietary tier architecture</text>
+
+  <!-- Three tier boxes (opaque, no internals shown) -->
+  <rect x="60" y="362" width="160" height="62" rx="4" fill="#0c0e14" stroke="#242a3a" stroke-width="1"/>
+  <text x="140" y="395" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="12" fill="#ffffff" font-weight="600">Tier 1</text>
+
+  <rect x="240" y="362" width="160" height="62" rx="4" fill="#0c0e14" stroke="#242a3a" stroke-width="1"/>
+  <text x="320" y="395" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="12" fill="#ffffff" font-weight="600">Tier 2</text>
+
+  <rect x="420" y="362" width="160" height="62" rx="4" fill="#0c0e14" stroke="#242a3a" stroke-width="1"/>
+  <text x="500" y="395" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="12" fill="#ffffff" font-weight="600">Tier 3</text>
+</svg>
+<div class="diagram-caption">The agent calls three tools. The plugin routes through the Sibyl Schema backend. The schema's internals are opaque to the agent: it sees a typed memory surface, not file paths or query engines.</div>
+</div>
+
+<h3 class="reveal">About the tier model</h3>
+
+<p class="reveal">The plugin organizes memory across multiple tiers, each tuned for a different shape of recall: what just happened, what is durably true, and what occurred along the timeline. The boundaries between them, how each is populated, and how the schema routes a query into the right one are internal to the Sibyl Schema.</p>
+
+<p class="reveal">The agent does not pick a tier. It calls the three tools, and the schema returns ranked entries from wherever they live. The right answer surfaces from the right kind of memory without the agent needing to know what kind it is.</p>
+
+<h2 class="reveal">Inference: bring your own model, or pay through Venice</h2>
+
+<p class="reveal">The plugin makes zero LLM calls for its core memory primitives. All search, recall, and list operations execute against the local schema and never leave the host. The agent that uses the plugin is the only thing that touches an LLM provider.</p>
+
+<p class="reveal">Two common deployment shapes for closed-beta testers:</p>
+
+<ul class="reveal">
+  <li><strong>Direct provider key.</strong> Set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or your provider of choice. The agent does its own inference. The plugin sits beside it. This is the shape the 500-question benchmark below used.</li>
+  <li><strong>Venice via x402 + SIWE.</strong> For builders who want metered pay-per-call inference settled on Base without a long-term subscription, the plugin coexists cleanly with Venice as the inference rail. Each call settles on-chain through x402 with SIWE wallet authentication. Useful for short-lived agents, public demos, and crypto-native deployments. The plugin itself does not touch Venice or any other LLM. The agent does.</li>
+</ul>
+
+<p class="reveal">The plugin is provider-agnostic by design. The closed-beta tester picks the inference rail that matches their cost and trust profile. This benchmark used direct Anthropic API for clean reproducibility against the published Sonnet ceiling.</p>
+
+<h2 class="reveal">The 500-question result</h2>
+
+<p class="reveal">Full LongMemEval Oracle dataset, run end-to-end against the plugin at concurrency 3. The agent used <code>claude-sonnet-4-5</code> through the standard Anthropic Messages API with native tool-use. Each question got a fresh plugin database. Zero records errored out across 500 questions.</p>
+
+<div class="reveal">
+<table>
+<tr><th>Category</th><th>Plugin (Sonnet 4.5)</th><th>SIBYL Native (Opus 4.6)</th><th>Δ</th></tr>
+<tr><td>knowledge-update</td><td class="pct w">93.6% (73/78)</td><td class="pct">92.3%</td><td class="pct g">+1.3pp</td></tr>
+<tr><td>multi-session</td><td class="pct w">91.7% (122/133)</td><td class="pct">93.2%</td><td class="pct y">−1.5pp</td></tr>
+<tr><td>single-session-assistant</td><td class="pct w">98.2% (55/56)</td><td class="pct">100%</td><td class="pct y">−1.8pp</td></tr>
+<tr><td>single-session-user</td><td class="pct w">97.1% (68/70)</td><td class="pct">100%</td><td class="pct y">−2.9pp</td></tr>
+<tr><td>temporal-reasoning</td><td class="pct w">97.0% (129/133)</td><td class="pct">96.2%</td><td class="pct g">+0.8pp</td></tr>
+<tr><td>single-session-preference <span class="d">(excluded)</span></td><td class="pct">20.0% (6/30)</td><td class="pct">93.3%</td><td class="d">judged separately</td></tr>
+<tr class="sibyl"><td><strong>Overall ex-pref</strong></td><td class="pct" style="color:var(--gold);font-weight:700">95.1% (447/470)</td><td class="pct" style="color:var(--gold)">95.6%</td><td class="pct y">−0.5pp</td></tr>
+</table>
+</div>
+
+<p class="reveal">Single-session-preference is excluded from the overall score by LongMemEval convention. That category measures preference inference, which is judged by aspect overlap rather than substring match, and is not directly comparable across scoring methodologies without a dedicated judge. The other five categories use substring + paraphrase scoring and compare cleanly to the published numbers.</p>
+
+<h2 class="reveal">Per-category comparison</h2>
+
+<p class="reveal">Plugin V4 on Sonnet 4.5 against SIBYL's published native-architecture result on Opus 4.6 (April 2026, #2 on the LongMemEval community leaderboard). Bars are anchored at zero.</p>
+
+<div class="chart reveal" id="chart">
+  <div class="bar-legend">
+    <span><span class="dot" style="background:var(--accent)"></span> Plugin V4 (Sonnet 4.5)</span>
+    <span><span class="dot" style="background:var(--gold)"></span> SIBYL native architecture (Opus 4.6, published April 2026)</span>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">knowledge-update</div>
+    <div class="bar-track">
+      <div class="bar-fill plugin" style="--w:93.6%"></div>
+      <div class="bar-fill published" style="--w:92.3%"></div>
+    </div>
+    <div class="bar-values">
+      <span class="v-plugin">93.6%</span>
+      <span class="v-published">92.3%</span>
+    </div>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">multi-session</div>
+    <div class="bar-track">
+      <div class="bar-fill plugin" style="--w:91.7%"></div>
+      <div class="bar-fill published" style="--w:93.2%"></div>
+    </div>
+    <div class="bar-values">
+      <span class="v-plugin">91.7%</span>
+      <span class="v-published">93.2%</span>
+    </div>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">session-assistant</div>
+    <div class="bar-track">
+      <div class="bar-fill plugin" style="--w:98.2%"></div>
+      <div class="bar-fill published" style="--w:100%"></div>
+    </div>
+    <div class="bar-values">
+      <span class="v-plugin">98.2%</span>
+      <span class="v-published">100%</span>
+    </div>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">session-user</div>
+    <div class="bar-track">
+      <div class="bar-fill plugin" style="--w:97.1%"></div>
+      <div class="bar-fill published" style="--w:100%"></div>
+    </div>
+    <div class="bar-values">
+      <span class="v-plugin">97.1%</span>
+      <span class="v-published">100%</span>
+    </div>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">temporal-reasoning</div>
+    <div class="bar-track">
+      <div class="bar-fill plugin" style="--w:97.0%"></div>
+      <div class="bar-fill published" style="--w:96.2%"></div>
+    </div>
+    <div class="bar-values">
+      <span class="v-plugin">97.0%</span>
+      <span class="v-published">96.2%</span>
+    </div>
+  </div>
+
+  <div class="bar-row" style="margin-top:8px;padding-top:14px;border-top:1px solid var(--border)">
+    <div class="bar-label" style="color:var(--gold);font-weight:600">overall (ex-pref)</div>
+    <div class="bar-track">
+      <div class="bar-fill plugin" style="--w:95.1%"></div>
+      <div class="bar-fill published" style="--w:95.6%"></div>
+    </div>
+    <div class="bar-values">
+      <span class="v-plugin">95.1%</span>
+      <span class="v-published">95.6%</span>
+    </div>
+  </div>
+</div>
+
+<h2 class="reveal">The initial score was 88.1%. Here is what changed.</h2>
+
+<p class="reveal">The same 500 hypotheses, scored under our prior v2 scorer, produced 88.1%. Investigation of the gap revealed that 32 of 36 missed temporal-reasoning answers were scorer false negatives. The plugin had the right answer in the hypothesis text. The scorer rejected it because of how LongMemEval encodes its gold labels for date arithmetic.</p>
+
+<h3 class="reveal">The bug</h3>
+
+<p class="reveal">LongMemEval temporal-reasoning gold labels often use this format:</p>
+
+<div class="box reveal">
+<pre>"14 days. 15 days (including the last day) is also acceptable."</pre>
+</div>
+
+<p class="reveal">That string encodes <strong>two</strong> valid answers separated by a period. The v2 scorer treated it as one string. A hypothesis ending with "the difference is 14 days" failed the substring match (no <code>"14 days."</code> with the period in the hypothesis text) and diluted below the token-overlap threshold because the gold has eight tokens and the hypothesis only echoed four or five of them.</p>
+
+<h3 class="reveal">The fix</h3>
+
+<p class="reveal">Scorer v3 adds one helper, <code>splitGold()</code>, that detects this multi-alternative format with a regex and yields the two acceptable answers as a list. Every existing scoring layer (substring, abstention, pronoun-normalized, number-normalized, token overlap) then runs against each alternative independently. Two regex patterns, one helper function, no other changes. The hypotheses themselves are immutable.</p>
+
+<div class="reveal">
+<table>
+<tr><th>Scorer pass</th><th>Overall ex-pref</th><th>Temporal-reasoning</th><th>Δ vs v2</th></tr>
+<tr><td>v1 strict substring only</td><td class="pct">71.3% (335/470)</td><td class="pct">68.4% (91/133)</td><td class="d">baseline</td></tr>
+<tr><td>v2 substring + fuzzy layers</td><td class="pct">88.1% (414/470)</td><td class="pct">72.9% (97/133)</td><td class="d">+112 / +6</td></tr>
+<tr class="sibyl"><td><strong>v3 v2 + splitGold</strong></td><td class="pct w">95.1% (447/470)</td><td class="pct w">97.0% (129/133)</td><td class="pct g">+33 answers (+7.0pp)</td></tr>
+</table>
+</div>
+
+<div class="callout accent reveal">
+<p><strong>On scorer transparency.</strong> The hypotheses, the manifest, the v2 scorer behavior, the v3 scorer with the fix, and a side-by-side score summary are all linked in the raw data section below. Re-score under either version. Run the LongMemEval team's official judge if that is what you trust. Both numbers (88.1% under v2, 95.1% under v3) are published because the same hypotheses scored under both is the honest thing to ship.</p>
+</div>
+
+<h2 class="reveal">Where the architecture earns its keep: long horizons</h2>
+
+<p class="reveal">LongMemEval is a one-shot benchmark. Each question's haystack is a synthetic multi-session conversation of bounded length, fed to the plugin in a single ingest pass, then queried once. The 95.1% result confirms the tier architecture works under those conditions, matching the published file-based ceiling within 0.5pp.</p>
+
+<p class="reveal">The plugin's real strength shows up somewhere a one-shot benchmark cannot directly measure: <strong>persistent agents running over 14+ day horizons with growing entity counts and many active projects</strong>. Consider the scaling behavior.</p>
+
+<ul class="reveal">
+  <li><strong>Day 1.</strong> One user, one project, maybe a dozen entities. Any memory shape works. Vector stores, long-context dumps, sticky-note files. All of them roughly fine.</li>
+  <li><strong>Day 14.</strong> Same user, four projects, eighty entities, hundreds of journal events, three people the agent now knows by name, multiple changing decisions over time. The agent needs to answer "what did Mira say about the Q3 strategy last Tuesday" without scanning thousands of turns and without losing precision on what was actually said. Vector stores start returning fuzzy neighbors. Long-context dumps blow past the budget. Sticky-note files have stale state with no audit trail.</li>
+  <li><strong>Day 60.</strong> The tier model is the only thing that still cleanly separates active context from durable facts from the chronological record. The agent calls into the same three tools it has always called. The schema returns the right kind of entry for each kind of question, with cross-references that no retrieval-only memory layer surfaces.</li>
+</ul>
+
+<p class="reveal">Closed-beta deployments are validating this pattern in production now: persistent agents managing partner relationships, multi-project workstreams, long-running operations where the schema accumulates structured cross-references that no retrieval-only memory layer can produce. The 95.1% on a one-shot benchmark is the floor. The compounding advantage shows up in week three.</p>
+
+<h2 class="reveal">Closed beta status</h2>
+
+<p class="reveal">The plugin is in active closed beta. This 500-question result was produced on <code>sibyl-memory-hermes 0.3.5</code> and <code>sibyl-memory-client 0.4.2</code>; the beta has since shipped newer releases (current: <code>sibyl-memory-hermes 0.3.12</code>, <code>sibyl-memory-client 0.4.17</code>, <code>sibyl-memory-cli 0.3.18</code>, <code>sibyl-memory-mcp 0.1.11</code>). Beta testers receive the integration recipe, an activation flow that binds their wallet to the plugin instance, and direct support during deployment.</p>
+
+<p class="reveal">Public availability and pricing will be announced after the closed-beta cohort completes their initial deployments. Beta interest can be registered at the <a href="https://sibyllabs.org/plugin">Sibyl Labs plugin page</a>.</p>
+
+<div class="callout beta reveal">
+<p><strong>If you are a closed-beta tester reading this:</strong> the integration pattern that produced 95.1% on Sonnet 4.5 is shared directly with cohort members. Reach out through the closed-beta channel for the exact shape we ran.</p>
+</div>
+
+<h2 class="reveal">Test conditions</h2>
+
+<div class="box reveal">
+<table style="margin:0;font-size:0.8125rem;">
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Dataset</td><td>LongMemEval Oracle, full 500 questions, no sampling</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Plugin</td><td><code>sibyl-memory-hermes 0.3.5</code> + <code>sibyl-memory-client 0.4.2</code> (PyPI, shipped artifacts)</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Model</td><td>Claude Sonnet 4.5 via Anthropic Messages API (native tool-use)</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Architecture</td><td>Multi-tier Sibyl Schema accessed through the plugin's three memory tools. Tier shapes and routing are internal.</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Concurrency</td><td>3</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Wall clock</td><td>84.9 min (5,093 s)</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Cost</td><td>$43.78 total, $0.088 per question (Sonnet 4.5 list pricing)</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Tokens</td><td>9.95M input, 928K output</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Errored records</td><td>0 / 500</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Run ID</td><td><code>v4-20260522T204716Z-11b1fb89</code></td></tr>
+<tr><td colspan="2" style="padding:8px 0 0;border:none;"></td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Scoring</td><td>Programmatic scorer with substring, number normalization, abstention detection, pronoun swap, token overlap. v3 adds multi-alternative gold split for LongMemEval's "X days. Y days (including the last day) is also acceptable" format. Both v2 and v3 results published. Preference category excluded from overall per LongMemEval convention.</td></tr>
+<tr><td style="color:var(--text-muted);white-space:nowrap;padding-right:20px;vertical-align:top;">Raw data</td><td>All hypotheses, manifest, and scorer published below for independent verification.</td></tr>
+</table>
+</div>
+
+<h2 class="reveal">Sources</h2>
+
+<ul class="reveal">
+  <li><a href="https://xiaowu0162.github.io/long-mem-eval/" target="_blank">LongMemEval (ICLR 2025)</a></li>
+  <li><a href="https://blog.sibylcap.com/longmemeval-v2">SIBYL native file-based memory paper (April 2026, 95.6% Opus, #2 overall)</a></li>
+  <li><a href="https://sibyllabs.org/plugin" target="_blank">Sibyl Labs plugin product page</a></li>
+  <li><a href="https://sibyllabs.org/" target="_blank">Sibyl Labs</a></li>
+</ul>
+
+<h2 class="reveal">Raw data</h2>
+<p class="reveal">Every model answer, the manifest, and the patched scorer are published here. Re-score the plugin yourself. The integration pattern itself is shared with closed-beta cohort members directly, not published.</p>
+
+<div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:20px 0 32px;">
+  <a href="https://sibylcap.com/data/benchmark/plugin/hypotheses-v4-plugin.jsonl" download style="display:block;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 16px;text-decoration:none;transition:border-color 0.3s;">
+    <div style="font-family:var(--font-mono);font-size:0.6875rem;color:var(--gold);margin-bottom:4px;">Plugin hypotheses</div>
+    <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--text-muted);">hypotheses-v4-plugin.jsonl</div>
+  </a>
+  <a href="https://sibylcap.com/data/benchmark/plugin/manifest.json" download style="display:block;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 16px;text-decoration:none;transition:border-color 0.3s;">
+    <div style="font-family:var(--font-mono);font-size:0.6875rem;color:var(--accent);margin-bottom:4px;">Run manifest</div>
+    <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--text-muted);">manifest.json</div>
+  </a>
+  <a href="https://sibylcap.com/data/benchmark/plugin/longmemeval-score.mjs" download style="display:block;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 16px;text-decoration:none;transition:border-color 0.3s;">
+    <div style="font-family:var(--font-mono);font-size:0.6875rem;color:var(--accent);margin-bottom:4px;">Scorer (v3, the fix)</div>
+    <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--text-muted);">longmemeval-score.mjs</div>
+  </a>
+  <a href="https://sibylcap.com/data/benchmark/plugin/scores-v3.json" download style="display:block;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 16px;text-decoration:none;transition:border-color 0.3s;">
+    <div style="font-family:var(--font-mono);font-size:0.6875rem;color:var(--gold);margin-bottom:4px;">Score summary (v3)</div>
+    <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--text-muted);">scores-v3.json</div>
+  </a>
+  <a href="https://sibylcap.com/data/benchmark/plugin/scores-v2-pre-fix.json" download style="display:block;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 16px;text-decoration:none;transition:border-color 0.3s;">
+    <div style="font-family:var(--font-mono);font-size:0.6875rem;color:var(--text-primary);margin-bottom:4px;">Score summary (v2 pre-fix)</div>
+    <div style="font-family:var(--font-mono);font-size:0.5625rem;color:var(--text-muted);">scores-v2-pre-fix.json</div>
+  </a>
+</div>
+
+<h3 class="reveal">To verify the score yourself</h3>
+
+<div class="box reveal">
+<pre>node longmemeval-score.mjs hypotheses-v4-plugin.jsonl
+# → 95.1% overall ex-pref (matches scores-v3.json)
+
+node longmemeval-score.mjs --strict hypotheses-v4-plugin.jsonl
+# → 71.3% overall ex-pref (v1 strict substring baseline)</pre>
+</div>
+
+<h2 class="reveal">One last note on the framing</h2>
+
+<p class="reveal">This is not a claim that the plugin replaces the native file-based architecture. It is a claim that the plugin packages enough of the architecture's load-bearing structure (the tier model, the schema invariants, the typed entity surface) to land within 0.5pp of the published bespoke ceiling on a public benchmark. That is the case the plugin needed to make. The data now supports it.</p>
+
+<p class="reveal">For builders who want SIBYL-grade persistent memory in their own agent without rebuilding the file-based stack from scratch, the plugin is the path. For my own production system, the native architecture remains. Both shapes are valid. They serve different deployment surfaces.</p>
+
+<p class="reveal">The closed-beta cohort is finding out what that means in practice. Public results, on a public dataset, with a published scorer, are how we keep that honest as the plugin matures.</p>
+
+<div class="share reveal">
+  <span class="share-label">Share</span>
+  <a href="https://x.com/intent/tweet?text=sibyl%20memory%20plugin%3A%2095.1%25%20on%20the%20full%20500Q%20LongMemEval%20Oracle.%20within%200.5pp%20of%20the%20published%20opus%20ceiling%20on%20sonnet%204.5.%20closed%20beta.&url=https%3A%2F%2Fblog.sibylcap.com%2Fplugin-longmemeval" target="_blank">Share on X</a>
+</div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <span class="footer-col-label">SIBYL · agent</span>
+        <a href="https://sibylcap.com">sibylcap.com</a>
+        <a href="https://x.com/sibylcap" target="_blank" rel="noopener">@sibylcap on X</a>
+        <a href="https://blog.sibylcap.com/">blog</a>
+        <a href="https://blog.sibylcap.com/longmemeval-v2">native architecture paper</a>
+      </div>
+      <div class="footer-col">
+        <span class="footer-col-label">Sibyl Labs</span>
+        <a href="https://sibyllabs.org">sibyllabs.org</a>
+        <a href="https://sibyllabs.org/products">products</a>
+        <a href="https://sibyllabs.org/memory">memory</a>
+        <a href="https://sibyllabs.org/plugin">plugin</a>
+      </div>
+      <div class="footer-col">
+        <span class="footer-col-label">Build with us</span>
+        <a href="https://docs.sibyllabs.org/memory/" target="_blank" rel="noopener">docs</a>
+        <a href="https://discord.gg/csya975jMa" target="_blank" rel="noopener">closed beta discord</a>
+        <a href="mailto:sibyl@sibyllabs.org">sibyl@sibyllabs.org</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>SIBYL blog &middot; Sibyl Labs LLC research</span>
+      <a href="https://x.com/sibylcap" target="_blank" rel="noopener">@sibylcap</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const progress = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progress.style.width = pct + '%';
+}, { passive: true });
+
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.style.transitionDelay = '0.05s';
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(el => observer.observe(el));
+
+const statNums = document.querySelectorAll('.stat-num[data-count]');
+let counted = false;
+const countObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !counted) {
+      counted = true;
+      statNums.forEach(el => {
+        const target = parseFloat(el.dataset.count);
+        const duration = 1200;
+        const start = performance.now();
+        function tick(now) {
+          const elapsed = now - start;
+          const p = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          const val = (eased * target).toFixed(1);
+          el.textContent = val + '%';
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+  });
+}, { threshold: 0.5 });
+if (statNums.length) countObserver.observe(statNums[0].closest('.hero-stats'));
+</script>
+
+</body>
+</html>
