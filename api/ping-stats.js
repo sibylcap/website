@@ -3,8 +3,8 @@
    All data via raw RPC batch calls. No ping-sdk dependency. */
 
 var RPCS = [
-  'https://base-mainnet.g.alchemy.com/v2/REDACTED',
-  'https://base-mainnet.gateway.tatum.io/v4/REDACTED',
+  (process.env.BASE_RPC_URL || 'https://mainnet.base.org'),
+  'https://mainnet.base.org',
   'https://base.gateway.tenderly.co',
   'https://mainnet.base.org',
   'https://base.drpc.org',

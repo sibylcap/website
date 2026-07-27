@@ -17,8 +17,8 @@ var RELAY_ADDRESS = '0x30FAfe372734cfD29b46bAf9bd0361ffFf779fDF';
 var SEND_AMOUNT = parseEther('0.001');
 var SEND_AMOUNT_ETH_NUM = 0.001; // keep in sync with SEND_AMOUNT, used in pricing math
 var RPC_URLS = [
-  'https://base-mainnet.g.alchemy.com/v2/REDACTED',
-  'https://base-mainnet.gateway.tatum.io/v4/REDACTED',
+  (process.env.BASE_RPC_URL || 'https://mainnet.base.org'),
+  'https://mainnet.base.org',
   'https://base.gateway.tenderly.co',
   'https://mainnet.base.org',
   'https://base.drpc.org',

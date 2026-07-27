@@ -31,8 +31,8 @@ var PING_V1_ADDRESS = '0xcd4af194dd8e79d26f9e7ccff8948e010a53d70a';
 var CHAINLINK_ETH_USD = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70';
 var ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 var RPC_URLS = [
-  'https://base-mainnet.g.alchemy.com/v2/REDACTED',
-  'https://base-mainnet.gateway.tatum.io/v4/REDACTED',
+  (process.env.BASE_RPC_URL || 'https://mainnet.base.org'),
+  'https://mainnet.base.org',
   'https://base.gateway.tenderly.co',
   'https://mainnet.base.org',
   'https://base.drpc.org',

@@ -37,13 +37,13 @@ var PROVIDERS = [
     timeout: 10000,
   },
   {
-    url: 'https://base-mainnet.g.alchemy.com/v2/REDACTED',
+    url: (process.env.BASE_RPC_URL || 'https://mainnet.base.org'),
     maxLogRange: 10,         // free tier: 10 block range limit
     batchLimit: 100,
     timeout: 8000,
   },
   {
-    url: 'https://base-mainnet.gateway.tatum.io/v4/REDACTED',
+    url: 'https://mainnet.base.org',
     maxLogRange: 100,        // free tier: "Requested range is over limit of 100"
     batchLimit: 50,
     timeout: 8000,
