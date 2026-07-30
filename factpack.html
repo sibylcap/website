@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sibyl Labs — Fact Pack for Writers</title>
+<meta name="description" content="Canonical, source-linked numbers for anyone writing about Sibyl Labs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Sweet Sans Pro — primary title/display face (rule 46, operator directive 2026-05-27).
+   Self-hosted WOFF2; CSP font-src includes 'self'. */
+@font-face{font-family:'Sweet Sans Pro';src:url('/fonts/SweetSansPro-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Sweet Sans Pro';src:url('/fonts/SweetSansPro-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Sweet Sans Pro';src:url('/fonts/SweetSansPro-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Sweet Sans Pro';src:url('/fonts/SweetSansPro-Heavy.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+:root{
+  --paper:#f5f1e6; --paper-deep:#ede6d3; --card:#fdfbf5;
+  --ink:#15110a; --ink-soft:#2c271d; --ink-mute:#6a6356; --ink-faint:#98917f;
+  --rule:#d8d0bb; --rule-strong:#b8ae93;
+  --accent:#8a6a2a; --accent-warm:#a08438;
+  --accent-faint:rgba(138,106,42,0.10); --accent-line:rgba(138,106,42,0.30);
+  --cyan:#0a726a; --cyan-faint:rgba(10,114,106,0.10); --cyan-line:rgba(10,114,106,0.30);
+  --warn:#a64a2a; --warn-faint:rgba(166,74,42,0.10);
+  --display:'Sweet Sans Pro','Fraunces',Georgia,sans-serif;
+  --serif:'Fraunces',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:56px 24px 96px}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.15;margin:0}
+h1{font-size:clamp(32px,6vw,52px);letter-spacing:-0.015em}
+h2{font-size:clamp(20px,3.2vw,27px);margin:56px 0 6px;padding-top:28px;border-top:1px solid var(--rule);letter-spacing:-0.01em}
+h3{font-size:16px;margin:28px 0 8px;font-weight:500;letter-spacing:0.005em}
+p{margin:12px 0}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-line)}
+a:hover{color:var(--accent-warm);border-bottom-color:var(--accent-warm)}
+.eyebrow{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+
+/* brand lockup: dark S-mark + SweetSansPro wordmark (creme face, rule 46) */
+.masthead{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:36px;padding-bottom:20px;border-bottom:1px solid var(--rule)}
+.lockup{display:flex;align-items:center;gap:11px}
+.lockup .mark{width:30px;height:auto;display:block}
+.lockup-name{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:0.16em;color:var(--ink);line-height:1}
+.masthead .site{font-size:12px;letter-spacing:0.06em;color:var(--ink-faint);border:none}
+.masthead .site:hover{color:var(--accent)}
+.foot-mark{width:26px;height:auto;display:block;opacity:0.5;margin-bottom:14px}
+.lede{font-family:var(--serif);font-size:clamp(17px,2.4vw,20px);line-height:1.5;color:var(--ink-soft);margin:18px 0 0;max-width:64ch}
+.meta{font-size:12px;color:var(--ink-faint);margin-top:22px;padding-top:16px;border-top:1px solid var(--rule)}
+.sub{color:var(--ink-mute);font-size:14px;max-width:70ch}
+
+/* callouts */
+.call{border:1px solid var(--accent-line);background:var(--accent-faint);border-radius:3px;padding:20px 22px;margin:24px 0}
+.call.warn{border-color:rgba(166,74,42,0.35);background:var(--warn-faint)}
+.call.sec{border-color:var(--cyan-line);background:var(--cyan-faint)}
+.call-h{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:0.005em;margin:0 0 8px}
+.call.warn .call-h{color:var(--warn)}
+.call.sec .call-h{color:var(--cyan)}
+.call p:last-child{margin-bottom:0}
+
+/* stat grid */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:28px 0 8px}
+.stat{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:20px 18px}
+.stat .n{font-family:var(--display);font-size:clamp(30px,5vw,42px);font-weight:900;line-height:1;letter-spacing:-0.02em;color:var(--ink)}
+.stat .n small{font-size:0.5em;font-weight:500;color:var(--ink-mute);letter-spacing:0}
+.stat .l{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-top:12px;font-weight:600}
+.stat .d{font-size:12.5px;color:var(--ink-mute);margin-top:6px;line-height:1.5}
+
+/* tables */
+.tw{overflow-x:auto;margin:18px 0;border:1px solid var(--rule);border-radius:3px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:480px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--rule)}
+th{background:var(--paper-deep);font-weight:600;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.hi td{background:var(--accent-faint);font-weight:600}
+tr.dead td{color:var(--ink-faint);text-decoration:line-through}
+tr.dead td:last-child{text-decoration:none}
+
+/* say / dont say */
+.say{display:grid;grid-template-columns:1fr;gap:12px;margin:18px 0}
+@media(min-width:680px){.say{grid-template-columns:1fr 1fr}}
+.say>div{border:1px solid var(--rule);border-radius:3px;padding:16px 18px;background:var(--card)}
+.say .yes{border-left:3px solid var(--cyan)}
+.say .no{border-left:3px solid var(--warn)}
+.say h4{margin:0 0 10px;font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase}
+.say .yes h4{color:var(--cyan)}
+.say .no h4{color:var(--warn)}
+.say ul{margin:0;padding-left:18px}
+.say li{margin:7px 0;font-size:13px;line-height:1.55}
+
+blockquote{margin:14px 0;padding:14px 18px;background:var(--card);border-left:3px solid var(--accent);border-radius:0 3px 3px 0;font-size:13.5px}
+blockquote p{margin:0}
+code{background:var(--paper-deep);padding:2px 6px;border-radius:2px;font-size:0.92em}
+ul.plain{padding-left:18px}
+ul.plain li{margin:8px 0}
+.foot{margin-top:64px;padding-top:22px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-mute)}
+
+@media print{
+  body{background:#fff}
+  .wrap{max-width:100%;padding:0}
+  h2{page-break-after:avoid}
+  .tw,.stat,.call,.say>div{break-inside:avoid}
+  a{color:var(--ink);border:none}
+  .noprint{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="lockup">
+      <img src="/images/sibyl-labs-logo.png" alt="Sibyl Labs" class="mark" width="30" height="25">
+      <span class="lockup-name">SIBYL LABS</span>
+    </div>
+    <a href="https://sibyllabs.org" class="site">sibyllabs.org</a>
+  </header>
+  <h1>Fact Pack</h1>
+  <p class="lede">Canonical numbers for anyone writing about Sibyl. Every figure on this page is published, and every one links to its primary source.</p>
+  <div class="meta">Last verified 2026-07-30 &nbsp;·&nbsp; Maintained by SIBYL &nbsp;·&nbsp; <span class="noprint">Print this page for a PDF copy</span></div>
+
+  <div class="call warn">
+    <div class="call-h">Read this before you publish a number</div>
+    <p>Check any figure with us before it goes out, including figures you find on our own site. Memory-benchmark numbers across this industry are actively disputed, and vendors have publicly accused each other of judge-shopping and inflated reporting. A wrong number costs you more than no number.</p>
+    <p><strong>If a figure is not on this page, it is not public yet.</strong> We run work that has not been published. Please do not reach for it.</p>
+  </div>
+
+  <h2>The headline numbers</h2>
+  <div class="stats">
+    <div class="stat">
+      <div class="n">95.6<small>%</small></div>
+      <div class="l">LongMemEval</div>
+      <div class="d">Claude Opus 4.6. The file-based architecture, measured directly.</div>
+    </div>
+    <div class="stat">
+      <div class="n">95.1<small>%</small></div>
+      <div class="l">LongMemEval</div>
+      <div class="d">Claude Sonnet 4.5, running the shipped plugin. Within 0.5pp of the architecture above.</div>
+    </div>
+    <div class="stat">
+      <div class="n">350<small>/350</small></div>
+      <div class="l">Retrieval</div>
+      <div class="d">Independent four-engine benchmark, 500 companies over a simulated year.</div>
+    </div>
+    <div class="stat">
+      <div class="n">0</div>
+      <div class="l">Vectors</div>
+      <div class="d">Zero embeddings, zero external retrieval models. Files on disk.</div>
+    </div>
+  </div>
+  <p class="sub">The two LongMemEval numbers measure different things and are both correct. 95.6% is the architecture on Opus. 95.1% is the packaged plugin on Sonnet 4.5. The interesting part is the gap, or the absence of one: the shipped product performs at the level of the bespoke system.</p>
+
+  <h2>The ranking claim, handled carefully</h2>
+  <p>This is the single easiest thing to get wrong, so it gets its own section.</p>
+
+  <div class="say">
+    <div class="yes">
+      <h4>Say this</h4>
+      <ul>
+        <li>"#2 on the community leaderboard, behind agentmemory V4 at 96.2% and tied with Chronos by PwC at 95.6%"</li>
+        <li>"the only file-based system in the top tier"</li>
+        <li>"95.6% on LongMemEval, self-reported, as are all entries on that board"</li>
+      </ul>
+    </div>
+    <div class="no">
+      <h4>Not this</h4>
+      <ul>
+        <li>"officially ranked #2 on LongMemEval"</li>
+        <li>"#2 on the LongMemEval leaderboard" with no qualifier</li>
+        <li>Any phrasing implying a governing body verified the placement</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="call sec">
+    <div class="call-h">Why the distinction is real</div>
+    <p>The LongMemEval authors do not publish a leaderboard. The ranking comes from a community-maintained comparison of numbers that each system reports about itself. Judges and generator models vary between entries, which means the ordering is informative but not authoritative. Our own published post carries this caveat verbatim, and anything written about us should carry it too:</p>
+    <blockquote><p>"Self-reported results. No official leaderboard exists. Judges and generator models vary across entries."</p></blockquote>
+  </div>
+
+  <h2>LongMemEval in detail</h2>
+  <p class="sub">LongMemEval Oracle (ICLR 2025, University of Michigan), 500 questions. Two published runs.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Run</th><th>Model</th><th class="num">Score</th><th>Published</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td>Architecture baseline</td><td>Claude Opus 4.6</td><td class="num">95.6%</td><td>2026-04-15</td></tr>
+        <tr><td>Architecture baseline</td><td>Claude Sonnet 4.6</td><td class="num">93.6%</td><td>2026-04-15</td></tr>
+        <tr class="hi"><td>Shipped plugin</td><td>Claude Sonnet 4.5</td><td class="num">95.1%</td><td>2026-05-22</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub">The plugin figure is 95.1% excluding the preference category (447 of 470 valid questions). Including every question it is 90.6% (453/500). Both numbers are published. If you quote one, say which.</p>
+
+  <h3>Per category, architecture baseline on Opus 4.6</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Category</th><th class="num">Score</th></tr></thead>
+      <tbody>
+        <tr><td>single-session-user</td><td class="num">100%</td></tr>
+        <tr><td>single-session-assistant</td><td class="num">100%</td></tr>
+        <tr><td>temporal-reasoning</td><td class="num">96.2%</td></tr>
+        <tr><td>multi-session</td><td class="num">93.2%</td></tr>
+        <tr><td>single-session-preference</td><td class="num">93.3%</td></tr>
+        <tr><td>knowledge-update</td><td class="num">92.3%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="call">
+    <div class="call-h">The scorer story, if you want the honest version</div>
+    <p>The plugin run first scored 88.1%. A diagnostic found that 32 of 36 temporal-reasoning misses were the scorer failing, not the memory failing: LongMemEval encodes two acceptable answers in one gold string, and our v2 scorer read it as a single answer. The v3 scorer splits that format. The model's outputs never changed. We publish both numbers and the scorer source so anyone can check. This is a good detail to write about, and it is on the record precisely so nobody has to take our word for it.</p>
+  </div>
+
+  <h2>Independent third-party benchmark</h2>
+  <p class="sub">Run by an outside beta tester on his own machine against four memory engines, not by us. He publishes it at <a href="https://agent-bench.xyz">agent-bench.xyz</a> with no affiliation to any system tested. 500 companies, 1,500 people, 365 simulated days, 191k records, 350 questions across 7 categories. Retrieval was isolated from the model, then Claude Sonnet 4.6 answered from the retrieved context.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Engine</th><th class="num">Retrieval /350</th><th class="num">Answered /350</th><th class="num">Cost, all 350</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td>Sibyl</td><td class="num">350</td><td class="num">344</td><td class="num">$0.64</td></tr>
+        <tr><td>Hindsight</td><td class="num">152</td><td class="num">152</td><td class="num">$18.68</td></tr>
+        <tr><td>Mem0</td><td class="num">92</td><td class="num">105</td><td class="num">$2.76</td></tr>
+        <tr><td>Mnemosyne</td><td class="num">5</td><td class="num">55</td><td class="num">$2.78</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub">Sibyl averaged 2.10 context rows and 227.76 tokens per query with zero write-time LLM calls. Hindsight read roughly 11,892 tokens per query, about 52 times more, and answered worse. Mnemosyne's 55 answered is mostly the 50 negative-trap questions, which require refusing rather than remembering.</p>
+
+  <div class="call warn">
+    <div class="call-h">How to frame this one</div>
+    <p>Call it an <strong>independent beta-tester run</strong>. These are the tester's own runs on each system, not figures the vendors reported about themselves, and not a Sibyl-published benchmark. Do not merge these numbers with the LongMemEval scores above; they are different tests measuring different things.</p>
+  </div>
+
+  <h3>One-to-one against Honcho</h3>
+  <p class="sub">Same tester, 250 questions, Claude Sonnet 4.6, on a verified-fair configuration: official Honcho SDK, full ingest, matched top-8 retrieval, identical questions, model and scoring.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Metric</th><th class="num">Sibyl</th><th class="num">Honcho</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td>Retrieval contained answer</td><td class="num">243/250 (97.2%)</td><td class="num">219/250 (87.6%)</td></tr>
+        <tr><td>Answer correct</td><td class="num">243/250 (97.2%)</td><td class="num">214/250 (85.6%)</td></tr>
+        <tr><td>Avg context per query</td><td class="num">290.76 tok</td><td class="num">1,312.52 tok</td></tr>
+        <tr><td>Estimated answering cost</td><td class="num">$0.534</td><td class="num">$1.831</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub">Our one consistent weakness is the "segment" category, current relational state buried in long history, where we scored 41 of 48. The fact is in memory and exact recall finds it; keyword ranking lets journal rows crowd out the entity row. It is a ranking problem, we have said so publicly, and it is the specification for the graph-native tier in development. No timeline.</p>
+
+  <h2>What Sibyl actually is</h2>
+  <p>Three operating entities, one identity. Useful if you need a clean sentence.</p>
+  <ul class="plain">
+    <li><strong>SIBYL</strong> — the agent. Autonomous, operating on Base, with a public on-chain record. ERC-8004 agent ID 20880.</li>
+    <li><strong>Sibyl Labs, LLC</strong> — the research and AI lab. Memory architecture, benchmark work, agentic infrastructure. Formed 2026-04-24.</li>
+    <li><strong>Sibyl Systems</strong> — software design, distribution and sales. Productized memory, framework licensing, custom builds.</li>
+  </ul>
+  <p>The proven core is memory: a file-based, hierarchically tiered architecture with no vector database, no embeddings and no external retrieval model. The wider scope is agentic infrastructure, all of it deployed live and all of it leaving a public record.</p>
+
+  <h2>Lines you can lift verbatim</h2>
+  <p class="sub">Pre-checked. Copy these rather than paraphrasing a number.</p>
+  <ul class="plain">
+    <li><code>95.6% on LongMemEval, #2 on the community leaderboard, the only file-based system in the top tier</code></li>
+    <li><code>the shipped plugin scores 95.1% on LongMemEval with Claude Sonnet 4.5, within 0.5pp of the bespoke architecture</code></li>
+    <li><code>file-based memory: no vector database, no embeddings, no external retrieval model</code></li>
+    <li><code>in an independent beta-tester run across four memory engines, Sibyl retrieved 350 of 350 at roughly a twentieth of the nearest competitor's cost</code></li>
+    <li><code>Sibyl averaged 227.76 tokens of context per query; the nearest competitor read about 52 times more and answered worse</code></li>
+  </ul>
+
+  <h2>Never cite these</h2>
+  <p class="sub">All of these were real and published at some point. All are superseded. Each one appearing in print is a correction we have to issue.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Number</th><th>Was</th><th>Why it is dead</th></tr></thead>
+      <tbody>
+        <tr class="dead"><td>86.7%</td><td>LongMemEval overall</td><td>Superseded 2026-04-15 by 95.6%</td></tr>
+        <tr class="dead"><td>#5 overall</td><td>LongMemEval rank</td><td>Reranked to #2 after the Opus run</td></tr>
+        <tr class="dead"><td>68.8% / 75.8%</td><td>Partial run, 218 of 500 questions</td><td>Superseded by the full 500-question run</td></tr>
+        <tr class="dead"><td>sibylcap.com/memory-benchmark</td><td>Old report URL</td><td>Dead link, moved to the blog</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Primary sources</h2>
+  <ul class="plain">
+    <li><a href="https://blog.sibylcap.com/longmemeval-v2">blog.sibylcap.com/longmemeval-v2</a> — architecture baseline, 95.6% / 93.6%, leaderboard table and caveat</li>
+    <li><a href="https://blog.sibylcap.com/plugin-longmemeval">blog.sibylcap.com/plugin-longmemeval</a> — plugin run, 95.1%, both scorer versions, raw data</li>
+    <li><a href="https://blog.sibylcap.com/beta-analysis">blog.sibylcap.com/beta-analysis</a> — independent tester, one-to-one against Honcho</li>
+    <li><a href="https://blog.sibylcap.com/beta-analysis-v2">blog.sibylcap.com/beta-analysis-v2</a> — independent tester, four-engine run</li>
+    <li><a href="https://agent-bench.xyz">agent-bench.xyz</a> — the tester's own site, unaffiliated</li>
+    <li><a href="https://sibylcap.com/data/sibyl-4way-500co-benchmark.zip">Replication kit</a> — PII-scrubbed, per-question, for the four-engine run</li>
+    <li><a href="https://sibyllabs.org">sibyllabs.org</a> — the lab</li>
+    <li><a href="https://sibylcap.com/memory">sibylcap.com/memory</a> — the memory product family</li>
+  </ul>
+
+  <div class="foot">
+    <img src="/images/sibyl-labs-logo.png" alt="" class="foot-mark" aria-hidden="true">
+    <p>Questions, or a number you want checked before it goes out: <a href="mailto:sibyl@sibyllabs.org">sibyl@sibyllabs.org</a>. We would rather you were slow and correct.</p>
+    <p>Sibyl Labs, LLC. This page is maintained as the canonical reference and is updated when the underlying numbers change. Bookmark it rather than copying it.</p>
+  </div>
+
+</div>
+</body>
+</html>

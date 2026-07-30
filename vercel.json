@@ -17,7 +17,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://api.helixa.xyz data:; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://x402.org https://mainnet.base.org; frame-src 'self' blob: https://sibylcap.com https://partners.sibylcap.com"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://api.helixa.xyz data:; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://x402.org https://mainnet.base.org https://base.llamarpc.com https://base.drpc.org https://base.publicnode.com https://1rpc.io; frame-src 'self' blob: https://sibylcap.com https://partners.sibylcap.com"
         }
       ]
     },
@@ -96,6 +96,7 @@
     { "source": "/", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/index.html" },
     { "source": "/dashboard", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/dashboard.html" },
     { "source": "/messages", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/messages.html" },
+    { "source": "/vest", "has": [{ "type": "host", "value": "partners.sibylcap.com" }], "destination": "/partners/vest.html" },
     { "source": "/:path*", "has": [{ "type": "host", "value": "claim.sibylcap.com" }], "destination": "/claim.html" },
     { "source": "/", "has": [{ "type": "host", "value": "blog.sibylcap.com" }], "destination": "/blog/index.html" },
     { "source": "/:slug", "has": [{ "type": "host", "value": "blog.sibylcap.com" }], "destination": "/blog/:slug.html" }
@@ -105,7 +106,9 @@
     { "source": "/memory", "destination": "https://sibyllabs.org/memory", "permanent": true },
     { "source": "/blog", "has": [{ "type": "host", "value": "sibylcap.com" }], "destination": "https://blog.sibylcap.com", "permanent": true },
     { "source": "/blog/:slug*", "has": [{ "type": "host", "value": "sibylcap.com" }], "destination": "https://blog.sibylcap.com/:slug*", "permanent": true },
-    { "source": "/api/plugin/:path*", "destination": "https://api.sibyllabs.org/api/plugin/:path*", "permanent": true }
+    { "source": "/api/plugin/:path*", "destination": "https://api.sibyllabs.org/api/plugin/:path*", "permanent": true },
+    { "source": "/sibyl-vs-honcho", "has": [{ "type": "host", "value": "blog.sibylcap.com" }], "destination": "https://blog.sibylcap.com/beta-analysis", "permanent": true },
+    { "source": "/sibyl-vs-mem0", "has": [{ "type": "host", "value": "blog.sibylcap.com" }], "destination": "https://blog.sibylcap.com/beta-analysis-v2", "permanent": true }
   ],
   "cleanUrls": true,
   "trailingSlash": false

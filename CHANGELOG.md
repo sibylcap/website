@@ -1,5 +1,134 @@
 # website changelog
 
+## 2026-07-30 — SweetSansPro self-hosted on sibylcap.com + Sibyl Labs logo lockup on /factpack
+
+Operator directive: "update title fonts to Sweet Sans Pro and add the company logo where appropriate."
+
+FONTS: copied the 4-weight WOFF2 subset (Regular 400 / Medium 500 / Bold 700 / Heavy 900) from `sibyllabs/fonts/` into NEW `website/fonts/` — already-converted assets, no TTF->WOFF2 work needed. `@font-face` block on factpack.html matches the sibyllabs.org declaration verbatim (`font-display:swap`). Title-level type rebound from Fraunces to `--display:'Sweet Sans Pro'`: h1/h2 (700), h3 (500), stat numbers (900, the display moment), callout headers (700), say/not-this headers (700 uppercase + tracking). Fraunces DELIBERATELY RETAINED on the lede and body-serif accents per the visual-identity hierarchy (SweetSansPro = title tier, Fraunces = secondary/body-serif) — the serif lede against the geometric-sans headline is the intended contrast, not an oversight. Tracking tightened on the large sizes (-0.015em h1) since SweetSansPro sets wider than Fraunces at display size.
+
+**CSP FIX (would have silently failed):** `website/vercel.json` allowed `font-src https://fonts.gstatic.com` only, which blocks a self-hosted WOFF2 and falls back to Fraunces without an obvious visual break. Changed to `font-src 'self' https://fonts.gstatic.com` — one surgical token, no other directive touched. Verified post-deploy via headless render that `document.fonts` actually reports `Sweet Sans Pro 500/700/900` loaded, rather than trusting the CSS declaration.
+
+LOGO: `sibyllabs/sibyl-labs-logo.png` (the DARK ink S-mark — correct for a creme ground; the `-light` variant is the creme mark for dark grounds) copied to `website/images/sibyl-labs-logo.png`. Masthead lockup = 30px mark + "SIBYL LABS" wordmark set in SweetSansPro 700 at 0.16em tracking, mirroring the sibyllabs.org nav construction (mark + type, not a baked wordmark image). The `brand/sibyl-labs-wordmark-*.png` files were rejected: they are creme-colored, built for dark grounds, and would vanish on paper. Right side of the masthead carries `sibyllabs.org` so the URL travels with a printed copy. Second, faded mark (26px, 50% opacity) above the footer.
+
+/predeploy-check PASS (0 critical). Verified live: CSP header, all 4 WOFF2 at 200 `font/woff2`, logo 200, noindex intact, still absent from sitemap.
+
+## 2026-07-30 — Fact Pack for writers (`/factpack`) — canonical, source-linked numbers for KOL/press
+
+New page `website/factpack.html` -> https://sibylcap.com/factpack (noindex, nofollow; not in sitemap). Built as a REUSABLE canonical reference for any writer/KOL/press contact, not a one-off. Creme lab-face palette per rule 46 §2 (lab work product), Fraunces + IBM Plex Mono (SweetSansPro still not web-hosted). Infographic-style stat cards + print CSS so Cmd+P yields a clean PDF — covers the operator's "PDF or URL" ask with one maintained artifact instead of two.
+
+Contents, every figure read from `memory/reference/benchmarks.md` this session per rule 34 (never from session memory): headline stat cards (95.6% Opus / 95.1% plugin Sonnet 4.5 / 350-of-350 independent retrieval / zero vectors); LongMemEval two-run table + per-category; the independent 4-engine tester run (Sibyl 350/344/$0.64 vs Hindsight 152/152/$18.68, Mem0 92/105/$2.76, Mnemosyne 5/55/$2.78) with agent-bench.xyz attribution; the Honcho 1:1; the segment/ranking weakness stated openly; lift-verbatim citation lines; a "never cite these" dead-numbers table (86.7%, #5, 68.8%/75.8%, the dead benchmark URL).
+
+RANKING-CLAIM GUARD (the main reason the page exists): WebFetch of the canonical LongMemEval site (xiaowu0162.github.io/long-mem-eval) confirmed it publishes NO leaderboard, so "#2 on LongMemEval" is not sourceable from the benchmark's own site. WebFetch of our own blog/longmemeval-v2 confirmed we publish it correctly as "#2 on the community leaderboard ... Self-reported results. No official leaderboard exists. Judges and generator models vary across entries." The page carries a say-this / not-this panel so a writer cannot flatten it into an unqualified "officially ranked #2". Unpublished internal work (BEAM, Phase A product-memory suite) deliberately excluded, with the page stating "if a figure is not on this page, it is not public yet."
+
+/predeploy-check PASS (0 critical, 18 pre-existing tx-hash warns, none from this file). Verified live: 200, noindex present, absent from sitemap, fonts confirmed Fraunces + IBM Plex Mono only (the grep hits for banned "inter"/"syne" were the substrings in "interesting" and "Mnemosyne").
+
+## 2026-07-30 — Sovereign blog synced to operator's X-article text edits
+
+Operator published the article on X (@sibyl_labs_, status 2082731836359479403, banner as cover) with live text edits; ported the 9 wording edits back to blog/sovereign.html so both surfaces match: reworked two-paragraph opening ("Executives... similar failures... or an agent"), "So, they've waited. And, they have been right to." + "the model usually behaves", standalone "Sibyl Sovereign is our answer." paragraph, "customer's admins watch", NEW persona-research sentence ("Our research is showing persona can have a dramatic effect... tied to certain job roles"), "run by an independent tester" simplification, "And token consumption drops dramatically." appended to Memory pillar, Integrations name-drops (O365, Google Workspace, SolidWorks, LangGraph), auditor answer rewrite ("in-depth analytics and auditable reports... Nothing else will suffice."), closer rewrite ("reduce the frequency of these mistakes... impossible for them to be executed"). Typos normalized while porting: "Lang Graph"->"LangGraph", "agents rules"->"agents' rules". X-format cuts NOT ported (Education section, diagrams, byline stay in blog as-is). Gate PASS, deployed, all 8 edit markers verified live.
+
+## 2026-07-30 — Sibyl Sovereign blog post PUBLISHED
+
+Operator called the publish. blog/sovereign.html: robots noindex,nofollow -> index,follow (+ canonical link added); Draft meta-tag -> "July 30, 2026" date. blog/index.html: new featured card at top (gold .tag-governance class added; title "The agent can be wrong. The gate cannot.", no stat-grid — governance post, no numbers to flex). sitemap.xml: /sovereign entry added (2026-07-30, priority 0.9). Gate PASS, deployed, all four surfaces verified live (robots, date, index card, sitemap). NOTE: sitemap's blog section predates aegis/beta-analysis/beta-analysis-v2/plugin-longmemeval — those four are still missing from it (pre-existing gap, not touched; flag for the next SEO pass). Operator drafting the X post himself.
+
+## 2026-07-29 — Sovereign blog: "What sovereign actually means." section + .vercelignore env hardening
+
+Added a new H2 section to `blog/sovereign.html` (between "Education is the other half" and the closer), per operator directive: sovereign names where authority lives — the operator governs the fleet as they see fit; strict governance and guaranteed compliance for those who want it, wide latitude for those who don't; the gate holds whatever boundaries the operator draws ("A wide charter is still a charter."). Drafted via sonnet against the page's register, edited to kill two "not X. It Y" spines. Read time bumped 8→9 min. Page remains `noindex, nofollow` Draft — this deploy is the team preview, NOT the public publish (publish checklist still pending: remove noindex, add blog index card). ALSO: added `.env*` block to `website/.vercelignore` (was only in `.gitignore`) — a deploy would previously have shipped `website/.env.local` as a fetchable static file. /predeploy-check PASS (0 critical) pre-deploy; post-deploy verified live on blog.sibylcap.com/sovereign + sibylcap.com/blog/sovereign and `/.env.local` → 404. FOLLOW-UP same day: fixed figure/text misalignment (operator report: images not centered) — paragraphs were `max-width:62ch` while figures spanned the full 672px container, so images jutted past the text edge; unified to one measure by dropping the 62ch/58ch caps on `.article-body p` + `.lede` (figures keep full size for SVG label legibility). Redeployed, gate PASS. SECOND FOLLOW-UP same day: average-reader readability pass (operator: 'slightly more readable, do not dumb down') — sonnet reviewed through a lay-reader lens, proposed 12 surgical edits; applied all 12 with 5 adjusted in review (kept 'deterministic' at first use with an in-line gloss; softened the tamper-evident gloss to 'any alteration is detectable' to avoid overclaiming; deduped two contrast tails in the Memory pillar; 'working mind' -> 'working memory'). Jargon glossed or replaced: probabilistic system, enforcement layer, compliance posture, fail closed, tamper-evident, cryptographically sealed, statistical recall, single-source-of-truth, structural blind spots, context discipline. Zero em dashes maintained. Redeployed, gate PASS. THIRD FOLLOW-UP: ten-dollar-word sweep (operator: 'humans RARELY speak like this' re corollaries) — corollaries->consequences, counterparty->business partner, wide latitude->far more room, accommodates both postures with equal fidelity->supports both equally, posture->boundaries (x2), distinction legible->difference visible. 'The model proposes; the gate disposes' kept deliberately (idiom, explained in context both times it appears). Redeployed, gate PASS.
+
+The same Alchemy RPC key was hardcoded across `api/{ping-cache,fund,portfolio,ping-stats,pingcast}.js` (server-side serverless functions — in-repo exposure, not browser-served). Replaced each literal with `process.env.BASE_RPC_URL || 'https://mainnet.base.org'` so the key lives in env, with a public fallback that never breaks. Source fixed on disk; not yet deployed. **Before redeploying: set `BASE_RPC_URL` in the website Vercel project env** — otherwise the getLogs-heavy endpoints (ping-cache/ping-stats/pingcast) fall back to rate-limited public RPC. Key rotation deferred (operator: low risk).
+
+## 2026-07-16 — /api/b20-audit → $0.10 + public demo OFF + internal-key bypass
+
+Operator directive during the e2e test. Price raised $0.01 → $0.10 (matches the b20_audit ACP
+offering). Public free demo (`?demo=true`) DISABLED (`allowDemo:false`) — the gate lib's 1/day
+cap is tracked in-memory per serverless instance and did NOT reliably enforce (repeated demo
+calls went through), so external callers now pay $0.10 via x402 with no free path. Our own ACP
+fulfillment watcher bypasses the paywall via a shared secret header `x-internal-key`
+(`B20_INTERNAL_KEY`; set on Vercel + a `600` env file on the data drive, outside the repo) —
+we operate both sides, so fulfillment stays free and decoupled from the demo policy. Watcher's
+`fetchAudit` now sends the header instead of `demo=true`. **Cache-bypass fixed** (caught by the
+e2e control test): the successful-audit 200 set `s-maxage=60`, so the CDN cached it by token URL
+and served the paid/internal result to subsequent UNPAID callers for 60s. Now `no-store`.
+
+## 2026-07-16 — /api/b20-audit reliability: sequential fallback (end-to-end test fix)
+
+End-to-end ACP test surfaced that the endpoint returned nulls (`no totalSupply`) from
+production even though all public RPCs (base.org / 1rpc / publicnode / drpc) return real
+data + support batch when called from our EC2 box. Root cause: **Vercel-specific** — public
+RPCs rate-limit datacenter IPs and 1rpc rejects multi-element batches, so the batched read
+comes back empty on Vercel while single `eth_call`s still succeed. Fix: `batchOrSequential()`
+— try the batch fast-path, then fill any missing ids via **sequential single eth_calls**
+(widely accepted, incl. from Vercel). Added `base-rpc.publicnode.com` to the RPC stack.
+Slower on the fallback path but reliable, which is what a paid 10-min-SLA offering needs.
+
+## 2026-07-16 — /api/b20-audit DEPLOYED to prod + rpcBatch fallback fix
+
+Deployed `website/api/b20-audit.js` to production (`vercel --prod`, aliased sibylcap.com) as
+part of the reconstructed-session wrap-up. Live-verify surfaced a real bug: `BASE_RPC_URL`
+resolves to `https://1rpc.io/base`, which **does not support JSON-RPC batch** — it returns a
+non-array 200, so `rpcBatch()` fell into its `arr = [arr]` wrap path and returned an empty/
+mismatched result set, making every audit bail with "no totalSupply." Fix: `rpcBatch()` now
+treats any **non-array or wrong-length** batch response as "batch unsupported" and falls
+through to the next RPC (`mainnet.base.org`, which supports batch + recent archive), instead
+of returning a broken result. Verified live against $BRIAN post-fix. payTo still Bankr
+(shared `_x402` config; cold #2 cutover remains a separate rule-6/7 item).
+
+## 2026-07-15 — NEW x402 endpoint: /api/b20-audit (B20 token control audit)
+
+New `website/api/b20-audit.js` — a paid x402 endpoint ($0.01 USDC, 1 free demo/day) that
+audits a **B20 token** (Base's native precompile token standard, Beryl upgrade) for its real
+control surface. Standard explorers + cast/forge + free RPCs cannot decode B20 (1-byte `0xef`
+code stub, `owner()`/`paused()` revert, unverified source); this reads the precompile directly.
+- Pure-JS (no cast/foundry/puppeteer): reads name/symbol/decimals/totalSupply/**supplyCap**/
+  **isPaused**(transfer/mint/burn)/**policyId**(4 transfer scopes) in one batched round-trip;
+  **binary-searches the creation block** via archive `totalSupply()`; reads the creation-window
+  events for deployer + initial holder; **`hasRole`** (DEFAULT_ADMIN/MINT/PAUSE/BURN_BLOCKED)
+  across every creation-path party in one batch. Returns a verdict (`no_admin_control` /
+  `admin_active` / `no_admin_partial`) + risk + the honest B20-enumeration limit + disclaimer.
+- Verified live against $BRIAN (`0xB200…cB301`): `no_admin_control`, admin renounced, supply
+  capped at total, unpaused, policies open — matches the manual forensic audit exactly.
+- Selectors + role/scope hashes embedded (no keccak dep). RPC via `process.env.BASE_RPC_URL`
+  + public fallbacks — **no hardcoded keys** (rule 51). **Deploy note:** point `BASE_RPC_URL`
+  at a fast archive RPC (Alchemy) on Vercel so the binary search runs in ~2-3s, not ~40s on
+  rate-limited public RPCs. Backs the `/b20-audit` skill and the (draft) ACP offering.
+- NOT yet deployed (operator `vercel --prod` go) and payTo still Bankr (cold #2 cutover pending).
+
+## 2026-07-06 — blog/aegis.html PUBLISHED: Aegis release post (blog.sibylcap.com/aegis)
+
+New `website/blog/aegis.html`, live at **https://blog.sibylcap.com/aegis** via the
+existing `blog.sibylcap.com/:slug -> /blog/:slug.html` cleanUrls rewrite. Release
+announcement for AEGIS: the coordinated hardening super-patch across all five Sibyl
+Memory packages (`client 0.4.19` / `cli 0.3.19` / `hermes 0.3.13` / `mcp 0.1.12`) plus
+the first public LangGraph adapter (`sibyl-memory-langgraph 0.1.0`, `SibylStore`).
+- Cloned the head/SEO/nav/link-strip/footer/CSS/typography from `blog/plugin-longmemeval.html`
+  (dark theme, Space Grotesk / IBM Plex) so it reads native to the blog. Dropped the
+  benchmark-only machinery (bar charts, count-up stats, chart CSS); no benchmark numbers.
+- Content lifted verbatim from `memory/research/aegis-x-article-2026-07-06.md`: Why this
+  matters, The hardening by theme (reliability, multi-tenant, privacy, security), The
+  LangGraph adapter (python `SibylStore` sample as a code box), What this enables, Versions
+  and upgrading, Verification. Zero em dashes (middots/periods only).
+- Version table rendered as a proper styled HTML `<table>` (5 rows, langgraph row highlighted
+  as first release). Install commands in a styled command box. Repo linked.
+- SEO: `<title>`, meta description/keywords, canonical, Open Graph (article), Twitter
+  summary_large_image, JSON-LD TechArticle (datePublished 2026-07-06, author SIBYL /
+  publisher Sibyl Labs, mainEntityOfPage canonical). `robots: index, follow` (public post).
+- Hero/OG image `images/aegis-og.png` (2400x1350 creme emblem card) referenced as
+  og:image + twitter:image and shown as the in-page hero.
+- Added Aegis as the newest featured card on `blog/index.html` (release · hardening tag,
+  release-fact stat grid, no benchmark numbers).
+
+## 2026-07-06 — blog/plugin-longmemeval.html current-versions line: AEGIS
+
+Closed-beta "current:" list updated to `client 0.4.19` / `cli 0.3.19` /
+`hermes 0.3.13` / `mcp 0.1.12` in lockstep with the AEGIS PyPI publish (35-finding
+hardening super-patch + first LangGraph adapter 0.1.0). Benchmark numbers
+untouched (attributed to hermes 0.3.5 / client 0.4.2).
+## 2026-07-05 — blog/plugin-longmemeval.html current-versions line bump
+
+Closed-beta status paragraph "current:" list updated to `sibyl-memory-client 0.4.18`
+(hermes 0.3.12 / cli 0.3.18 / mcp 0.1.11 unchanged) in lockstep with the 2026-07-05
+PyPI publish (FREE-tier account-level cap aggregation, staging PR #10 adapted).
+Benchmark numbers untouched — the result remains attributed to hermes 0.3.5 / client 0.4.2.
+
 ## 2026-06-30 — blog/plugin-longmemeval.html current-versions line bump
 
 Closed-beta status paragraph "current:" list updated to `sibyl-memory-hermes 0.3.12`, `sibyl-memory-client 0.4.17`, `sibyl-memory-cli 0.3.18`, `sibyl-memory-mcp 0.1.11` in lockstep with the 2026-06-30 PyPI publish (summarizer privacy + bounty audit release). Benchmark numbers untouched — the result remains attributed to hermes 0.3.5 / client 0.4.2.
