@@ -1,5 +1,13 @@
 # website changelog
 
+## 2026-08-22 — plugin-longmemeval "current" versions: client 0.7.0 / cli 0.3.23 / mcp 0.1.14 / hermes 0.3.16
+
+`blog/plugin-longmemeval.html` "current:" list updated to the multi-language search part 4 release (N4/N5/N1'-diagnostics, closing what 0.6.1 left open per an independent adversarial re-verification). Benchmark attribution untouched (result remains attributed to hermes 0.3.5 / client 0.4.2, per rule 34).
+
+## 2026-08-01 — plugin-longmemeval "current" versions: hermes 0.3.14
+
+`blog/plugin-longmemeval.html` "current:" list updated `sibyl-memory-hermes 0.3.13` → `0.3.14` (first-party Docker bundle + `SIBYL_TENANT_ID` env override; verified on hermes-agent 0.19.0). Benchmark attribution untouched (result remains attributed to hermes 0.3.5 / client 0.4.2). The dated AEGIS release post + blog table intentionally left showing 0.3.13 (historical record of that release).
+
 ## 2026-07-30 — SweetSansPro self-hosted on sibylcap.com + Sibyl Labs logo lockup on /factpack
 
 Operator directive: "update title fonts to Sweet Sans Pro and add the company logo where appropriate."
